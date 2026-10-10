@@ -27,7 +27,7 @@ Project Root
 ├── dashboard1.html             # Finalized Core Dashboard HTML & Modals
 ├── dashboard1.css              # Custom CSS Design System, Components & Media Queries
 ├── dashboard1.js               # Application Logic, DOM Event Listeners & State Binding
-├── dashboard1-react.js         # Native React 18 Interactive Telemetry & Forecaster Modules
+├── dashboard1-react.js         # Native React 18 Interactive Telemetry Modules
 ├── studentsData.js             # Central Data Layer: 70-Student Roster, Faculty Auth & Calendar Events
 │
 ├── backend/                    # Spring Boot 3.2.4 Full-Stack Enterprise Java Backend
@@ -51,10 +51,6 @@ Project Root
 - **Faculty Profile Lock**: Logged-in faculty members are locked to their assigned subject portfolio and cannot impersonate or switch into another faculty member's profile.
 
 ### 2. Native React 18 Interactive Modules
-- **Student Attendance Compliance & What-If Forecaster**:
-  - Automatically assesses Mumbai University / APSIT 75% attendance threshold rules.
-  - Interactive simulator allows students to project the mathematical impact of attending or missing upcoming lectures.
-  - Dynamically calculates the **Safe Absence Buffer** or exact **Lectures Needed** to regain good standing.
 - **Faculty Real-Time Cohort Telemetry & Defaulter Insights**:
   - Live cohort health distribution: **Eligible ($\ge 75\%$)**, **Warning ($60-74\%$)**, and **Critical Defaulters ($< 60\%$)**.
   - Real-time batch average indicator synchronized instantly across class records.
