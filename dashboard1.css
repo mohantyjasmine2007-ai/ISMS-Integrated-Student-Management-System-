@@ -1,9 +1,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
-        body {
-            background-color: #f5f7fb;
-            font-family: Arial, sans-serif;
-        }
+:root {
+    --app-bg: #f5f7fb;
+    --app-surface: #ffffff;
+    --app-card-bg: #ffffff;
+    --app-text: #1e293b;
+    --app-text-muted: #64748b;
+    --app-border: #e2e8f0;
+    --app-primary: #123b6d;
+    --app-primary-hover: #0a254a;
+    --app-sidebar-bg: #ffffff;
+    --app-sidebar-border: #e2e8f0;
+    --app-input-bg: #ffffff;
+    --app-input-border: #cbd5e1;
+    --app-input-text: #1e293b;
+}
+
+[data-theme="dark"] {
+    --app-bg: #0b1329;
+    --app-surface: #101c38;
+    --app-card-bg: #132244;
+    --app-text: #e2e8f0;
+    --app-text-muted: #94a3b8;
+    --app-border: #1e335e;
+    --app-primary: #3b82f6;
+    --app-primary-hover: #2563eb;
+    --app-sidebar-bg: #0d172e;
+    --app-sidebar-border: #192a4e;
+    --app-input-bg: #18284e;
+    --app-input-border: #294073;
+    --app-input-text: #f8fafc;
+}
+
+body {
+    background-color: var(--app-bg) !important;
+    color: var(--app-text);
+    font-family: Arial, sans-serif;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
 
         .navbar {
             background: #123b6d !important;
@@ -282,3 +316,253 @@
             letter-spacing: 1px;
             font-weight: 600;
         }
+
+/* ==========================================================================
+   Dark Mode Theme Overrides
+   ========================================================================== */
+[data-theme="dark"] .sidebar {
+    background: var(--app-sidebar-bg) !important;
+    border-right-color: var(--app-sidebar-border) !important;
+}
+
+[data-theme="dark"] .sidebar .nav-link {
+    color: var(--app-text-muted) !important;
+}
+
+[data-theme="dark"] .sidebar .nav-link:hover,
+[data-theme="dark"] .sidebar .nav-link.active {
+    background-color: #1e3a6c !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .card:not(.welcome-card) {
+    background-color: var(--app-card-bg) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .card-header,
+[data-theme="dark"] .card-footer {
+    background-color: var(--app-surface) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .bg-light {
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .table {
+    --bs-table-bg: var(--app-card-bg);
+    --bs-table-color: var(--app-text);
+    --bs-table-border-color: var(--app-border);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--app-surface) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: #1e335e !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-color: var(--app-border) !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--app-input-bg) !important;
+    border-color: var(--app-input-border) !important;
+    color: var(--app-input-text) !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background-color: var(--app-input-bg) !important;
+    color: #ffffff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+}
+
+[data-theme="dark"] .input-group-text {
+    background-color: var(--app-surface) !important;
+    border-color: var(--app-input-border) !important;
+    color: var(--app-text-muted) !important;
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: var(--app-surface) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .modal-footer.bg-light {
+    background-color: var(--app-card-bg) !important;
+    border-color: var(--app-border) !important;
+}
+
+[data-theme="dark"] .border,
+[data-theme="dark"] .border-bottom,
+[data-theme="dark"] .border-top,
+[data-theme="dark"] .border-end {
+    border-color: var(--app-border) !important;
+}
+
+[data-theme="dark"] .list-group-item {
+    background-color: var(--app-card-bg) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--app-text-muted) !important;
+}
+
+[data-theme="dark"] .breadcrumb-item a {
+    color: #60a5fa !important;
+}
+
+[data-theme="dark"] .breadcrumb-item.active {
+    color: var(--app-text-muted) !important;
+}
+
+[data-theme="dark"] .accordion-item {
+    background-color: var(--app-card-bg) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .accordion-button {
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .accordion-button:not(.collapsed) {
+    background-color: #1e335e !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Account Settings Modal Specific Styles
+   ========================================================================== */
+.settings-sidebar {
+    background-color: var(--app-bg);
+}
+
+.settings-user-badge {
+    background-color: var(--app-surface);
+    border: 1px solid var(--app-border) !important;
+}
+
+.settings-avatar-circle {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #123b6d 0%, #2878c8 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(18, 59, 109, 0.25);
+    margin: 0 auto;
+}
+
+.settings-tabs .nav-link {
+    color: var(--app-text);
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.settings-tabs .nav-link:hover {
+    background-color: rgba(18, 59, 109, 0.08);
+}
+
+[data-theme="dark"] .settings-tabs .nav-link:hover {
+    background-color: rgba(59, 130, 246, 0.15);
+}
+
+.settings-tabs .nav-link.active {
+    background-color: #123b6d !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(18, 59, 109, 0.2);
+}
+
+.settings-tabs .nav-link.active i {
+    color: white !important;
+}
+
+[data-theme="dark"] .settings-tabs .nav-link.active {
+    background-color: #2563eb !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.official-academic-card {
+    border: 1px dashed var(--app-border) !important;
+}
+
+/* Theme Preference Cards */
+.theme-card {
+    border: 2px solid var(--app-border) !important;
+    border-radius: 12px !important;
+    background-color: var(--app-surface);
+    cursor: pointer;
+    transition: all 0.22s ease-in-out;
+}
+
+.theme-card:hover {
+    transform: translateY(-3px);
+    border-color: #3b82f6 !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.theme-card.active {
+    border-color: #2563eb !important;
+    background-color: rgba(37, 99, 235, 0.05) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+.theme-card.active .theme-card-badge .badge {
+    background-color: #2563eb !important;
+    color: white !important;
+}
+
+[data-theme="dark"] .theme-card.active {
+    background-color: rgba(37, 99, 235, 0.15) !important;
+    border-color: #60a5fa !important;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25) !important;
+}
+
+[data-theme="dark"] .theme-card.active .theme-card-badge .badge {
+    background-color: #3b82f6 !important;
+    color: white !important;
+}
+
+/* Form switch enhancements */
+.form-switch .form-check-input {
+    cursor: pointer;
+}
+
+.form-switch-lg .form-check-input {
+    width: 2.75em;
+    height: 1.5em;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+

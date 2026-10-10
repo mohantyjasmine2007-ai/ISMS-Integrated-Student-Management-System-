@@ -2,6 +2,9 @@ let activeFacultyObj = null;
 
     // Initialize application on load
     document.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        initSettingsModalEvents();
+
         const urlParams = new URLSearchParams(window.location.search);
         const isFaculty = isFacultyRole();
         const facultyNavItem = document.getElementById('sidebarFacultyNavItem');
@@ -972,4 +975,635 @@ let activeFacultyObj = null;
         a.href = url;
         a.download = `APSIT_${activeFacultyObj.subjectKey}_Roster.csv`;
         a.click();
+    }
+
+    // ==========================================================================
+    // THEME PREFERENCE ENGINE (System, Light, Dark)
+    // ==========================================================================
+    const THEME_STORAGE_KEY = 'apsit-isms-theme-preference';
+
+    function getThemePreference() {
+        try {
+            return localStorage.getItem(THEME_STORAGE_KEY) || 'system';
+        } catch(e) {
+            return 'system';
+        }
+    }
+
+    function resolveTheme(preference) {
+        if (preference === 'system') {
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        return (preference === 'dark') ? 'dark' : 'light';
+    }
+
+    function applyTheme(preference, isLivePreview = false) {
+        const resolved = resolveTheme(preference);
+        document.documentElement.setAttribute('data-theme', resolved);
+        document.documentElement.setAttribute('data-bs-theme', resolved);
+        highlightThemeCard(preference);
+        updateThemeBadge(preference, resolved);
+        if (!isLivePreview) {
+            try {
+                localStorage.setItem(THEME_STORAGE_KEY, preference);
+            } catch(e) {}
+        }
+    }
+
+    function selectThemePreference(preference) {
+        // Immediate Live Preview
+        applyTheme(preference, true);
+        highlightThemeCard(preference);
+        updateThemeBadge(preference, resolveTheme(preference));
+    }
+
+    function saveThemePreferenceConfirm() {
+        const activeCard = document.querySelector('.theme-card.active');
+        let selected = 'system';
+        if (activeCard) {
+            if (activeCard.id === 'themeCardLight') selected = 'light';
+            else if (activeCard.id === 'themeCardDark') selected = 'dark';
+            else selected = 'system';
+        }
+        applyTheme(selected, false);
+        showSettingsAlert('success', `<i class="bi bi-check-circle-fill me-2"></i>Theme preference <strong>${selected.toUpperCase()}</strong> saved permanently!`);
+    }
+
+    function highlightThemeCard(preference) {
+        const systemCard = document.getElementById('themeCardSystem');
+        const lightCard = document.getElementById('themeCardLight');
+        const darkCard = document.getElementById('themeCardDark');
+        if (!systemCard || !lightCard || !darkCard) return;
+
+        systemCard.classList.remove('active');
+        lightCard.classList.remove('active');
+        darkCard.classList.remove('active');
+
+        if (preference === 'light') {
+            lightCard.classList.add('active');
+        } else if (preference === 'dark') {
+            darkCard.classList.add('active');
+        } else {
+            systemCard.classList.add('active');
+        }
+    }
+
+    function updateThemeBadge(preference, resolved) {
+        const badge = document.getElementById('appearanceCurrentStatusBadge');
+        if (!badge) return;
+        const res = resolved || resolveTheme(preference);
+        if (preference === 'system') {
+            badge.textContent = `Theme: System (${res === 'dark' ? 'Dark' : 'Light'})`;
+            badge.className = 'badge bg-primary px-3 py-1';
+        } else if (preference === 'light') {
+            badge.textContent = 'Theme: Light (Active)';
+            badge.className = 'badge bg-warning text-dark px-3 py-1';
+        } else {
+            badge.textContent = 'Theme: Dark (Active)';
+            badge.className = 'badge bg-info px-3 py-1';
+        }
+    }
+
+    function initTheme() {
+        const pref = getThemePreference();
+        const resolved = resolveTheme(pref);
+        document.documentElement.setAttribute('data-theme', resolved);
+        document.documentElement.setAttribute('data-bs-theme', resolved);
+
+        if (window.matchMedia) {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const handleOSThemeChange = (e) => {
+                const currentPref = getThemePreference();
+                // IMPORTANT: Only auto-update if the user's preference is 'system'!
+                if (currentPref === 'system') {
+                    const newResolved = e.matches ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', newResolved);
+                    document.documentElement.setAttribute('data-bs-theme', newResolved);
+                    updateThemeBadge('system', newResolved);
+                }
+            };
+            if (mediaQuery.addEventListener) {
+                mediaQuery.addEventListener('change', handleOSThemeChange);
+            } else if (mediaQuery.addListener) {
+                mediaQuery.addListener(handleOSThemeChange);
+            }
+        }
+    }
+
+    // ==========================================================================
+    // ACCOUNT SETTINGS MODAL CONTROLLER
+    // ==========================================================================
+    function initSettingsModalEvents() {
+        const settingsModalEl = document.getElementById('settingsModal');
+        if (settingsModalEl) {
+            settingsModalEl.addEventListener('show.bs.modal', () => {
+                populateSettingsModal();
+            });
+        }
+    }
+
+    function populateSettingsModal() {
+        const isFaculty = isFacultyRole();
+        dismissSettingsAlert();
+
+        if (isFaculty) {
+            const faculty = getCurrentFaculty() || (typeof FACULTY_LIST !== 'undefined' ? FACULTY_LIST[0] : null);
+            if (!faculty) return;
+
+            const avatarEl = document.getElementById('settingsAvatarPreview');
+            if (avatarEl) {
+                const initials = faculty.name ? faculty.name.split(' ').map(n => n[0]).slice(0, 2).join('') : 'FC';
+                avatarEl.innerHTML = `<span class="fw-bold">${initials}</span>`;
+            }
+            const userTitle = document.getElementById('settingsSidebarUserName');
+            if (userTitle) userTitle.textContent = faculty.title || faculty.name;
+
+            const userEmail = document.getElementById('settingsSidebarUserEmail');
+            if (userEmail) userEmail.textContent = faculty.email || 'faculty@apsit.edu.in';
+
+            const roleBadge = document.getElementById('settingsSidebarRoleBadge');
+            if (roleBadge) {
+                roleBadge.textContent = 'Faculty • Information Technology';
+                roleBadge.className = 'badge bg-warning-subtle text-warning fw-semibold px-2 py-1 mx-auto';
+            }
+
+            const lblIdent = document.getElementById('lblProfileIdentifier');
+            if (lblIdent) lblIdent.textContent = 'Faculty Name (Official Record)';
+            const lblMoodle = document.getElementById('lblProfileMoodleId');
+            if (lblMoodle) lblMoodle.textContent = 'Faculty Employee ID';
+            const lblRoll = document.getElementById('lblProfileRollNo');
+            if (lblRoll) lblRoll.textContent = 'Designation Code';
+
+            const nameInput = document.getElementById('settingsFullName');
+            if (nameInput) nameInput.value = faculty.name;
+
+            const idInput = document.getElementById('settingsMoodleId');
+            if (idInput) idInput.value = faculty.id;
+
+            const rollInput = document.getElementById('settingsRollNo');
+            if (rollInput) rollInput.value = faculty.designation || 'Asst. Professor';
+
+            const deptInput = document.getElementById('settingsDepartment');
+            if (deptInput) deptInput.value = faculty.department || 'Information Technology';
+
+            const semInput = document.getElementById('settingsSemester');
+            if (semInput) semInput.value = 'Academic Year 2026-27';
+
+            const divInput = document.getElementById('settingsDivision');
+            if (divInput) divInput.value = `${(faculty.subjectKey || '').toUpperCase()} In-Charge`;
+
+            const emailInput = document.getElementById('settingsEmail');
+            if (emailInput) emailInput.value = faculty.email || '';
+
+            const phoneInput = document.getElementById('settingsPhone');
+            if (phoneInput) phoneInput.value = faculty.phone || '+91 9820011223';
+
+            const addrInput = document.getElementById('settingsAddress');
+            if (addrInput) addrInput.value = faculty.cabinLocation || 'Faculty Cabin 304, IT Dept, APSIT Thane';
+
+            const pwdStatus = document.getElementById('settingsPasswordLastChanged');
+            if (pwdStatus) {
+                pwdStatus.textContent = faculty.passwordLastChanged 
+                    ? `Last modified: ${new Date(faculty.passwordLastChanged).toLocaleDateString()}` 
+                    : 'Default Institutional Credential';
+            }
+        } else {
+            const student = getCurrentUser() || (typeof getLiveStudents === 'function' ? getLiveStudents()[0] : null);
+            if (!student) return;
+
+            const avatarEl = document.getElementById('settingsAvatarPreview');
+            if (avatarEl) {
+                const initials = student.name ? student.name.split(' ').map(n => n[0]).slice(0, 2).join('') : 'ST';
+                avatarEl.innerHTML = `<span class="fw-bold">${initials}</span>`;
+            }
+            const userTitle = document.getElementById('settingsSidebarUserName');
+            if (userTitle) userTitle.textContent = student.name;
+
+            const userEmail = document.getElementById('settingsSidebarUserEmail');
+            if (userEmail) userEmail.textContent = student.personalEmail || `${student.moodleId}@apsit.edu.in`;
+
+            const roleBadge = document.getElementById('settingsSidebarRoleBadge');
+            if (roleBadge) {
+                roleBadge.textContent = `Student • SE IT Div ${student.division || 'B'}`;
+                roleBadge.className = 'badge bg-primary-subtle text-primary fw-semibold px-2 py-1 mx-auto';
+            }
+
+            const lblIdent = document.getElementById('lblProfileIdentifier');
+            if (lblIdent) lblIdent.textContent = 'Full Name (Official Record)';
+            const lblMoodle = document.getElementById('lblProfileMoodleId');
+            if (lblMoodle) lblMoodle.textContent = 'Moodle / Student ID';
+            const lblRoll = document.getElementById('lblProfileRollNo');
+            if (lblRoll) lblRoll.textContent = 'Roll No';
+
+            const nameInput = document.getElementById('settingsFullName');
+            if (nameInput) nameInput.value = student.fullName || student.name;
+
+            const idInput = document.getElementById('settingsMoodleId');
+            if (idInput) idInput.value = student.moodleId;
+
+            const rollInput = document.getElementById('settingsRollNo');
+            if (rollInput) rollInput.value = student.rollNo;
+
+            const deptInput = document.getElementById('settingsDepartment');
+            if (deptInput) deptInput.value = student.department || 'Information Technology';
+
+            const semInput = document.getElementById('settingsSemester');
+            if (semInput) semInput.value = 'Semester III (2026-27)';
+
+            const divInput = document.getElementById('settingsDivision');
+            if (divInput) divInput.value = `Division ${student.division || 'B'}`;
+
+            const emailInput = document.getElementById('settingsEmail');
+            if (emailInput) emailInput.value = student.personalEmail || `${student.moodleId}@apsit.edu.in`;
+
+            const phoneInput = document.getElementById('settingsPhone');
+            if (phoneInput) phoneInput.value = student.contact || '+91 980135791';
+
+            const addrInput = document.getElementById('settingsAddress');
+            if (addrInput) addrInput.value = student.residentialAddress || 'Thane (W), Maharashtra, India';
+
+            const pwdStatus = document.getElementById('settingsPasswordLastChanged');
+            if (pwdStatus) {
+                pwdStatus.textContent = student.passwordLastChanged 
+                    ? `Last modified: ${new Date(student.passwordLastChanged).toLocaleDateString()}` 
+                    : 'Default Moodle Credential';
+            }
+        }
+
+        // Active session info
+        const devEl = document.getElementById('settingsActiveDevice');
+        if (devEl) {
+            const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || 'Desktop';
+            devEl.textContent = `Web Browser (${platform}) • Active Session`;
+        }
+
+        // Restore notification preferences
+        loadNotificationPreferences();
+
+        // Restore theme UI cards
+        const currentThemePref = getThemePreference();
+        highlightThemeCard(currentThemePref);
+        updateThemeBadge(currentThemePref);
+
+        // Restore privacy preferences
+        loadPrivacyPreferences();
+    }
+
+    // --- Personal Profile Form Handlers ---
+    function handleProfileSave(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const isFaculty = isFacultyRole();
+        const emailInput = document.getElementById('settingsEmail');
+        const phoneInput = document.getElementById('settingsPhone');
+        const addrInput = document.getElementById('settingsAddress');
+
+        const email = emailInput ? emailInput.value.trim() : '';
+        const phone = phoneInput ? phoneInput.value.trim() : '';
+        const address = addrInput ? addrInput.value.trim() : '';
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showSettingsAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>Please enter a valid email address.');
+            return;
+        }
+        if (!phone || phone.replace(/\s+/g, '').length < 10) {
+            showSettingsAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>Please enter a valid 10-digit mobile number.');
+            return;
+        }
+
+        if (isFaculty) {
+            const faculty = getCurrentFaculty();
+            if (!faculty) return;
+            const res = updateFacultyProfile(faculty.id, {
+                phone: phone,
+                cabinLocation: address
+            });
+            if (res.success) {
+                faculty.email = email;
+                faculty.phone = phone;
+                faculty.cabinLocation = address;
+                setCurrentFaculty(faculty);
+                applyFacultyData(faculty);
+                populateSettingsModal();
+                showSettingsAlert('success', '<i class="bi bi-check-circle-fill me-2"></i>Faculty contact details updated successfully.');
+            } else {
+                showSettingsAlert('danger', `<i class="bi bi-exclamation-triangle-fill me-2"></i>${res.message || 'Failed to update faculty profile.'}`);
+            }
+        } else {
+            const student = getCurrentUser();
+            if (!student) return;
+            const res = updateStudentProfile(student.moodleId, {
+                personalEmail: email,
+                contact: phone,
+                residentialAddress: address
+            });
+            if (res.success) {
+                applyStudentData(res.student);
+                populateSettingsModal();
+                showSettingsAlert('success', '<i class="bi bi-check-circle-fill me-2"></i>Personal profile contact details updated successfully.');
+            } else {
+                showSettingsAlert('danger', `<i class="bi bi-exclamation-triangle-fill me-2"></i>${res.message || 'Failed to update student profile.'}`);
+            }
+        }
+    }
+
+    function resetProfileForm() {
+        populateSettingsModal();
+        showSettingsAlert('info', '<i class="bi bi-arrow-counterclockwise me-2"></i>Form fields restored to current profile records.');
+    }
+
+    // --- Security & Password Handlers ---
+    function togglePasswordVisibility(fieldId, btn) {
+        const input = document.getElementById(fieldId);
+        if (!input) return;
+        const isPass = input.type === 'password';
+        input.type = isPass ? 'text' : 'password';
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.className = isPass ? 'bi bi-eye-slash' : 'bi bi-eye';
+        }
+    }
+
+    function checkPasswordStrength(password) {
+        const bar = document.getElementById('pwdStrengthBar');
+        const label = document.getElementById('pwdStrengthLabel');
+        const reqLength = document.getElementById('reqLength');
+        const reqUpperLower = document.getElementById('reqUpperLower');
+        const reqNumber = document.getElementById('reqNumber');
+        const reqSpecial = document.getElementById('reqSpecial');
+
+        if (!bar || !label) return;
+
+        let score = 0;
+        const hasLength = password.length >= 8;
+        const hasUpperLower = /[A-Z]/.test(password) && /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecial = /[@#$%^&*!_~-]/.test(password);
+
+        if (reqLength) reqLength.className = hasLength ? 'text-success fw-semibold' : 'text-muted';
+        if (reqUpperLower) reqUpperLower.className = hasUpperLower ? 'text-success fw-semibold' : 'text-muted';
+        if (reqNumber) reqNumber.className = hasNumber ? 'text-success fw-semibold' : 'text-muted';
+        if (reqSpecial) reqSpecial.className = hasSpecial ? 'text-success fw-semibold' : 'text-muted';
+
+        if (hasLength) score += 25;
+        if (hasUpperLower) score += 25;
+        if (hasNumber) score += 25;
+        if (hasSpecial) score += 25;
+
+        bar.style.width = `${score}%`;
+        if (score === 0) {
+            bar.className = 'progress-bar bg-danger';
+            label.textContent = 'None';
+            label.className = 'fw-bold text-muted';
+        } else if (score <= 25) {
+            bar.className = 'progress-bar bg-danger';
+            label.textContent = 'Weak';
+            label.className = 'fw-bold text-danger';
+        } else if (score <= 50) {
+            bar.className = 'progress-bar bg-warning';
+            label.textContent = 'Fair';
+            label.className = 'fw-bold text-warning';
+        } else if (score <= 75) {
+            bar.className = 'progress-bar bg-info';
+            label.textContent = 'Good';
+            label.className = 'fw-bold text-info';
+        } else {
+            bar.className = 'progress-bar bg-success';
+            label.textContent = 'Strong';
+            label.className = 'fw-bold text-success';
+        }
+    }
+
+    function handlePasswordChange(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const isFaculty = isFacultyRole();
+        const curPwd = document.getElementById('settingsCurrentPwd')?.value || '';
+        const newPwd = document.getElementById('settingsNewPwd')?.value || '';
+        const confirmPwd = document.getElementById('settingsConfirmPwd')?.value || '';
+        const mismatchWarning = document.getElementById('pwdMismatchWarning');
+
+        if (newPwd !== confirmPwd) {
+            if (mismatchWarning) mismatchWarning.classList.remove('d-none');
+            showSettingsAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>New password and confirmation password do not match.');
+            return;
+        } else {
+            if (mismatchWarning) mismatchWarning.classList.add('d-none');
+        }
+
+        if (newPwd.length < 8) {
+            showSettingsAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>New password must be at least 8 characters long.');
+            return;
+        }
+        if (!/[A-Z]/.test(newPwd) || !/[a-z]/.test(newPwd) || !/[0-9]/.test(newPwd) || !/[@#$%^&*!_~-]/.test(newPwd)) {
+            showSettingsAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>New password must contain at least one uppercase letter, one lowercase letter, one number, and one special symbol.');
+            return;
+        }
+
+        let res;
+        if (isFaculty) {
+            const faculty = getCurrentFaculty();
+            if (!faculty) return;
+            res = updateFacultyPassword(faculty.id, curPwd, newPwd);
+        } else {
+            const student = getCurrentUser();
+            if (!student) return;
+            res = updateStudentPassword(student.moodleId, curPwd, newPwd);
+        }
+
+        if (res.success) {
+            resetPasswordForm();
+            populateSettingsModal();
+            showSettingsAlert('success', `<i class="bi bi-check-circle-fill me-2"></i>${res.message}`);
+        } else {
+            showSettingsAlert('danger', `<i class="bi bi-exclamation-triangle-fill me-2"></i>${res.message}`);
+        }
+    }
+
+    function resetPasswordForm() {
+        const form = document.getElementById('settingsPasswordForm');
+        if (form) form.reset();
+        checkPasswordStrength('');
+        const mismatchWarning = document.getElementById('pwdMismatchWarning');
+        if (mismatchWarning) mismatchWarning.classList.add('d-none');
+    }
+
+    // --- Notification Preferences Handlers ---
+    const NOTIF_PREF_KEY = 'apsit-isms-notification-preferences';
+
+    function loadNotificationPreferences() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(NOTIF_PREF_KEY) || 'null');
+            if (!saved) return;
+
+            const master = document.getElementById('notifMasterSwitch');
+            if (master) master.checked = saved.master !== false;
+
+            const inApp = document.getElementById('channelInApp');
+            if (inApp) inApp.checked = saved.channelInApp !== false;
+
+            const email = document.getElementById('channelEmail');
+            if (email) email.checked = saved.channelEmail !== false;
+
+            const att = document.getElementById('notifAttendance');
+            if (att) att.checked = saved.attendance !== false;
+
+            const exams = document.getElementById('notifExams');
+            if (exams) exams.checked = saved.exams !== false;
+
+            const grades = document.getElementById('notifGrades');
+            if (grades) grades.checked = saved.grades !== false;
+
+            const cal = document.getElementById('notifCalendar');
+            if (cal) cal.checked = saved.calendar !== false;
+
+            const fac = document.getElementById('notifFaculty');
+            if (fac) fac.checked = saved.faculty !== false;
+
+            const not = document.getElementById('notifNotices');
+            if (not) not.checked = saved.notices !== false;
+
+            toggleMasterNotifications(saved.master !== false);
+        } catch(e) {}
+    }
+
+    function saveNotificationPreferences() {
+        const prefs = {
+            master: document.getElementById('notifMasterSwitch')?.checked ?? true,
+            channelInApp: document.getElementById('channelInApp')?.checked ?? true,
+            channelEmail: document.getElementById('channelEmail')?.checked ?? true,
+            attendance: document.getElementById('notifAttendance')?.checked ?? true,
+            exams: document.getElementById('notifExams')?.checked ?? true,
+            grades: document.getElementById('notifGrades')?.checked ?? true,
+            calendar: document.getElementById('notifCalendar')?.checked ?? true,
+            faculty: document.getElementById('notifFaculty')?.checked ?? true,
+            notices: document.getElementById('notifNotices')?.checked ?? true,
+            updatedAt: new Date().toISOString()
+        };
+        try {
+            localStorage.setItem(NOTIF_PREF_KEY, JSON.stringify(prefs));
+            showSettingsAlert('success', '<i class="bi bi-check-circle-fill me-2"></i>Notification preferences saved successfully.');
+        } catch(e) {
+            showSettingsAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>Could not save notification preferences.');
+        }
+    }
+
+    function restoreDefaultNotifications() {
+        document.querySelectorAll('.notif-channel, .notif-item, #notifMasterSwitch').forEach(sw => {
+            sw.checked = true;
+            sw.disabled = false;
+        });
+        saveNotificationPreferences();
+        showSettingsAlert('info', '<i class="bi bi-info-circle-fill me-2"></i>Default notification preferences restored.');
+    }
+
+    function toggleMasterNotifications(enabled) {
+        document.querySelectorAll('.notif-channel, .notif-item').forEach(sw => {
+            sw.disabled = !enabled;
+        });
+    }
+
+    // --- Privacy & Data Handlers ---
+    function loadPrivacyPreferences() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('apsit-isms-privacy-preferences') || '{}');
+            if (saved.visibility === 'faculty_only') {
+                const rad = document.getElementById('visibilityFacultyOnly');
+                if (rad) rad.checked = true;
+            } else {
+                const rad = document.getElementById('visibilityCohort');
+                if (rad) rad.checked = true;
+            }
+        } catch(e) {}
+    }
+
+    function savePrivacyPreference(key, value) {
+        try {
+            const saved = JSON.parse(localStorage.getItem('apsit-isms-privacy-preferences') || '{}');
+            saved[key] = value;
+            saved.updatedAt = new Date().toISOString();
+            localStorage.setItem('apsit-isms-privacy-preferences', JSON.stringify(saved));
+            showSettingsAlert('success', '<i class="bi bi-check-circle-fill me-2"></i>Privacy preference updated successfully.');
+        } catch(e) {}
+    }
+
+    function exportAcademicRecordJSON() {
+        const isFaculty = isFacultyRole();
+        let data;
+        let filename;
+        if (isFaculty) {
+            const faculty = getCurrentFaculty() || { id: 'FAC01' };
+            data = {
+                exportType: 'APSIT_ISMS_FACULTY_RECORD',
+                exportedAt: new Date().toISOString(),
+                institution: 'A. P. Shah Institute of Technology, Thane',
+                academicYear: '2026-27',
+                faculty: faculty,
+                courses: (typeof getFacultyCourses === 'function') ? getFacultyCourses(faculty.id) : []
+            };
+            filename = `APSIT_ISMS_Record_Faculty_${faculty.id}.json`;
+        } else {
+            const student = getCurrentUser() || (typeof getLiveStudents === 'function' ? getLiveStudents()[0] : { moodleId: 'Student' });
+            data = {
+                exportType: 'APSIT_ISMS_STUDENT_ACADEMIC_RECORD',
+                exportedAt: new Date().toISOString(),
+                institution: 'A. P. Shah Institute of Technology, Thane',
+                academicYear: '2026-27',
+                semester: 'Semester III',
+                department: 'Information Technology',
+                division: student.division || 'B',
+                student: student,
+                subjects: SUBJECT_INFO
+            };
+            filename = `APSIT_ISMS_Record_${student.moodleId}.json`;
+        }
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+        showSettingsAlert('success', '<i class="bi bi-filetype-json me-2"></i>Academic record JSON downloaded successfully.');
+    }
+
+    function exportAcademicRecordCSV() {
+        const isFaculty = isFacultyRole();
+        if (isFaculty) {
+            exportFacultyRosterCSV();
+            showSettingsAlert('success', '<i class="bi bi-file-earmark-spreadsheet me-2"></i>Faculty course roster CSV exported successfully.');
+            return;
+        }
+        const student = getCurrentUser();
+        if (!student) return;
+
+        let csv = `Subject Code,Subject Name,Faculty In-Charge,Attended Lectures,Conducted Lectures,Attendance %,Term Work Marks,Grade,Status\n`;
+        Object.keys(SUBJECT_INFO).forEach(key => {
+            const info = SUBJECT_INFO[key];
+            const att = (student.attendance && student.attendance[key]) ? student.attendance[key] : { attended: 0, pct: 0 };
+            const gr = (student.grades && student.grades[key]) ? student.grades[key] : { termWork: 0, grade: 'P', status: 'Submitted' };
+            csv += `"${info.code}","${info.name}","${info.faculty}",${att.attended},${info.conducted},${att.pct}%,${gr.termWork},"${gr.grade}","${gr.status}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `APSIT_Academic_Transcript_${student.moodleId}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showSettingsAlert('success', '<i class="bi bi-file-earmark-spreadsheet me-2"></i>Attendance & Grades CSV exported successfully.');
+    }
+
+    function showSettingsAlert(type, message) {
+        const alertEl = document.getElementById('settingsFeedbackAlert');
+        const textEl = document.getElementById('settingsFeedbackText');
+        if (!alertEl || !textEl) return;
+        alertEl.className = `alert alert-${type} alert-dismissible fade show mb-3`;
+        textEl.innerHTML = message;
+        alertEl.classList.remove('d-none');
+        alertEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function dismissSettingsAlert() {
+        const alertEl = document.getElementById('settingsFeedbackAlert');
+        if (alertEl) alertEl.classList.add('d-none');
     }

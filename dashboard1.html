@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APSIT Moodle - Student Dashboard</title>
     
+    <!-- Theme Early Initializer (Prevents theme flash on load) -->
+    <script>
+        (function() {
+            try {
+                var storedPref = localStorage.getItem('apsit-isms-theme-preference') || 'system';
+                var resolvedTheme = storedPref;
+                if (storedPref === 'system') {
+                    resolvedTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+                }
+                document.documentElement.setAttribute('data-theme', resolvedTheme);
+                document.documentElement.setAttribute('data-bs-theme', resolvedTheme);
+            } catch(e) {}
+        })();
+    </script>
+    
     <!-- Favicon -->
     <link rel="icon" type="image/jpg" href="favicon.jpg">
     
@@ -100,6 +115,7 @@
                             <a class="dropdown-item py-2" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">
                                 <i class="bi bi-gear text-secondary me-2"></i> Account Settings
                             </a>
+                        </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <a class="dropdown-item py-2 text-danger fw-semibold" href="javascript:void(0)" onclick="logoutStudent()">
@@ -1176,18 +1192,587 @@
 
 <!-- Settings Modal -->
 <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color: #123b6d; color: white;">
-                <h5 class="modal-title" id="settingsModalLabel"><i class="bi bi-gear-fill me-2"></i> Account Settings</h5>
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg border-0">
+            <!-- Modal Header -->
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #0a1c3a 0%, #123b6d 100%);">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-warning text-dark rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                        <i class="bi bi-gear-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="settingsModalLabel">Account Settings</h5>
+                        <p class="mb-0 text-white-50 small">Manage your profile, security, notifications, appearance, and privacy preferences.</p>
+                    </div>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
-                <p>Account Settings Content</p>
+
+            <!-- Modal Body with 2-Column Tabs -->
+            <div class="modal-body p-0">
+                <div class="container-fluid p-0">
+                    <div class="row g-0">
+                        <!-- Left Navigation Sidebar -->
+                        <div class="col-lg-3 col-md-4 border-end settings-sidebar p-3 p-lg-4">
+                            <!-- User Quick Profile Badge -->
+                            <div class="card border-0 shadow-sm mb-3 settings-user-badge text-center p-3">
+                                <div class="position-relative d-inline-block mx-auto mb-2">
+                                    <div class="settings-avatar-circle" id="settingsAvatarPreview">
+                                        <i class="bi bi-person-fill fs-1"></i>
+                                    </div>
+                                    <span class="position-absolute bottom-0 end-0 badge rounded-pill bg-success p-1 border border-2 border-white" title="Active Account">
+                                        <span class="visually-hidden">Active</span>
+                                    </span>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-truncate" id="settingsSidebarUserName">Jasmine Mohanty</h6>
+                                <small class="text-muted d-block text-truncate mb-1" id="settingsSidebarUserEmail">student@apsit.edu.in</small>
+                                <span class="badge bg-primary-subtle text-primary fw-semibold px-2 py-1 mx-auto" id="settingsSidebarRoleBadge">Student • SE IT</span>
+                            </div>
+
+                            <!-- Navigation Tabs -->
+                            <ul class="nav nav-pills flex-column gap-1 settings-tabs" id="settingsTabList" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active d-flex align-items-center gap-2 w-100 text-start py-2 px-3" id="settings-profile-tab" data-bs-toggle="pill" data-bs-target="#settings-profile-pane" type="button" role="tab" aria-controls="settings-profile-pane" aria-selected="true">
+                                        <i class="bi bi-person-vcard fs-5 text-primary"></i>
+                                        <span>Personal Profile</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link d-flex align-items-center gap-2 w-100 text-start py-2 px-3" id="settings-security-tab" data-bs-toggle="pill" data-bs-target="#settings-security-pane" type="button" role="tab" aria-controls="settings-security-pane" aria-selected="false">
+                                        <i class="bi bi-shield-lock fs-5 text-success"></i>
+                                        <span>Security &amp; Login</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link d-flex align-items-center gap-2 w-100 text-start py-2 px-3" id="settings-notifications-tab" data-bs-toggle="pill" data-bs-target="#settings-notifications-pane" type="button" role="tab" aria-controls="settings-notifications-pane" aria-selected="false">
+                                        <i class="bi bi-bell fs-5 text-warning"></i>
+                                        <span>Notifications</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link d-flex align-items-center gap-2 w-100 text-start py-2 px-3" id="settings-appearance-tab" data-bs-toggle="pill" data-bs-target="#settings-appearance-pane" type="button" role="tab" aria-controls="settings-appearance-pane" aria-selected="false">
+                                        <i class="bi bi-palette fs-5 text-info"></i>
+                                        <span>Appearance</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link d-flex align-items-center gap-2 w-100 text-start py-2 px-3" id="settings-privacy-tab" data-bs-toggle="pill" data-bs-target="#settings-privacy-pane" type="button" role="tab" aria-controls="settings-privacy-pane" aria-selected="false">
+                                        <i class="bi bi-shield-check fs-5 text-danger"></i>
+                                        <span>Privacy &amp; Data</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Right Content Area -->
+                        <div class="col-lg-9 col-md-8 p-4 settings-content-area">
+                            <!-- Alert Feedback Banner -->
+                            <div class="alert alert-dismissible fade show d-none mb-3" id="settingsFeedbackAlert" role="alert">
+                                <span id="settingsFeedbackText"></span>
+                                <button type="button" class="btn-close" onclick="dismissSettingsAlert()" aria-label="Close"></button>
+                            </div>
+
+                            <div class="tab-content" id="settingsTabContent">
+                                
+                                <!-- 1. PERSONAL PROFILE PANE -->
+                                <div class="tab-pane fade show active" id="settings-profile-pane" role="tabpanel" aria-labelledby="settings-profile-tab" tabindex="0">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                        <div>
+                                            <h5 class="fw-bold mb-0"><i class="bi bi-person-circle text-primary me-2"></i>Personal Profile</h5>
+                                            <small class="text-muted">Review academic registration and manage your verified contact details.</small>
+                                        </div>
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-1">
+                                            <i class="bi bi-patch-check-fill me-1"></i> APSIT Verified
+                                        </span>
+                                    </div>
+
+                                    <form id="settingsProfileForm" onsubmit="handleProfileSave(event)">
+                                        <!-- Academic Info (Read-only) -->
+                                        <div class="card bg-light border-0 mb-4 p-3 rounded-3 official-academic-card">
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <h6 class="fw-bold text-uppercase small text-muted mb-0">
+                                                    <i class="bi bi-building-lock me-1"></i> Official Academic Identifiers (Read-Only)
+                                                </h6>
+                                                <span class="badge bg-secondary opacity-75">Managed by Academic Cell</span>
+                                            </div>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-semibold text-muted mb-1" id="lblProfileIdentifier">Full Name (Official Record)</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-person"></i></span>
+                                                        <input type="text" class="form-control bg-white border-start-0" id="settingsFullName" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label small fw-semibold text-muted mb-1" id="lblProfileMoodleId">Moodle / Student ID</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-upc-scan"></i></span>
+                                                        <input type="text" class="form-control bg-white border-start-0 fw-bold" id="settingsMoodleId" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label small fw-semibold text-muted mb-1" id="lblProfileRollNo">Roll No / Code</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-hash"></i></span>
+                                                        <input type="text" class="form-control bg-white border-start-0 fw-bold" id="settingsRollNo" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label small fw-semibold text-muted mb-1">Department</label>
+                                                    <input type="text" class="form-control bg-white" id="settingsDepartment" readonly>
+                                                </div>
+                                                <div class="col-md-4 col-6">
+                                                    <label class="form-label small fw-semibold text-muted mb-1">Academic Year &amp; Semester</label>
+                                                    <input type="text" class="form-control bg-white" id="settingsSemester" readonly>
+                                                </div>
+                                                <div class="col-md-4 col-6">
+                                                    <label class="form-label small fw-semibold text-muted mb-1">Division &amp; Batch</label>
+                                                    <input type="text" class="form-control bg-white" id="settingsDivision" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Editable Contact Info -->
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold text-uppercase small text-muted mb-3">
+                                                <i class="bi bi-pencil-square me-1"></i> Editable Contact &amp; Communication Details
+                                            </h6>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label for="settingsEmail" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                                        <input type="email" class="form-control" id="settingsEmail" required placeholder="name@domain.com">
+                                                    </div>
+                                                    <small class="form-text text-muted">Primary address for examination hall tickets &amp; alerts.</small>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="settingsPhone" class="form-label fw-semibold">Mobile Number <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                                        <input type="tel" class="form-control" id="settingsPhone" required placeholder="+91 98XXXXXXXX">
+                                                    </div>
+                                                    <small class="form-text text-muted">Used for critical SMS broadcasts and defaulter notices.</small>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="settingsAddress" class="form-label fw-semibold">Residential / Communication Address</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                                        <input type="text" class="form-control" id="settingsAddress" placeholder="Enter residential address, Thane / Mumbai">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                                            <button type="button" class="btn btn-outline-secondary px-3" onclick="resetProfileForm()">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                                            </button>
+                                            <button type="submit" class="btn btn-primary px-4 fw-semibold" id="btnSaveProfile">
+                                                <i class="bi bi-check2-circle me-1"></i> Save Changes
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- 2. SECURITY & LOGIN PANE -->
+                                <div class="tab-pane fade" id="settings-security-pane" role="tabpanel" aria-labelledby="settings-security-tab" tabindex="0">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                        <div>
+                                            <h5 class="fw-bold mb-0"><i class="bi bi-shield-lock text-success me-2"></i>Security &amp; Login</h5>
+                                            <small class="text-muted">Manage your authentication credentials, session security, and active device logins.</small>
+                                        </div>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
+                                            <i class="bi bi-shield-fill-check me-1"></i> SSL Protected
+                                        </span>
+                                    </div>
+
+                                    <!-- Session & Login Information -->
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <div class="card border p-3 rounded-3 h-100">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="bg-primary-subtle text-primary p-2 rounded-circle">
+                                                        <i class="bi bi-laptop fs-4"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="fw-bold mb-0">Active Device Session</h6>
+                                                        <small class="text-muted d-block" id="settingsActiveDevice">Web Browser (Windows 11 / Chrome)</small>
+                                                        <span class="badge bg-success-subtle text-success mt-1"><i class="bi bi-dot"></i> Online Now</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card border p-3 rounded-3 h-100">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="bg-warning-subtle text-warning p-2 rounded-circle">
+                                                        <i class="bi bi-clock-history fs-4"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="fw-bold mb-0">Password Status</h6>
+                                                        <small class="text-muted d-block" id="settingsPasswordLastChanged">Last modified: Initial Setup</small>
+                                                        <span class="badge bg-light text-secondary border mt-1">Single Sign-On Enabled</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Change Password Form -->
+                                    <form id="settingsPasswordForm" onsubmit="handlePasswordChange(event)">
+                                        <div class="card border-0 bg-light p-3 rounded-3 mb-4">
+                                            <h6 class="fw-bold text-uppercase small text-muted mb-3">
+                                                <i class="bi bi-key me-1"></i> Update Account Password
+                                            </h6>
+
+                                            <div class="mb-3">
+                                                <label for="settingsCurrentPwd" class="form-label fw-semibold">Current Password <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                                    <input type="password" class="form-control" id="settingsCurrentPwd" required placeholder="Enter your current password">
+                                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('settingsCurrentPwd', this)">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="settingsNewPwd" class="form-label fw-semibold">New Password <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                                                    <input type="password" class="form-control" id="settingsNewPwd" required placeholder="Create a strong new password" oninput="checkPasswordStrength(this.value)">
+                                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('settingsNewPwd', this)">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </div>
+                                                <!-- Password Strength Meter -->
+                                                <div class="mt-2">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <small class="fw-semibold">Strength:</small>
+                                                        <small id="pwdStrengthLabel" class="fw-bold text-muted">None</small>
+                                                    </div>
+                                                    <div class="progress" style="height: 6px;">
+                                                        <div id="pwdStrengthBar" class="progress-bar bg-danger" role="progressbar" style="width: 0%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="settingsConfirmPwd" class="form-label fw-semibold">Confirm New Password <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="bi bi-check-circle"></i></span>
+                                                    <input type="password" class="form-control" id="settingsConfirmPwd" required placeholder="Repeat the new password">
+                                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('settingsConfirmPwd', this)">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="invalid-feedback d-block text-danger small mt-1 d-none" id="pwdMismatchWarning">
+                                                    Passwords do not match.
+                                                </div>
+                                            </div>
+
+                                            <!-- Password requirements list -->
+                                            <div class="bg-white p-2 rounded border small">
+                                                <div class="fw-semibold text-muted mb-1">Password Requirements:</div>
+                                                <ul class="mb-0 ps-3 text-muted">
+                                                    <li id="reqLength">Minimum 8 characters long</li>
+                                                    <li id="reqUpperLower">At least one uppercase and one lowercase letter</li>
+                                                    <li id="reqNumber">At least one numerical digit (0-9)</li>
+                                                    <li id="reqSpecial">At least one special symbol (@, #, $, %, ^, &amp;, *, !, _, ~, -)</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                                            <button type="reset" class="btn btn-outline-secondary px-3" onclick="resetPasswordForm()">
+                                                Clear
+                                            </button>
+                                            <button type="submit" class="btn btn-primary px-4 fw-semibold" id="btnUpdatePassword">
+                                                <i class="bi bi-shield-check me-1"></i> Change Password
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- 3. NOTIFICATIONS PANE -->
+                                <div class="tab-pane fade" id="settings-notifications-pane" role="tabpanel" aria-labelledby="settings-notifications-tab" tabindex="0">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                        <div>
+                                            <h5 class="fw-bold mb-0"><i class="bi bi-bell text-warning me-2"></i>Notification Preferences</h5>
+                                            <small class="text-muted">Customize how and when you receive academic, exam, and institutional alerts.</small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Master Notification Toggle Card -->
+                                    <div class="card border-0 bg-primary-subtle p-3 rounded-3 mb-4">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="fw-bold text-primary mb-1"><i class="bi bi-bell-fill me-1"></i> Master Notification Switch</h6>
+                                                <small class="text-muted">Quickly enable or pause all real-time alerts across all channels.</small>
+                                            </div>
+                                            <div class="form-check form-switch form-switch-lg">
+                                                <input class="form-check-input" type="checkbox" role="switch" id="notifMasterSwitch" checked onchange="toggleMasterNotifications(this.checked)">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Notification Channels -->
+                                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Delivery Channels</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <div class="card border p-3 rounded-3">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="fw-bold mb-0"><i class="bi bi-app-indicator text-primary me-2"></i>In-App Notification Center</h6>
+                                                        <small class="text-muted">Top navigation bell badge and interactive dropdown items.</small>
+                                                    </div>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input notif-channel" type="checkbox" id="channelInApp" checked>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card border p-3 rounded-3">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="fw-bold mb-0"><i class="bi bi-envelope-at text-success me-2"></i>Email Notifications</h6>
+                                                        <small class="text-muted">Critical notifications delivered directly to registered email.</small>
+                                                    </div>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input notif-channel" type="checkbox" id="channelEmail" checked>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Notification Event Types -->
+                                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Academic &amp; Institutional Events</h6>
+                                    <div class="list-group list-group-flush border rounded-3 mb-4 notif-events-group">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <div>
+                                                <div class="fw-semibold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Attendance Shortage &amp; Defaulter Alerts</div>
+                                                <small class="text-muted">Immediate alert when subject attendance dips below mandatory 75% threshold.</small>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input notif-item" type="checkbox" id="notifAttendance" checked>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <div>
+                                                <div class="fw-semibold text-primary"><i class="bi bi-file-earmark-ruled me-2"></i>Examination Schedules &amp; Hall Tickets</div>
+                                                <small class="text-muted">Unit Test, In-Semester assessments, and Mumbai University term examinations.</small>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input notif-item" type="checkbox" id="notifExams" checked>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <div>
+                                                <div class="fw-semibold text-success"><i class="bi bi-trophy me-2"></i>Results, Grades &amp; Marks Updates</div>
+                                                <small class="text-muted">Publication of IAT-1, IAT-2, lab assessments, and semester grade cards.</small>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input notif-item" type="checkbox" id="notifGrades" checked>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <div>
+                                                <div class="fw-semibold text-info"><i class="bi bi-calendar3-event me-2"></i>Academic Calendar &amp; Holidays</div>
+                                                <small class="text-muted">Commencement, syllabus submission weeks, cultural fests, and public holidays.</small>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input notif-item" type="checkbox" id="notifCalendar" checked>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <div>
+                                                <div class="fw-semibold text-warning"><i class="bi bi-megaphone me-2"></i>Faculty Announcements</div>
+                                                <small class="text-muted">Class cancellations, lab submissions, extra lectures, and mentor meetings.</small>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input notif-item" type="checkbox" id="notifFaculty" checked>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <div>
+                                                <div class="fw-semibold text-dark"><i class="bi bi-info-circle me-2"></i>General Institutional Notices</div>
+                                                <small class="text-muted">Training &amp; placement circulars, library announcements, and campus updates.</small>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input notif-item" type="checkbox" id="notifNotices" checked>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                                        <button type="button" class="btn btn-outline-secondary px-3" onclick="restoreDefaultNotifications()">
+                                            Restore Defaults
+                                        </button>
+                                        <button type="button" class="btn btn-primary px-4 fw-semibold" onclick="saveNotificationPreferences()">
+                                            <i class="bi bi-check2-circle me-1"></i> Save Preferences
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 4. APPEARANCE PANE -->
+                                <div class="tab-pane fade" id="settings-appearance-pane" role="tabpanel" aria-labelledby="settings-appearance-tab" tabindex="0">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                        <div>
+                                            <h5 class="fw-bold mb-0"><i class="bi bi-palette text-info me-2"></i>Appearance &amp; Theme</h5>
+                                            <small class="text-muted">Choose your preferred visual mode for the APSIT ISMS student portal.</small>
+                                        </div>
+                                        <span class="badge bg-primary px-3 py-1" id="appearanceCurrentStatusBadge">Theme: System</span>
+                                    </div>
+
+                                    <p class="text-muted small mb-4">
+                                        Select how the dashboard should be presented. <strong>System Default</strong> dynamically syncs with your operating system or browser theme settings in real-time.
+                                    </p>
+
+                                    <!-- 3 Theme Selection Cards -->
+                                    <div class="row g-3 mb-4">
+                                        <!-- System Default Option -->
+                                        <div class="col-md-4">
+                                            <div class="theme-card card p-3 h-100 text-center cursor-pointer" id="themeCardSystem" onclick="selectThemePreference('system')">
+                                                <div class="theme-card-icon mb-2">
+                                                    <i class="bi bi-display fs-1 text-primary"></i>
+                                                </div>
+                                                <h6 class="fw-bold mb-1">System Default</h6>
+                                                <p class="text-muted small mb-2">Automatically matches your OS / browser light or dark mode.</p>
+                                                <div class="theme-card-badge mt-auto">
+                                                    <span class="badge bg-secondary-subtle text-secondary py-1 px-2" id="badgeSystemState">Auto Sync</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Light Mode Option -->
+                                        <div class="col-md-4">
+                                            <div class="theme-card card p-3 h-100 text-center cursor-pointer" id="themeCardLight" onclick="selectThemePreference('light')">
+                                                <div class="theme-card-icon mb-2">
+                                                    <i class="bi bi-sun-fill fs-1 text-warning"></i>
+                                                </div>
+                                                <h6 class="fw-bold mb-1">Light Mode</h6>
+                                                <p class="text-muted small mb-2">Crisp, high-contrast light theme with classic APSIT navy styling.</p>
+                                                <div class="theme-card-badge mt-auto">
+                                                    <span class="badge bg-secondary-subtle text-secondary py-1 px-2" id="badgeLightState">Light</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Dark Mode Option -->
+                                        <div class="col-md-4">
+                                            <div class="theme-card card p-3 h-100 text-center cursor-pointer" id="themeCardDark" onclick="selectThemePreference('dark')">
+                                                <div class="theme-card-icon mb-2">
+                                                    <i class="bi bi-moon-stars-fill fs-1 text-info"></i>
+                                                </div>
+                                                <h6 class="fw-bold mb-1">Dark Mode</h6>
+                                                <p class="text-muted small mb-2">Sleek, glare-free dark interface optimized for low-light studying.</p>
+                                                <div class="theme-card-badge mt-auto">
+                                                    <span class="badge bg-secondary-subtle text-secondary py-1 px-2" id="badgeDarkState">Dark</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Theme Details & Persistence Summary -->
+                                    <div class="card border bg-light p-3 rounded-3 mb-4">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-info-circle-fill text-primary"></i>
+                                            <div class="small text-muted">
+                                                Saved preference key: <code>apsit-isms-theme-preference</code>. Theme choice is preserved permanently across browser restarts and tab refreshes.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                                        <button type="button" class="btn btn-primary px-4 fw-semibold" onclick="saveThemePreferenceConfirm()">
+                                            <i class="bi bi-check2-circle me-1"></i> Save Theme Preference
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 5. PRIVACY & DATA PANE -->
+                                <div class="tab-pane fade" id="settings-privacy-pane" role="tabpanel" aria-labelledby="settings-privacy-tab" tabindex="0">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                        <div>
+                                            <h5 class="fw-bold mb-0"><i class="bi bi-shield-check text-danger me-2"></i>Privacy &amp; Data Governance</h5>
+                                            <small class="text-muted">Institutional data transparency, directory visibility, and record export tools.</small>
+                                        </div>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1">
+                                            <i class="bi bi-lock-fill me-1"></i> Mumbai University
+                                        </span>
+                                    </div>
+
+                                    <!-- Institutional Usage Statement -->
+                                    <div class="card border-0 bg-light p-3 rounded-3 mb-4">
+                                        <h6 class="fw-bold small text-uppercase text-muted mb-2"><i class="bi bi-journal-check me-1"></i> Institutional Academic Use Policy</h6>
+                                        <p class="small text-muted mb-0">
+                                            Student academic records, including lecture attendance logs, internal assessment test scores, and lab submission timestamps, are securely processed by the A. P. Shah Institute of Technology in accordance with University of Mumbai Ordinances (O.6086) and National Board of Accreditation (NBA) criteria.
+                                        </p>
+                                    </div>
+
+                                    <!-- Profile Visibility Preferences -->
+                                    <div class="card border p-3 rounded-3 mb-4">
+                                        <h6 class="fw-bold mb-2"><i class="bi bi-eye me-1 text-primary"></i> Student Directory Visibility</h6>
+                                        <p class="small text-muted mb-3">Control your student profile visibility in departmental cohort directories and academic peer groups.</p>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="privacyVisibility" id="visibilityCohort" value="cohort" checked onchange="savePrivacyPreference('visibility', 'cohort')">
+                                            <label class="form-check-label" for="visibilityCohort">
+                                                <strong>Standard Cohort Visibility</strong> — Visible to Division B classmates, academic faculty mentors, and course in-charges.
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="privacyVisibility" id="visibilityFacultyOnly" value="faculty_only" onchange="savePrivacyPreference('visibility', 'faculty_only')">
+                                            <label class="form-check-label" for="visibilityFacultyOnly">
+                                                <strong>Faculty &amp; Advisor Restricted</strong> — Hidden from student classmate lists; visible only to authenticated faculty and Head of Department.
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Client-Side Data Export Controls -->
+                                    <div class="card border p-3 rounded-3 mb-4">
+                                        <h6 class="fw-bold mb-2"><i class="bi bi-download me-1 text-success"></i> Academic Data Export</h6>
+                                        <p class="small text-muted mb-3">Download a client-side digital copy of your official academic registration, attendance statistics, and semester marksheet.</p>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <button type="button" class="btn btn-outline-primary" id="btnExportJSON" onclick="exportAcademicRecordJSON()">
+                                                <i class="bi bi-filetype-json me-1"></i> Export Complete Profile (JSON)
+                                            </button>
+                                            <button type="button" class="btn btn-outline-success" id="btnExportCSV" onclick="exportAcademicRecordCSV()">
+                                                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Attendance &amp; Grades (CSV)
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Institutional Account Deletion / Status Notice -->
+                                    <div class="card border-warning border-opacity-50 bg-warning-subtle p-3 rounded-3">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <i class="bi bi-exclamation-triangle-fill text-warning fs-4 flex-shrink-0"></i>
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-dark">Institutional Account Governance &amp; Deactivation</h6>
+                                                <p class="small text-muted mb-0">
+                                                    As an enrolled student of Mumbai University, ISMS accounts cannot be self-deleted to safeguard academic transcript integrity and statutory examination eligibility records. For semester breaks, discontinuation, or college transfers, please submit an official application to the Registrar's Office at <a href="mailto:registrar@apsit.edu.in" class="fw-semibold">registrar@apsit.edu.in</a>.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" style="background-color: #123b6d; border: none;">Save Changes</button>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-light px-4 py-2 border-top">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-lock-fill text-success me-1"></i> APSIT ISMS v2.6.4 • Secure Session
+                    </small>
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>

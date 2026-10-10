@@ -4411,10 +4411,19 @@ function authenticateFaculty(facultyNameOrId, password) {
     ];
 
     const passTrim = String(password).trim();
-    const isPassValid = validPasswords.some(vp => 
+    let isPassValid = validPasswords.some(vp => 
         vp === passTrim || 
         vp.toLowerCase() === passTrim.toLowerCase()
     );
+
+    try {
+        if (!isPassValid && typeof localStorage !== 'undefined') {
+            const stored = JSON.parse(localStorage.getItem('apsit_custom_faculty_passwords') || '{}');
+            if (stored[faculty.id] === passTrim || stored[faculty.name] === passTrim) {
+                isPassValid = true;
+            }
+        }
+    } catch(e) {}
 
     if (!isPassValid) {
         return { 
@@ -4439,9 +4448,11 @@ function setCurrentFaculty(faculty) {
     try {
         if (typeof sessionStorage !== 'undefined') {
             sessionStorage.setItem(STORAGE_KEY_FACULTY, JSON.stringify(faculty));
+            sessionStorage.setItem('apsit_auth_role', 'faculty');
         }
         if (typeof localStorage !== 'undefined') {
             localStorage.setItem(STORAGE_KEY_FACULTY, JSON.stringify(faculty));
+            localStorage.setItem('apsit_auth_role', 'faculty');
         }
     } catch(e) {}
 }
@@ -4490,7 +4501,7 @@ function authenticateStudent(moodleId, password) {
     if (!student) {
         return { success: false, message: 'Moodle ID not registered in SE IT Div B database.' };
     }
-    const expectedPassword = moodleId.trim() + '@Apsit';
+    const expectedPassword = student.customPassword || (moodleId.trim() + '@Apsit');
     if (password !== expectedPassword) {
         return { success: false, message: 'Invalid credentials. Please verify your password.' };
     }
@@ -4569,6 +4580,114 @@ function getAcademicCalendarEvents() {
     return ACADEMIC_CALENDAR_EVENTS;
 }
 
+// Function to update student password
+function updateStudentPassword(moodleId, currentPassword, newPassword) {
+    const students = getLiveStudents();
+    const student = students.find(s => s.moodleId === String(moodleId).trim());
+    if (!student) {
+        return { success: false, message: 'Student record not found in institutional database.' };
+    }
+
+    const expected = student.customPassword || (student.moodleId + '@Apsit');
+    if (currentPassword !== expected) {
+        return { success: false, message: 'Current password is incorrect. Please verify your credentials.' };
+    }
+
+    if (!newPassword || newPassword.length < 8) {
+        return { success: false, message: 'New password must be at least 8 characters long.' };
+    }
+    if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword) || !/[@#$%^&*!_~-]/.test(newPassword)) {
+        return { success: false, message: 'New password must contain at least one uppercase letter, one lowercase letter, one number, and one special symbol (@, #, $, etc.).' };
+    }
+
+    student.customPassword = newPassword;
+    student.passwordLastChanged = new Date().toISOString();
+    saveLiveStudents(students);
+    setCurrentUser(student);
+
+    return { success: true, message: 'Password updated successfully! Please use your new password for your next login.' };
+}
+
+// Function to update faculty password
+function updateFacultyPassword(facultyNameOrId, currentPassword, newPassword) {
+    const faculty = getCurrentFaculty();
+    if (!faculty) {
+        return { success: false, message: 'No active faculty profile found.' };
+    }
+
+    // Verify current password
+    const authCheck = authenticateFaculty(faculty.name, currentPassword);
+    if (!authCheck.success) {
+        return { success: false, message: 'Current faculty password is incorrect.' };
+    }
+
+    if (!newPassword || newPassword.length < 8) {
+        return { success: false, message: 'New password must be at least 8 characters long.' };
+    }
+    if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword) || !/[@#$%^&*!_~-]/.test(newPassword)) {
+        return { success: false, message: 'New password must contain at least one uppercase letter, one lowercase letter, one number, and one special symbol (@, #, $, etc.).' };
+    }
+
+    faculty.customPassword = newPassword;
+    faculty.passwordLastChanged = new Date().toISOString();
+    setCurrentFaculty(faculty);
+
+    // Save in custom faculty passwords dictionary in localStorage
+    try {
+        if (typeof localStorage !== 'undefined') {
+            const stored = JSON.parse(localStorage.getItem('apsit_custom_faculty_passwords') || '{}');
+            stored[faculty.id] = newPassword;
+            stored[faculty.name] = newPassword;
+            localStorage.setItem('apsit_custom_faculty_passwords', JSON.stringify(stored));
+        }
+    } catch(e) {}
+
+    return { success: true, message: 'Faculty password updated successfully!' };
+}
+
+// Function to update student contact profile
+function updateStudentProfile(moodleId, updatedData) {
+    const students = getLiveStudents();
+    const student = students.find(s => s.moodleId === String(moodleId).trim());
+    if (!student) {
+        return { success: false, message: 'Student record not found.' };
+    }
+
+    if (updatedData.personalEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updatedData.personalEmail)) {
+        return { success: false, message: 'Please provide a valid personal email address.' };
+    }
+    if (updatedData.contact && !/^\+?[0-9\s-]{10,14}$/.test(updatedData.contact.replace(/\s+/g, ''))) {
+        return { success: false, message: 'Please provide a valid 10-digit mobile number.' };
+    }
+
+    if (updatedData.personalEmail !== undefined) student.personalEmail = updatedData.personalEmail;
+    if (updatedData.contact !== undefined) student.contact = updatedData.contact;
+    if (updatedData.residentialAddress !== undefined) student.residentialAddress = updatedData.residentialAddress;
+    student.profileLastUpdated = new Date().toISOString();
+
+    saveLiveStudents(students);
+    setCurrentUser(student);
+
+    return { success: true, student: student, message: 'Personal profile details updated successfully.' };
+}
+
+// Function to update faculty profile details
+function updateFacultyProfile(facultyId, updatedData) {
+    const faculty = getCurrentFaculty();
+    if (!faculty) {
+        return { success: false, message: 'Faculty record not found.' };
+    }
+
+    if (updatedData.phone !== undefined) faculty.phone = updatedData.phone;
+    if (updatedData.cabinLocation !== undefined) faculty.cabinLocation = updatedData.cabinLocation;
+    if (updatedData.epabxExtension !== undefined) faculty.epabxExtension = updatedData.epabxExtension;
+    if (updatedData.consultationHours !== undefined) faculty.consultationHours = updatedData.consultationHours;
+    faculty.profileLastUpdated = new Date().toISOString();
+
+    setCurrentFaculty(faculty);
+    return { success: true, faculty: faculty, message: 'Faculty profile details updated successfully.' };
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         STUDENTS_DATA,
@@ -4591,7 +4710,11 @@ if (typeof module !== 'undefined' && module.exports) {
         getFacultyCourses,
         isFacultyRole,
         isStudentRole,
-        getAcademicCalendarEvents
+        getAcademicCalendarEvents,
+        updateStudentPassword,
+        updateFacultyPassword,
+        updateStudentProfile,
+        updateFacultyProfile
     };
 }
 
