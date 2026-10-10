@@ -437,6 +437,8 @@
             }
 
             // Success state
+            sessionStorage.setItem('apsit_auth_role', 'student');
+            localStorage.setItem('apsit_auth_role', 'student');
             showAlert(`Welcome, ${authResult.student.name}! Redirecting to your dashboard...`, true);
             const submitBtn = document.getElementById('studentSubmitBtn');
             submitBtn.disabled = true;
@@ -466,6 +468,8 @@
                 return;
             }
 
+            sessionStorage.setItem('apsit_auth_role', 'faculty');
+            localStorage.setItem('apsit_auth_role', 'faculty');
             showAlert(`Welcome, ${authResult.faculty.title}! Loading Faculty Academic Portal...`, true);
             const submitBtn = document.getElementById('facultySubmitBtn');
             submitBtn.disabled = true;

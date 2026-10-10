@@ -434,7 +434,7 @@
                         <i class="bi bi-bar-chart"></i> Grades &amp; Marks
                     </a>
                 </li>
-                <li class="nav-item" role="presentation">
+                <li class="nav-item" role="presentation" id="sidebarFacultyNavItem" style="display: none;">
                     <a class="nav-link d-flex align-items-center justify-content-between text-success fw-bold" id="faculty-tab" data-bs-toggle="pill" data-bs-target="#faculty-view" role="tab" aria-controls="faculty-view" aria-selected="false">
                         <span><i class="bi bi-person-workspace me-1"></i> Faculty Portal</span>
                         <span class="badge bg-success">Live</span>
@@ -3186,8 +3186,9 @@
     // Initialize application on load
     document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
-        const isFacultyRole = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty';
-        const isFacultyParam = urlParams.get('view') === 'faculty' || isFacultyRole;
+        const isFaculty = isFacultyRole();
+        const facultyNavItem = document.getElementById('sidebarFacultyNavItem');
+        const facultyViewPane = document.getElementById('faculty-view');
 
         let student = getCurrentUser();
         if (!student) {
@@ -3199,11 +3200,16 @@
         initNotifications();
         initAnnouncements();
         renderStudentGrades(student);
-        initFacultyPortal();
 
-        if (isFacultyParam) {
+        if (isFaculty) {
+            // Authorized Faculty: show faculty nav and initialize portal
+            if (facultyNavItem) facultyNavItem.style.display = 'block';
+            if (facultyViewPane) facultyViewPane.style.display = 'block';
+            initFacultyPortal();
+
+            // Open Faculty view directly
             openFacultyPortalTab();
-            if (activeFacultyObj && isFacultyRole) {
+            if (activeFacultyObj) {
                 const navName = document.getElementById('navStudentName');
                 if (navName) navName.textContent = activeFacultyObj.title;
                 const navBadge = document.getElementById('navMoodleBadge');
@@ -3216,6 +3222,20 @@
                 const dropMeta = document.getElementById('dropdownStudentMeta');
                 if (dropMeta) dropMeta.textContent = `${activeFacultyObj.subjectName} • ${activeFacultyObj.email}`;
             }
+        } else {
+            // Student logged in: strictly HIDE faculty portal from student
+            if (facultyNavItem) facultyNavItem.style.display = 'none';
+            if (facultyViewPane) facultyViewPane.style.display = 'none';
+
+            // If a student tries to open URL with ?view=faculty, block access and redirect to overview
+            if (urlParams.get('view') === 'faculty') {
+                const overviewTab = document.getElementById('overview-tab');
+                if (overviewTab) {
+                    const tabInstance = new bootstrap.Tab(overviewTab);
+                    tabInstance.show();
+                }
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         }
 
         // Listen for storage events across tabs
@@ -3223,7 +3243,7 @@
             if (e.key === 'apsit_isms_dynamic_students') {
                 const refreshed = getCurrentUser();
                 if (refreshed) applyStudentData(refreshed);
-                renderFacultyRoster();
+                if (isFacultyRole()) renderFacultyRoster();
             }
         });
     });

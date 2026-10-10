@@ -156,13 +156,12 @@
 
         function App() {
             const [currentStudent, setCurrentStudent] = useState(() => getCurrentUser());
+            const isFacultyAuth = isFacultyRole();
             const [activeTab, setActiveTab] = useState(() => {
                 const p = new URLSearchParams(window.location.search);
-                if (p.get('view') === 'faculty') return 'faculty';
-                if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty') return 'faculty';
+                if (p.get('view') === 'faculty' && isFacultyRole()) return 'faculty';
                 return 'dashboard';
             });
-            const isFacultyAuth = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty';
             const [activeModal, setActiveModal] = useState(null); // 'ed', 'evs', etc.
             const [selectedFaculty, setSelectedFaculty] = useState(() => getCurrentFaculty() || FACULTY_LIST[1]);
             const [rosterSearch, setRosterSearch] = useState('');
@@ -283,14 +282,16 @@
                                     </ul>
                                 </div>
 
-                                {/* Faculty Portal Direct Button */}
-                                <button 
-                                    class={`btn btn-sm ${activeTab === 'faculty' ? 'btn-warning text-dark fw-bold' : 'btn-outline-warning text-white fw-bold'} d-flex align-items-center gap-1`}
-                                    onClick={() => setActiveTab('faculty')}
-                                >
-                                    <i class="bi bi-person-workspace"></i>
-                                    <span>Faculty Portal</span>
-                                </button>
+                                {/* Faculty Portal Direct Button (Only for Authorized Faculty) */}
+                                {isFacultyAuth && (
+                                    <button 
+                                        class={`btn btn-sm ${activeTab === 'faculty' ? 'btn-warning text-dark fw-bold' : 'btn-outline-warning text-white fw-bold'} d-flex align-items-center gap-1`}
+                                        onClick={() => setActiveTab('faculty')}
+                                    >
+                                        <i class="bi bi-person-workspace"></i>
+                                        <span>Faculty Portal</span>
+                                    </button>
+                                )}
                                 
                                 {/* Profile Dropdown */}
                                 <div class="dropdown">
@@ -358,12 +359,14 @@
                                             <span><i class="bi bi-award me-2"></i> Grades & Marks</span>
                                         </a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class={`nav-link text-success fw-bold ${activeTab === 'faculty' ? 'active text-white' : ''}`} onClick={() => setActiveTab('faculty')}>
-                                            <span><i class="bi bi-person-workspace me-2"></i> Faculty Portal</span>
-                                            <span class="badge bg-success">Live</span>
-                                        </a>
-                                    </li>
+                                    {isFacultyAuth && (
+                                        <li class="nav-item">
+                                            <a class={`nav-link text-success fw-bold ${activeTab === 'faculty' ? 'active text-white' : ''}`} onClick={() => setActiveTab('faculty')}>
+                                                <span><i class="bi bi-person-workspace me-2"></i> Faculty Portal</span>
+                                                <span class="badge bg-success">Live</span>
+                                            </a>
+                                        </li>
+                                    )}
                                 </ul>
 
                                 <hr />
@@ -778,7 +781,7 @@
                                     </div>
                                 )}
 
-                                {activeTab === 'faculty' && (() => {
+                                {activeTab === 'faculty' && isFacultyAuth && (() => {
                                     const subjKey = selectedFaculty.subjectKey;
                                     const subjInfo = SUBJECT_INFO[subjKey] || { conducted: 20, type: selectedFaculty.type };
                                     

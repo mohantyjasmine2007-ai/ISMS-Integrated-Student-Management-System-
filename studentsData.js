@@ -4426,6 +4426,11 @@ function authenticateFaculty(facultyNameOrId, password) {
     setCurrentFaculty(faculty);
     if (typeof sessionStorage !== 'undefined') {
         sessionStorage.setItem('apsit_auth_role', 'faculty');
+        sessionStorage.removeItem('apsit_current_user');
+    }
+    if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('apsit_auth_role', 'faculty');
+        localStorage.removeItem('apsit_current_user');
     }
     return { success: true, faculty: faculty };
 }
@@ -4454,9 +4459,28 @@ function getCurrentFaculty() {
 
 function logoutFaculty() {
     try {
-        if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem(STORAGE_KEY_FACULTY);
-        if (typeof localStorage !== 'undefined') localStorage.removeItem(STORAGE_KEY_FACULTY);
+        if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.removeItem(STORAGE_KEY_FACULTY);
+            sessionStorage.removeItem('apsit_auth_role');
+        }
+        if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem(STORAGE_KEY_FACULTY);
+            localStorage.removeItem('apsit_auth_role');
+        }
     } catch(e) {}
+}
+
+// Role Helpers
+function isFacultyRole() {
+    try {
+        if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty') return true;
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('apsit_auth_role') === 'faculty') return true;
+    } catch(e) {}
+    return false;
+}
+
+function isStudentRole() {
+    return !isFacultyRole();
 }
 
 // Authentication & Session helpers for Student
@@ -4471,6 +4495,14 @@ function authenticateStudent(moodleId, password) {
         return { success: false, message: 'Invalid credentials. Please verify your password.' };
     }
     setCurrentUser(student);
+    if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem('apsit_auth_role', 'student');
+        sessionStorage.removeItem(STORAGE_KEY_FACULTY);
+    }
+    if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('apsit_auth_role', 'student');
+        localStorage.removeItem(STORAGE_KEY_FACULTY);
+    }
     return { success: true, student: student };
 }
 
@@ -4557,6 +4589,8 @@ if (typeof module !== 'undefined' && module.exports) {
         setCurrentFaculty,
         logoutFaculty,
         getFacultyCourses,
+        isFacultyRole,
+        isStudentRole,
         getAcademicCalendarEvents
     };
 }
