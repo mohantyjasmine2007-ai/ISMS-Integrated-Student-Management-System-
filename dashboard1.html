@@ -190,19 +190,19 @@
                             <div class="row align-items-center">
                                 <div class="col-md-8">
                                     <div class="d-flex align-items-center gap-2 mb-2">
-                                        <span class="badge bg-warning text-dark fw-bold px-3 py-1">SE IT DIV B</span>
+                                        <span class="badge bg-warning text-dark fw-bold px-3 py-1" id="dashRoleBadge">SE IT DIV B</span>
                                         <span class="badge bg-light text-primary fw-semibold" id="dashOverallAttendanceBadge">Attendance: 90% (Eligible)</span>
                                     </div>
                                     <h2 class="fw-bold mb-1">Welcome back, <span id="dashStudentName">Jasmine Mohanty</span>!</h2>
                                     <p class="mb-2 text-light opacity-90" id="dashStudentSubtitle">
                                         Roll No: <span id="dashRollNo" class="fw-semibold">IT-2026-38</span> | Moodle ID: <span id="dashMoodleId" class="fw-semibold">25104021</span> | Semester III
                                     </p>
-                                    <p class="mb-0 small text-light opacity-75">
+                                    <p class="mb-0 small text-light opacity-75" id="dashWelcomeDesc">
                                         Access your courses, attendance reports, syllabi, grades, and academic records in one integrated portal.
                                     </p>
                                 </div>
                                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                                    <i class="bi bi-mortarboard-fill" style="font-size:75px; opacity: 0.9;"></i>
+                                    <i class="bi bi-mortarboard-fill" id="dashWelcomeIcon" style="font-size:75px; opacity: 0.9;"></i>
                                 </div>
                             </div>
                         </div>
@@ -339,8 +339,8 @@
 
                     <!-- Academic Overview Stats -->
                     <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
-                        <h3 class="dashboard-title mb-0">Academic &amp; Attendance Overview</h3>
-                        <a href="javascript:void(0)" onclick="document.getElementById('attendance-tab').click()" class="btn btn-outline-primary btn-sm">
+                        <h3 class="dashboard-title mb-0" id="dashOverviewTitle">Academic &amp; Attendance Overview</h3>
+                        <a href="javascript:void(0)" id="dashOverviewActionBtn" onclick="document.getElementById('attendance-tab').click()" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-calendar-check me-1"></i> View Full Attendance Report
                         </a>
                     </div>
@@ -349,9 +349,9 @@
                             <div class="card section-card text-center border-0 shadow-sm">
                                 <div class="card-body">
                                     <i class="bi bi-book fs-1 text-primary"></i>
-                                    <h3 class="mt-2 fw-bold">10</h3>
-                                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Enrolled Courses</p>
-                                    <small class="text-secondary">Sem III (IT Dept)</small>
+                                    <h3 class="mt-2 fw-bold" id="dashEnrolledCoursesVal">10</h3>
+                                    <p class="text-muted mb-0 small text-uppercase fw-semibold" id="dashCard1Label">Enrolled Courses</p>
+                                    <small class="text-secondary" id="dashCard1Sub">Sem III (IT Dept)</small>
                                 </div>
                             </div>
                         </div>
@@ -360,7 +360,7 @@
                                 <div class="card-body">
                                     <i class="bi bi-person-check fs-1 text-success"></i>
                                     <h3 class="mt-2 fw-bold" id="dashTheoryAttended">129 / 146</h3>
-                                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Theory Attendance</p>
+                                    <p class="text-muted mb-0 small text-uppercase fw-semibold" id="dashCard2Label">Theory Attendance</p>
                                     <small class="text-success fw-bold" id="dashTheoryPct">88% (Conducted)</small>
                                 </div>
                             </div>
@@ -370,8 +370,8 @@
                                 <div class="card-body">
                                     <i class="bi bi-pc-display fs-1 text-info"></i>
                                     <h3 class="mt-2 fw-bold" id="dashPracticalAvg">92%</h3>
-                                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Practical Average</p>
-                                    <small class="text-info fw-bold">Labs &amp; Practicals</small>
+                                    <p class="text-muted mb-0 small text-uppercase fw-semibold" id="dashCard3Label">Practical Average</p>
+                                    <small class="text-info fw-bold" id="dashCard3Sub">Labs &amp; Practicals</small>
                                 </div>
                             </div>
                         </div>
@@ -380,7 +380,7 @@
                                 <div class="card-body">
                                     <i class="bi bi-award fs-1 text-warning" id="dashOverallIcon"></i>
                                     <h3 class="mt-2 fw-bold" id="dashOverallAttendance">90%</h3>
-                                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Overall Attendance</p>
+                                    <p class="text-muted mb-0 small text-uppercase fw-semibold" id="dashCard4Label">Overall Attendance</p>
                                     <span class="badge bg-success" id="dashEligibilityBadge">Eligible</span>
                                 </div>
                             </div>
@@ -1117,11 +1117,11 @@
                         </div>
                     </header>
 
-                    <div class="header-strip">STUDENT IDENTITY CARD &nbsp;|&nbsp; A.Y 2025 - 2026</div>
+                    <div class="header-strip" id="idCardHeaderStrip">STUDENT IDENTITY CARD &nbsp;|&nbsp; A.Y 2025 - 2026</div>
 
                     <div class="photo-wrap">
                         <div class="photo-ring">
-                            <img class="student-photo" src="apsit.jpg" alt="Student Photo" />
+                            <img class="student-photo" id="idCardPhoto" src="apsit.jpg" alt="Identity Photo" />
                         </div>
                     </div>
 
@@ -1132,32 +1132,32 @@
 
                     <div class="info-list">
                         <div class="info-row">
-                            <span class="info-label">Roll Number</span>
+                            <span class="info-label" id="idCardFieldLabel1">Roll Number</span>
                             <span class="info-value" id="idCardRoll">IT-2026-38</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Moodle ID.</span>
+                            <span class="info-label" id="idCardFieldLabel2">Moodle ID.</span>
                             <span class="info-value" id="idCardMoodle">25104021</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Course</span>
+                            <span class="info-label" id="idCardFieldLabel3">Course</span>
                             <span class="info-value" id="idCardCourse">S.E. Information Technology</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Date of Birth</span>
+                            <span class="info-label" id="idCardFieldLabel4">Date of Birth</span>
                             <span class="info-value" id="idCardDob">30/09/2007</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Blood Group</span>
+                            <span class="info-label" id="idCardFieldLabel5">Blood Group</span>
                             <span class="info-value" id="idCardBlood">O+</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Contact</span>
+                            <span class="info-label" id="idCardFieldLabel6">Contact</span>
                             <span class="info-value" id="idCardContact">+91 8779432270</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Valid Upto</span>
-                            <span class="info-value">31 May 2026</span>
+                            <span class="info-value" id="idCardValidUpto">31 May 2026</span>
                         </div>
                     </div>
 

@@ -27,6 +27,8 @@
             };
         }, []);
 
+        // If logged in as faculty, do not render student attendance forecaster
+        if (typeof isFacultyRole === 'function' && isFacultyRole()) return null;
         if (!student) return null;
 
         const theoryTotal = student.attendance?.theoryTotal || { attended: 129, pct: 88 };
@@ -298,16 +300,23 @@
     // 3. Mount React Modules when DOM is ready
     // =========================================================================
     function mountReactModules() {
-        // Mount Student Forecaster on Overview tab
+        const isFaculty = typeof isFacultyRole === 'function' && isFacultyRole();
+
+        // Mount on Overview/Dashboard tab
         const forecasterRootEl = document.getElementById('react-attendance-forecaster-root');
         if (forecasterRootEl && typeof ReactDOM !== 'undefined') {
             const root = ReactDOM.createRoot(forecasterRootEl);
-            root.render(h(StudentAttendanceForecaster));
+            if (isFaculty) {
+                // When logged in as faculty, mount live cohort telemetry and action controls!
+                root.render(h(FacultyLiveInsights));
+            } else {
+                root.render(h(StudentAttendanceForecaster));
+            }
         }
 
         // Mount Faculty Insights on Faculty tab
         const facultyInsightsRootEl = document.getElementById('react-faculty-insights-root');
-        if (facultyInsightsRootEl && typeof ReactDOM !== 'undefined') {
+        if (facultyInsightsRootEl && typeof ReactDOM !== 'undefined' && isFaculty) {
             const root = ReactDOM.createRoot(facultyInsightsRootEl);
             root.render(h(FacultyLiveInsights));
         }
