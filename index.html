@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APSIT ISMS - Student Login | SE IT Div B</title>
+    <link rel="icon" type="image/jpg" href="favicon.jpg">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary-navy: #0f2744;
+            --accent-blue: #1d5fbf;
+            --accent-teal: #0891b2;
+            --gold-accent: #f59e0b;
+            --bg-light: #f3f6fb;
+            --card-shadow: 0 20px 45px -10px rgba(15, 39, 68, 0.18);
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a1c33 0%, #102a4a 50%, #183e6b 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background ambient glow shapes */
+        .ambient-glow-1 {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(29, 95, 191, 0.28) 0%, rgba(29, 95, 191, 0) 70%);
+            top: -100px;
+            left: -100px;
+            pointer-events: none;
+        }
+        .ambient-glow-2 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(8, 145, 178, 0.22) 0%, rgba(8, 145, 178, 0) 70%);
+            bottom: -120px;
+            right: -100px;
+            pointer-events: none;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border: none;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            width: 100%;
+            max-width: 460px;
+            position: relative;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #0b223d 0%, #16467d 60%, #1d5fbf 100%);
+            color: white;
+            padding: 34px 28px 28px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo-ring {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .logo-ring i {
+            font-size: 34px;
+            color: #f3ad06;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .login-subtitle {
+            font-size: 13px;
+            color: #d1e2f7;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .card-body {
+            padding: 32px 30px 28px;
+        }
+
+        .form-label {
+            color: #475569;
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        .input-group {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1.5px solid #e2e8f0;
+            transition: all 0.2s ease;
+            background-color: #f8fafc;
+        }
+
+        .input-group:focus-within {
+            border-color: #1d5fbf;
+            box-shadow: 0 0 0 4px rgba(29, 95, 191, 0.12);
+            background-color: #ffffff;
+        }
+
+        .input-group-text {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-size: 17px;
+            padding-left: 16px;
+            padding-right: 10px;
+        }
+
+        .form-control {
+            border: none;
+            background: transparent;
+            font-size: 14.5px;
+            padding: 12px 14px 12px 4px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .form-control:focus {
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .password-hint {
+            font-size: 11.5px;
+            color: #64748b;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .password-hint code {
+            color: #0f2744;
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #102a4a 0%, #16467d 50%, #1d5fbf 100%);
+            color: white;
+            border: none;
+            padding: 13px;
+            font-weight: 700;
+            font-size: 15px;
+            border-radius: 12px;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(16, 42, 74, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(29, 95, 191, 0.35);
+            color: #ffffff;
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .demo-selector-wrap {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .demo-title {
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chip-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .demo-chip {
+            font-size: 11.5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #edf2f7;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-weight: 600;
+        }
+
+        .demo-chip:hover {
+            background: #1d5fbf;
+            color: white;
+            border-color: #1d5fbf;
+            transform: translateY(-1px);
+        }
+
+        .demo-chip.active {
+            background: #0f2744;
+            color: white;
+            border-color: #0f2744;
+        }
+
+        .info-pill {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            font-size: 12px;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 16px;
+        }
+
+        #loginAlert {
+            border-radius: 10px;
+            font-size: 13px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo-ring">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <h3 class="login-title">APSIT ISMS</h3>
+            <p class="login-subtitle">Integrated Student Management System • SE IT Div B</p>
+        </div>
+
+        <div class="card-body">
+            <div id="loginAlert" class="alert alert-danger py-2 px-3 mb-3"></div>
+
+            <div class="info-pill d-flex align-items-center">
+                <i class="bi bi-shield-check fs-5 me-2 text-primary"></i>
+                <div>
+                    <strong>Secure Student Portal</strong>
+                    <div style="font-size: 11px;">Access Attendance, Notes, Grades & Syllabi</div>
+                </div>
+            </div>
+
+            <form id="loginForm" autocomplete="off">
+                <div class="mb-3">
+                    <label class="form-label" for="studentId">Moodle ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                        <input type="text" class="form-control" id="studentId" placeholder="e.g. 25104021" required autofocus>
+                    </div>
+                    <small class="text-muted" style="font-size: 11px;">Enter your 8-digit Moodle ID registered in SE IT Div B</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+                        <button class="btn btn-link text-muted border-0 pe-3" type="button" id="togglePassword">
+                            <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+                    <div class="password-hint">
+                        <i class="bi bi-info-circle-fill text-primary"></i>
+                        <span>Format: <code>&lt;MoodleID&gt;@Apsit</code></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-login w-100 mt-4" id="submitBtn">
+                    <span>Login to Dashboard</span>
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- Quick Demo Roster Selector for Testing -->
+            <div class="demo-selector-wrap">
+                <div class="demo-title">
+                    <span><i class="bi bi-people-fill me-1"></i> Quick Test (SE IT Div B)</span>
+                    <span class="badge bg-secondary-subtle text-secondary">70 Students</span>
+                </div>
+                <div class="chip-list">
+                    <span class="demo-chip active" onclick="fillStudent('25104021')">Jasmine Mohanty (25104021)</span>
+                    <span class="demo-chip" onclick="fillStudent('25104023')">Nilanchal Jena (25104023)</span>
+                    <span class="demo-chip" onclick="fillStudent('25104039')">Harsh Pandey (25104039)</span>
+                    <span class="demo-chip" onclick="fillStudent('25104046')">Vedant Rane (25104046)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Students and Attendance Data -->
+    <script src="studentsData.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Password visibility toggle
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('togglePasswordIcon');
+
+        togglePasswordBtn.addEventListener('click', function() {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            toggleIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+        });
+
+        // Quick filler function for evaluation
+        function fillStudent(moodleId) {
+            const idInput = document.getElementById('studentId');
+            const passInput = document.getElementById('password');
+            idInput.value = moodleId;
+            passInput.value = moodleId + '@Apsit';
+            hideAlert();
+
+            // Highlight chip
+            document.querySelectorAll('.demo-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.textContent.includes(moodleId));
+            });
+        }
+
+        // Auto-update password template as user types Moodle ID
+        document.getElementById('studentId').addEventListener('input', function(e) {
+            hideAlert();
+        });
+
+        function showAlert(msg, isSuccess = false) {
+            const alertBox = document.getElementById('loginAlert');
+            alertBox.textContent = msg;
+            alertBox.className = isSuccess ? 'alert alert-success py-2 px-3 mb-3' : 'alert alert-danger py-2 px-3 mb-3';
+            alertBox.style.display = 'block';
+        }
+
+        function hideAlert() {
+            const alertBox = document.getElementById('loginAlert');
+            alertBox.style.display = 'none';
+        }
+
+        // Login Submission
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            hideAlert();
+
+            const studentId = document.getElementById('studentId').value.trim();
+            const pass = document.getElementById('password').value.trim();
+
+            if (!studentId || !pass) {
+                showAlert('Please fill in both Moodle ID and Password.');
+                return;
+            }
+
+            // Authenticate using the central student roster
+            const authResult = authenticateStudent(studentId, pass);
+
+            if (!authResult.success) {
+                showAlert(authResult.message);
+                return;
+            }
+
+            // Success state
+            showAlert(`Welcome, ${authResult.student.name}! Redirecting to your dashboard...`, true);
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading Dashboard...';
+
+            setTimeout(() => {
+                window.location.href = 'dashboard1.html';
+            }, 600);
+        });
+
+        // Default fill Jasmine Mohanty for seamless testing
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!document.getElementById('studentId').value) {
+                fillStudent('25104021');
+            }
+        });
+    </script>
+</body>
+</html>
