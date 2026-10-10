@@ -4136,28 +4136,339 @@ const STUDENTS_DATA = [
   }
 ];
 
-// Total conducted lectures per subject for SE IT Div B
+// Total conducted lectures per subject for SE IT Div B with Faculty In-charges
 const SUBJECT_INFO = {
-    amt1: { code: 'AMT-I', name: 'Applied Mathematics Thinking-I', conducted: 18, type: 'Theory' },
-    adsa: { code: 'ADSA', name: 'Advance Data Structure & Analysis', conducted: 21, type: 'Theory' },
-    dbms: { code: 'DBMSA', name: 'Database Management System & Application', conducted: 22, type: 'Theory' },
-    at: { code: 'AT', name: 'Automata Theory', conducted: 27, type: 'Theory' },
-    oe: { code: 'OE', name: 'Open Elective (Banking)', conducted: 13, type: 'Theory' },
-    fsjp: { code: 'FSJP', name: 'Full Stack Java Programming', conducted: 14, type: 'Theory' },
-    evs: { code: 'EVS', name: 'Environmental Science', conducted: 12, type: 'Theory' },
-    ed: { code: 'ED', name: 'Entrepreneurship Development', conducted: 15, type: 'Theory' },
-    mentoring: { code: 'MENT', name: 'Mentoring Sessions', conducted: 4, type: 'Mentoring' }
+    amt1: { code: 'AMT-I', name: 'Applied Mathematics Thinking-I', conducted: 18, type: 'Theory', faculty: 'Puja Chavan', facultyTitle: 'Prof. Puja Chavan' },
+    adsa: { code: 'ADSA', name: 'Advance Data Structure & Analysis', conducted: 21, type: 'Theory', faculty: 'Sonia Aneesh', facultyTitle: 'Dr. Sonia Aneesh' },
+    dbms: { code: 'DBMSA', name: 'Database Management System & Application', conducted: 22, type: 'Theory', faculty: 'Shital Agarwal', facultyTitle: 'Prof. Shital Agarwal' },
+    at: { code: 'AT', name: 'Automata Theory', conducted: 27, type: 'Theory', faculty: 'Charul Singh', facultyTitle: 'Prof. Charul Singh' },
+    oe: { code: 'OE', name: 'Open Elective (Banking)', conducted: 13, type: 'Theory', faculty: 'Anupama Singh', facultyTitle: 'Prof. Anupama Singh' },
+    adsaLab: { code: 'ADSA-LAB', name: 'ADSA Lab', conducted: 10, type: 'Practical', faculty: 'Anupama Singh', facultyTitle: 'Prof. Anupama Singh' },
+    sqlLab: { code: 'SQL-LAB', name: 'SQL Lab', conducted: 10, type: 'Practical', faculty: 'Shital Agarwal', facultyTitle: 'Prof. Shital Agarwal' },
+    fsjp: { code: 'FSJP', name: 'Mini-Project - Full Stack Java Programming', conducted: 14, type: 'Theory & Practical', faculty: 'Mandar Ganjapurkar', facultyTitle: 'Prof. Mandar Ganjapurkar' },
+    ed: { code: 'ED', name: 'Entrepreneurship Development', conducted: 15, type: 'Practical', faculty: 'Randeep Kaur Kahlon', facultyTitle: 'Prof. Randeep Kaur Kahlon' },
+    evs: { code: 'EVS', name: 'Environmental Science', conducted: 12, type: 'Practical', faculty: 'Pranali Vhora', facultyTitle: 'Prof. Pranali Vhora' },
+    mentoring: { code: 'MENT', name: 'Mentoring Sessions', conducted: 4, type: 'Mentoring', faculty: 'Sonia Aneesh', facultyTitle: 'Dr. Sonia Aneesh' }
 };
 
-// Authentication & Session helpers
+// Official Department Faculty Directory
+const FACULTY_LIST = [
+    { id: 'FAC01', name: 'Puja Chavan', title: 'Prof. Puja Chavan', subjectKey: 'amt1', subjectName: 'Applied Mathematics Thinking-I', type: 'Theory', email: 'pchavan@apsit.edu.in' },
+    { id: 'FAC02', name: 'Sonia Aneesh', title: 'Dr. Sonia Aneesh', subjectKey: 'adsa', subjectName: 'Advance Data Structure & Analysis', type: 'Theory', email: 'saneesh@apsit.edu.in' },
+    { id: 'FAC03', name: 'Shital Agarwal', title: 'Prof. Shital Agarwal', subjectKey: 'dbms', subjectName: 'Database Management System & Application', type: 'Theory', email: 'sagarwal@apsit.edu.in' },
+    { id: 'FAC04', name: 'Charul Singh', title: 'Prof. Charul Singh', subjectKey: 'at', subjectName: 'Automata Theory', type: 'Theory', email: 'csingh@apsit.edu.in' },
+    { id: 'FAC05', name: 'Anupama Singh', title: 'Prof. Anupama Singh', subjectKey: 'oe', subjectName: 'Open Elective (Banking)', type: 'Theory', email: 'asingh@apsit.edu.in' },
+    { id: 'FAC06', name: 'Anupama Singh', title: 'Prof. Anupama Singh', subjectKey: 'adsaLab', subjectName: 'ADSA Lab', type: 'Practical', email: 'asingh@apsit.edu.in' },
+    { id: 'FAC07', name: 'Shital Agarwal', title: 'Prof. Shital Agarwal', subjectKey: 'sqlLab', subjectName: 'SQL Lab', type: 'Practical', email: 'sagarwal@apsit.edu.in' },
+    { id: 'FAC08', name: 'Mandar Ganjapurkar', title: 'Prof. Mandar Ganjapurkar', subjectKey: 'fsjp', subjectName: 'Mini-Project - Full Stack Java Programming', type: 'Theory & Practical', email: 'mganjapurkar@apsit.edu.in' },
+    { id: 'FAC09', name: 'Randeep Kaur Kahlon', title: 'Prof. Randeep Kaur Kahlon', subjectKey: 'ed', subjectName: 'Entrepreneurship Development', type: 'Practical', email: 'rkahlon@apsit.edu.in' },
+    { id: 'FAC10', name: 'Pranali Vhora', title: 'Prof. Pranali Vhora', subjectKey: 'evs', subjectName: 'Environmental Science', type: 'Practical', email: 'pvhora@apsit.edu.in' }
+];
+
+// Academic Calendar Upcoming Events for Second Half 2026 (Reflected in Notifications & Dashboards)
+const ACADEMIC_CALENDAR_EVENTS = [
+    { id: 1, date: '12-10-2026', title: 'DevOps Club Hands-on Activity', type: 'Club Activity', badge: 'bg-info text-dark', desc: 'Hands-on session on CI/CD pipelines, Docker containerization & cloud deployments.' },
+    { id: 2, date: '16-10-2026', title: '3rd Defaulter Attendance List Display', type: 'Academic Review', badge: 'bg-danger text-white', desc: 'Official review of cumulative attendance under University of Mumbai Ordinance 6086.' },
+    { id: 3, date: '19-10-2026', title: 'APSIT Garbha Night Celebration', type: 'Cultural', badge: 'bg-warning text-dark', desc: 'Annual student cultural festivity & traditional celebration on campus.' },
+    { id: 4, date: '20-10-2026', title: 'Dasara (Public Holiday)', type: 'Holiday', badge: 'bg-secondary text-white', desc: 'College holiday on occasion of Vijayadashami / Dasara.' },
+    { id: 5, date: '21-10-2026 To 23-10-2026', title: 'Term Test-II (IAT-II) & Academic Review', type: 'Examination', badge: 'bg-primary text-white', desc: 'Compulsory Internal Assessment Test-II for all Semester III core courses.' },
+    { id: 6, date: '26-10-2026', title: 'Anti-Ragging Committee Statutory Meeting', type: 'Institutional', badge: 'bg-secondary text-white', desc: 'Institutional review, campus safety compliance and grievance assessment.' },
+    { id: 7, date: '26-10-2026 To 06-11-2026', title: 'Oral & Practical Examinations (Mumbai University)', type: 'University Exam', badge: 'bg-danger text-white', desc: 'External oral & practical university evaluations for SE IT lab courses and mini-projects.' },
+    { id: 8, date: '05-11-2026 To 11-11-2026', title: 'Diwali Holidays & Semester Break', type: 'Vacation', badge: 'bg-success text-white', desc: 'College holiday recess for Diwali festive break.' },
+    { id: 9, date: '16-11-2026', title: 'Commencement of Theory Examinations (Sem III, V, VII)', type: 'University Exam', badge: 'bg-danger text-white', desc: 'University of Mumbai End-Semester Theory Written Examinations.' },
+    { id: 10, date: '24-11-2026', title: 'Guru Nanak Jayanti (Holiday)', type: 'Holiday', badge: 'bg-secondary text-white', desc: 'College closed on occasion of Guru Nanak Jayanti.' },
+    { id: 11, date: '26-11-2026', title: 'Constitution Day (Samvidhan Divas) Celebration', type: 'Celebration', badge: 'bg-info text-dark', desc: 'Preamble reading ceremony and constitutional ethics symposium.' },
+    { id: 12, date: '01-12-2026', title: 'World AIDS Day Youth Awareness', type: 'Awareness', badge: 'bg-warning text-dark', desc: 'Community health outreach organized by APSIT NSS unit.' },
+    { id: 13, date: '04-12-2026', title: 'Commencement of Even Semester (KT) Examinations', type: 'University Exam', badge: 'bg-danger text-white', desc: 'University Examinations for Semesters II, IV, VI & VIII.' },
+    { id: 14, date: '25-12-2026', title: 'Christmas (Holiday)', type: 'Holiday', badge: 'bg-secondary text-white', desc: 'Public Holiday.' },
+    { id: 15, date: '28-12-2026', title: 'NSS Special Residential Winter Camp', type: 'NSS Activity', badge: 'bg-success text-white', desc: 'Rural community development & village outreach program.' },
+    { id: 16, date: '28-12-2026 onwards', title: 'OJAS SPORTS 2026 Annual Inter-Department Meet', type: 'Sports', badge: 'bg-primary text-white', desc: 'Annual sports festival spanning athletics, cricket, football, and indoor games.' }
+];
+
+// Helper to seed initial student grades if not present
+function initializeStudentGrades(student) {
+    if (!student.grades) {
+        student.grades = {
+            amt1: { termWork: 22, maxTermWork: 25, iat1: 17, iat2: 18, grade: 'A+', status: 'Submitted', faculty: 'Puja Chavan' },
+            adsa: { termWork: 23, maxTermWork: 25, iat1: 19, iat2: 18, grade: 'O', status: 'Submitted', faculty: 'Sonia Aneesh' },
+            dbms: { termWork: 22, maxTermWork: 25, iat1: 18, iat2: 19, grade: 'A+', status: 'Submitted', faculty: 'Shital Agarwal' },
+            at: { termWork: 21, maxTermWork: 25, iat1: 16, iat2: 18, grade: 'A', status: 'Submitted', faculty: 'Charul Singh' },
+            oe: { termWork: 24, maxTermWork: 25, iat1: 19, iat2: 20, grade: 'O', status: 'Submitted', faculty: 'Anupama Singh' },
+            adsaLab: { termWork: 23, maxTermWork: 25, grade: 'O', status: 'Completed', faculty: 'Anupama Singh' },
+            sqlLab: { termWork: 24, maxTermWork: 25, grade: 'O', status: 'Completed', faculty: 'Shital Agarwal' },
+            fsjp: { termWork: 46, maxTermWork: 50, oral: 23, grade: 'O', status: 'Completed', faculty: 'Mandar Ganjapurkar' },
+            ed: { termWork: 45, maxTermWork: 50, grade: 'O', status: 'Completed', faculty: 'Randeep Kaur Kahlon' },
+            evs: { termWork: 44, maxTermWork: 50, grade: 'A+', status: 'Completed', faculty: 'Pranali Vhora' }
+        };
+    }
+    return student;
+}
+
+// Live shared data store with localStorage sync
+const STORAGE_KEY_STUDENTS = 'apsit_isms_dynamic_students';
+const STORAGE_KEY_FACULTY = 'apsit_isms_active_faculty';
+
+function getLiveStudents() {
+    try {
+        if (typeof localStorage !== 'undefined') {
+            const cached = localStorage.getItem(STORAGE_KEY_STUDENTS);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed) && parsed.length === STUDENTS_DATA.length) {
+                    return parsed;
+                }
+            }
+        }
+    } catch(e) {
+        console.error('Failed reading live students from localStorage', e);
+    }
+    // Deep clone original and initialize grades
+    const cloned = STUDENTS_DATA.map(s => initializeStudentGrades(JSON.parse(JSON.stringify(s))));
+    saveLiveStudents(cloned);
+    return cloned;
+}
+
+function saveLiveStudents(studentsList) {
+    try {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(studentsList));
+        }
+    } catch(e) {
+        console.error('Failed saving live students to localStorage', e);
+    }
+}
+
+function getStudentByMoodleId(moodleId) {
+    const students = getLiveStudents();
+    return students.find(s => s.moodleId === String(moodleId).trim()) || null;
+}
+
+// Get all courses assigned to a faculty member
+function getFacultyCourses(facultyNameOrId) {
+    if (!facultyNameOrId) return [];
+    const clean = String(facultyNameOrId).toLowerCase().replace(/^(prof\.|dr\.|prof|dr|mr\.|mrs\.|ms\.)\s*/i, '').trim();
+    return FACULTY_LIST.filter(f => {
+        const fClean = f.name.toLowerCase();
+        return f.id.toLowerCase() === clean ||
+               fClean === clean ||
+               fClean.includes(clean) ||
+               clean.includes(fClean);
+    });
+}
+
+// Faculty activity: Update attendance for a subject
+function updateStudentAttendanceByFaculty(moodleId, subjectKey, newAttended, newConducted) {
+    // Role check: Ensure logged-in faculty is authorized for this specific subject
+    const activeFaculty = getCurrentFaculty();
+    if (activeFaculty && typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty') {
+        const allowedSubjects = FACULTY_LIST
+            .filter(f => f.name.toLowerCase() === activeFaculty.name.toLowerCase())
+            .map(f => f.subjectKey);
+        if (allowedSubjects.length > 0 && !allowedSubjects.includes(subjectKey)) {
+            return { 
+                success: false, 
+                message: `Access Denied: ${activeFaculty.title} is strictly authorized to manage their assigned course(s) only.` 
+            };
+        }
+    }
+
+    const students = getLiveStudents();
+    const student = students.find(s => s.moodleId === String(moodleId).trim());
+    if (!student) {
+        return { success: false, message: 'Student not found with Moodle ID: ' + moodleId };
+    }
+
+    if (!student.attendance[subjectKey]) {
+        student.attendance[subjectKey] = { attended: 0, pct: 0 };
+    }
+
+    const conducted = newConducted !== undefined ? Number(newConducted) : (SUBJECT_INFO[subjectKey] ? SUBJECT_INFO[subjectKey].conducted : 20);
+    const attended = Math.min(Math.max(0, Number(newAttended)), conducted);
+    
+    student.attendance[subjectKey].attended = attended;
+    student.attendance[subjectKey].conducted = conducted;
+    student.attendance[subjectKey].pct = Math.round((attended / conducted) * 100);
+
+    // Recalculate theory total
+    const theoryKeys = ['amt1', 'adsa', 'dbms', 'at', 'oe', 'fsjp', 'evs', 'ed', 'mentoring'];
+    let totalAttended = 0;
+    let totalConducted = 0;
+    theoryKeys.forEach(k => {
+        if (student.attendance[k] && SUBJECT_INFO[k]) {
+            totalAttended += student.attendance[k].attended;
+            totalConducted += SUBJECT_INFO[k].conducted;
+        }
+    });
+
+    student.attendance.theoryTotal = {
+        attended: totalAttended,
+        pct: Math.round((totalAttended / (totalConducted || 146)) * 100)
+    };
+
+    // Calculate overall attendance (weighted 70% theory + 30% practical)
+    student.attendance.overallPct = Math.round((student.attendance.theoryTotal.pct * 0.7) + (student.attendance.practicalAvg * 0.3));
+
+    saveLiveStudents(students);
+
+    // If currently logged-in student is updated, sync their active session immediately
+    const currentUser = getCurrentUser();
+    if (currentUser && currentUser.moodleId === student.moodleId) {
+        setCurrentUser(student);
+    }
+
+    return { success: true, student: student };
+}
+
+// Faculty activity: Update grades and assessment for a subject
+function updateStudentGradeByFaculty(moodleId, subjectKey, gradePayload) {
+    // Role check: Ensure logged-in faculty is authorized for this specific subject
+    const activeFaculty = getCurrentFaculty();
+    if (activeFaculty && typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty') {
+        const allowedSubjects = FACULTY_LIST
+            .filter(f => f.name.toLowerCase() === activeFaculty.name.toLowerCase())
+            .map(f => f.subjectKey);
+        if (allowedSubjects.length > 0 && !allowedSubjects.includes(subjectKey)) {
+            return { 
+                success: false, 
+                message: `Access Denied: ${activeFaculty.title} is strictly authorized to manage their assigned course(s) only.` 
+            };
+        }
+    }
+
+    const students = getLiveStudents();
+    const student = students.find(s => s.moodleId === String(moodleId).trim());
+    if (!student) {
+        return { success: false, message: 'Student not found with Moodle ID: ' + moodleId };
+    }
+
+    initializeStudentGrades(student);
+
+    student.grades[subjectKey] = {
+        ...student.grades[subjectKey],
+        ...gradePayload,
+        lastUpdated: new Date().toISOString()
+    };
+
+    saveLiveStudents(students);
+
+    // Sync session if matching current user
+    const currentUser = getCurrentUser();
+    if (currentUser && currentUser.moodleId === student.moodleId) {
+        setCurrentUser(student);
+    }
+
+    return { success: true, student: student };
+}
+
+// Faculty Session & Authentication
+function authenticateFaculty(facultyNameOrId, password) {
+    if (!facultyNameOrId || !String(facultyNameOrId).trim()) {
+        return { success: false, message: 'Please enter your Faculty Name.' };
+    }
+    if (!password || !String(password).trim()) {
+        return { success: false, message: 'Please enter your password.' };
+    }
+
+    const rawInput = String(facultyNameOrId).trim();
+    const cleanInput = rawInput.toLowerCase()
+        .replace(/^(prof\.|dr\.|prof|dr|mr\.|mrs\.|ms\.)\s*/i, '')
+        .trim();
+
+    const faculty = FACULTY_LIST.find(f => {
+        const fClean = f.name.toLowerCase();
+        const fTitle = f.title.toLowerCase();
+        const fFirst = fClean.split(' ')[0];
+        const id = f.id.toLowerCase();
+        const email = f.email.toLowerCase();
+
+        return id === cleanInput ||
+               email === cleanInput ||
+               fClean === cleanInput ||
+               fTitle === cleanInput ||
+               fClean.includes(cleanInput) ||
+               cleanInput.includes(fClean) ||
+               cleanInput === fFirst ||
+               cleanInput.includes(fFirst);
+    });
+
+    if (!faculty) {
+        return { success: false, message: 'Faculty member not found. Please verify your name.' };
+    }
+
+    // Password must be in the format of name@Apsit
+    const fFirst = faculty.name.split(' ')[0]; // e.g. "Puja", "Sonia", "Shital", "Charul", "Anupama", "Mandar", "Randeep", "Pranali"
+    const fFullNameNoSpace = faculty.name.replace(/\s+/g, '');
+    const cleanInputNoSpace = cleanInput.replace(/\s+/g, '');
+
+    const validPasswords = [
+        `${fFirst}@Apsit`,
+        `${fFirst.toLowerCase()}@Apsit`,
+        `${fFullNameNoSpace}@Apsit`,
+        `${fFullNameNoSpace.toLowerCase()}@Apsit`,
+        `${faculty.name}@Apsit`,
+        `${cleanInputNoSpace}@Apsit`,
+        `${cleanInputNoSpace.toLowerCase()}@Apsit`
+    ];
+
+    const passTrim = String(password).trim();
+    const isPassValid = validPasswords.some(vp => 
+        vp === passTrim || 
+        vp.toLowerCase() === passTrim.toLowerCase()
+    );
+
+    if (!isPassValid) {
+        return { 
+            success: false, 
+            message: 'Invalid credentials. Password must match your faculty credentials.' 
+        };
+    }
+
+    setCurrentFaculty(faculty);
+    if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem('apsit_auth_role', 'faculty');
+    }
+    return { success: true, faculty: faculty };
+}
+
+function setCurrentFaculty(faculty) {
+    try {
+        if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem(STORAGE_KEY_FACULTY, JSON.stringify(faculty));
+        }
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(STORAGE_KEY_FACULTY, JSON.stringify(faculty));
+        }
+    } catch(e) {}
+}
+
+function getCurrentFaculty() {
+    try {
+        let stored = null;
+        if (typeof sessionStorage !== 'undefined') stored = sessionStorage.getItem(STORAGE_KEY_FACULTY);
+        if (!stored && typeof localStorage !== 'undefined') stored = localStorage.getItem(STORAGE_KEY_FACULTY);
+        if (stored) return JSON.parse(stored);
+    } catch(e) {}
+    // Default to Prof. Shital Agarwal or Dr. Sonia Aneesh for quick view
+    return FACULTY_LIST[1]; // Dr. Sonia Aneesh
+}
+
+function logoutFaculty() {
+    try {
+        if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem(STORAGE_KEY_FACULTY);
+        if (typeof localStorage !== 'undefined') localStorage.removeItem(STORAGE_KEY_FACULTY);
+    } catch(e) {}
+}
+
+// Authentication & Session helpers for Student
 function authenticateStudent(moodleId, password) {
-    const student = STUDENTS_DATA.find(s => s.moodleId === moodleId.trim());
+    const students = getLiveStudents();
+    const student = students.find(s => s.moodleId === moodleId.trim());
     if (!student) {
         return { success: false, message: 'Moodle ID not registered in SE IT Div B database.' };
     }
     const expectedPassword = moodleId.trim() + '@Apsit';
     if (password !== expectedPassword) {
-        return { success: false, message: 'Invalid password. Expected format: ' + moodleId.trim() + '@Apsit' };
+        return { success: false, message: 'Invalid credentials. Please verify your password.' };
     }
     setCurrentUser(student);
     return { success: true, student: student };
@@ -4186,7 +4497,10 @@ function getCurrentUser() {
             stored = localStorage.getItem('apsit_current_user');
         }
         if (stored) {
-            return JSON.parse(stored);
+            const parsed = JSON.parse(stored);
+            // Refresh with live data if available
+            const live = getStudentByMoodleId(parsed.moodleId);
+            return live || parsed;
         }
     } catch(e) {
         console.error('Failed to parse current user', e);
@@ -4219,6 +4533,31 @@ function logoutStudent() {
     }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { STUDENTS_DATA, SUBJECT_INFO, authenticateStudent, getCurrentUser, setCurrentUser, requireAuth, logoutStudent };
+function getAcademicCalendarEvents() {
+    return ACADEMIC_CALENDAR_EVENTS;
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        STUDENTS_DATA,
+        SUBJECT_INFO,
+        FACULTY_LIST,
+        ACADEMIC_CALENDAR_EVENTS,
+        getLiveStudents,
+        getStudentByMoodleId,
+        updateStudentAttendanceByFaculty,
+        updateStudentGradeByFaculty,
+        authenticateStudent,
+        getCurrentUser,
+        setCurrentUser,
+        requireAuth,
+        logoutStudent,
+        authenticateFaculty,
+        getCurrentFaculty,
+        setCurrentFaculty,
+        logoutFaculty,
+        getFacultyCourses,
+        getAcademicCalendarEvents
+    };
+}
+

@@ -327,41 +327,37 @@
                     </a>
                 </li>
                 
-                <!-- Notifications Dropdown -->
+                <!-- Notifications Dropdown (Upcoming Academic Calendar Events) -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-bell"></i>
-                        Notifications
+                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bell-fill text-warning"></i>
+                        <span>Notifications</span>
+                        <span class="badge bg-danger rounded-pill ms-1" id="notifBadgeCount">16</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="notificationsDropdown" style="width: 320px;">
-                        <li><h6 class="dropdown-header text-primary fw-bold">Upcoming Events</h6></li>
-                        <li>
-                            <a class="dropdown-item py-2" href="#">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1 text-wrap">Mahatma Gandhi Jayanti</h6>
-                                </div>
-                                <small class="text-muted">02 OCT | Full Day</small>
-                            </a>
+                    <ul class="dropdown-menu dropdown-menu-end p-2 shadow-lg" aria-labelledby="notificationsDropdown" style="width: 360px; max-height: 480px; overflow-y: auto;">
+                        <li class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
+                            <h6 class="dropdown-header text-primary fw-bold p-0 mb-0">
+                                <i class="bi bi-calendar-event me-1"></i> Upcoming Academic Events
+                            </h6>
+                            <span class="badge bg-primary-subtle text-primary">Sem III 2026</span>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item py-2" href="#">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1 text-wrap">AWS Cloud Club Activity</h6>
-                                </div>
-                                <small class="text-muted">03 OCT | Scheduled</small>
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item py-2" href="#">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1 text-wrap">Cyber Security Club Activity</h6>
-                                </div>
-                                <small class="text-muted">05 OCT | Scheduled</small>
+                        <div id="dynamicNotificationsList">
+                            <!-- Populated dynamically from ACADEMIC_CALENDAR_EVENTS -->
+                        </div>
+                        <li><hr class="dropdown-divider my-2"></li>
+                        <li class="text-center">
+                            <a class="small text-decoration-none fw-semibold text-primary" href="javascript:void(0)" onclick="document.getElementById('calendar-tab').click()">
+                                View Complete Academic Calendar <i class="bi bi-arrow-right"></i>
                             </a>
                         </li>
                     </ul>
+                </li>
+
+                <!-- Faculty Portal Direct Access -->
+                <li class="nav-item">
+                    <a class="nav-link btn btn-sm btn-outline-warning text-white fw-bold px-3 py-1 ms-lg-2 my-1 my-lg-0" href="javascript:void(0)" onclick="openFacultyPortalTab()">
+                        <i class="bi bi-person-workspace text-warning me-1"></i> Faculty Portal
+                    </a>
                 </li>
                 
                 <!-- Student Profile Dropdown -->
@@ -438,6 +434,12 @@
                         <i class="bi bi-bar-chart"></i> Grades &amp; Marks
                     </a>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link d-flex align-items-center justify-content-between text-success fw-bold" id="faculty-tab" data-bs-toggle="pill" data-bs-target="#faculty-view" role="tab" aria-controls="faculty-view" aria-selected="false">
+                        <span><i class="bi bi-person-workspace me-1"></i> Faculty Portal</span>
+                        <span class="badge bg-success">Live</span>
+                    </a>
+                </li>
             </ul>
             <hr>
             <h6 class="text-muted px-3">SUPPORT</h6>
@@ -483,7 +485,7 @@
                                         Roll No: <span id="dashRollNo" class="fw-semibold">IT-2026-38</span> | Moodle ID: <span id="dashMoodleId" class="fw-semibold">25104021</span> | Semester III
                                     </p>
                                     <p class="mb-0 small text-light opacity-75">
-                                        Access your courses, attendance reports, syllabi, notes, grades, and academic resources in one integrated portal.
+                                        Access your courses, attendance reports, syllabi, grades, and academic records in one integrated portal.
                                     </p>
                                 </div>
                                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
@@ -602,28 +604,17 @@
                         </div>
                     </div>
 
-                    <!-- Announcements Block -->
-                    <div class="row g-4">
+                    <!-- Announcements Block: Academic Calendar Upcoming Events -->
+                    <div class="row g-4 mb-4">
                         <div class="col-12">
-                            <div class="card section-card">
-                                <div class="card-header bg-white">
-                                    <h5 class="mb-0"><i class="bi bi-megaphone-fill text-warning me-2"></i> Announcements</h5>
+                            <div class="card section-card border-0 shadow-sm">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                                    <h5 class="mb-0 fw-bold"><i class="bi bi-calendar-event-fill text-primary me-2"></i> Upcoming Academic Calendar Events &amp; Official Notices</h5>
+                                    <span class="badge bg-primary-subtle text-primary fw-semibold">Second Half 2026</span>
                                 </div>
-                                <div class="card-body">
-                                    <div class="alert alert-primary">
-                                        <strong>Internal Assessment</strong>
-                                        <p class="mb-0">Internal assessment schedule has been published.</p>
-                                        <small>2 hours ago</small>
-                                    </div>
-                                    <div class="alert alert-warning">
-                                        <strong>Assignment Submission</strong>
-                                        <p class="mb-0">Submit your pending assignments before the deadline.</p>
-                                        <small>Yesterday</small>
-                                    </div>
-                                    <div class="alert alert-success mb-0">
-                                        <strong>College Event</strong>
-                                        <p class="mb-0">Technical event registrations are now open.</p>
-                                        <small>3 days ago</small>
+                                <div class="card-body p-3">
+                                    <div class="row g-3" id="dashUpcomingEventsGrid">
+                                        <!-- Dynamically loaded from ACADEMIC_CALENDAR_EVENTS -->
                                     </div>
                                 </div>
                             </div>
@@ -697,112 +688,144 @@
                     <div class="row g-4 mb-4">
                         <!-- Math Course Card -->
                         <div class="col-sm-6 col-xl-3">
-                            <div class="card course-card shadow-sm">
+                            <div class="card course-card shadow-sm border-0">
                                 <div class="card-body">
-                                    <i class="bi bi-calculator course-icon"></i>
-                                    <h5 class="mt-3">Applied Mathematics Thinking-I</h5>
-                                    <p class="text-muted mb-0">Information Technology</p>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <i class="bi bi-calculator course-icon"></i>
+                                        <span class="badge bg-primary-subtle text-primary border">ITC301</span>
+                                    </div>
+                                    <h5 class="mt-3 fw-bold">Applied Mathematics Thinking-I</h5>
+                                    <p class="text-primary small mb-1 fw-semibold"><i class="bi bi-person-fill me-1"></i>Prof. Puja Chavan</p>
+                                    <p class="text-muted small mb-0">Theory • 4 Credits</p>
                                 </div>
                                 <div class="card-footer bg-white border-0">
-                                    <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#mathCourseModal">Go to Course</button>
+                                    <button class="btn btn-outline-primary w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#mathCourseModal">Go to Course</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- ADSA Course Card -->
                         <div class="col-sm-6 col-xl-3">
-                            <div class="card course-card shadow-sm">
+                            <div class="card course-card shadow-sm border-0">
                                 <div class="card-body">
-                                    <i class="bi bi-diagram-3 course-icon"></i>
-                                    <h5 class="mt-3">Advance Data Structure & Analysis</h5>
-                                    <p class="text-muted mb-0">Information Technology</p>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <i class="bi bi-diagram-3 course-icon"></i>
+                                        <span class="badge bg-primary-subtle text-primary border">ITC302</span>
+                                    </div>
+                                    <h5 class="mt-3 fw-bold">Advance Data Structure &amp; Analysis</h5>
+                                    <p class="text-primary small mb-1 fw-semibold"><i class="bi bi-person-fill me-1"></i>Dr. Sonia Aneesh</p>
+                                    <p class="text-muted small mb-0">Theory • 3 Credits</p>
                                 </div>
                                 <div class="card-footer bg-white border-0">
-                                    <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#adsaCourseModal">Go to Course</button>
+                                    <button class="btn btn-outline-primary w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#adsaCourseModal">Go to Course</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- DBMS Course Card -->
                         <div class="col-sm-6 col-xl-3">
-                            <div class="card course-card shadow-sm">
+                            <div class="card course-card shadow-sm border-0">
                                 <div class="card-body">
-                                    <i class="bi bi-database course-icon"></i>
-                                    <h5 class="mt-3">Database Management System & Application</h5>
-                                    <p class="text-muted mb-0">Information Technology</p>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <i class="bi bi-database course-icon"></i>
+                                        <span class="badge bg-primary-subtle text-primary border">ITC303</span>
+                                    </div>
+                                    <h5 class="mt-3 fw-bold">Database Management System &amp; Application</h5>
+                                    <p class="text-primary small mb-1 fw-semibold"><i class="bi bi-person-fill me-1"></i>Prof. Shital Agarwal</p>
+                                    <p class="text-muted small mb-0">Theory • 3 Credits</p>
                                 </div>
                                 <div class="card-footer bg-white border-0">
-                                    <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#dbmsCourseModal">Go to Course</button>
+                                    <button class="btn btn-outline-primary w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#dbmsCourseModal">Go to Course</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Automata Theory Course Card -->
                         <div class="col-sm-6 col-xl-3">
-                            <div class="card course-card shadow-sm">
+                            <div class="card course-card shadow-sm border-0">
                                 <div class="card-body">
-                                    <i class="bi bi-cpu course-icon"></i>
-                                    <h5 class="mt-3">Automata Theory</h5>
-                                    <p class="text-muted mb-0">Information Technology</p>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <i class="bi bi-cpu course-icon"></i>
+                                        <span class="badge bg-primary-subtle text-primary border">ITC304</span>
+                                    </div>
+                                    <h5 class="mt-3 fw-bold">Automata Theory</h5>
+                                    <p class="text-primary small mb-1 fw-semibold"><i class="bi bi-person-fill me-1"></i>Prof. Charul Singh</p>
+                                    <p class="text-muted small mb-0">Theory • 3 Credits</p>
                                 </div>
                                 <div class="card-footer bg-white border-0">
-                                    <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#automataCourseModal">Go to Course</button>
+                                    <button class="btn btn-outline-primary w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#automataCourseModal">Go to Course</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Open Elective Card -->
                         <div class="col-sm-6 col-xl-3">
-                            <div class="card course-card shadow-sm">
+                            <div class="card course-card shadow-sm border-0">
                                 <div class="card-body">
-                                    <i class="bi bi-book course-icon"></i>
-                                    <h5 class="mt-3">Open Elective</h5>
-                                    <p class="text-muted mb-0">Information Technology</p>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <i class="bi bi-book course-icon"></i>
+                                        <span class="badge bg-primary-subtle text-primary border">ITC305</span>
+                                    </div>
+                                    <h5 class="mt-3 fw-bold">Open Elective (Banking &amp; Finance)</h5>
+                                    <p class="text-primary small mb-1 fw-semibold"><i class="bi bi-person-fill me-1"></i>Prof. Anupama Singh</p>
+                                    <p class="text-muted small mb-0">Theory • 3 Credits</p>
                                 </div>
                                 <div class="card-footer bg-white border-0">
-                                    <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#openElectiveModal">Go to Course</button>
+                                    <button class="btn btn-outline-primary w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#openElectiveModal">Go to Course</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- ADSA Lab Card -->
                         <div class="col-sm-6 col-xl-3">
-                            <div class="card course-card shadow-sm">
+                            <div class="card course-card shadow-sm border-0">
                                 <div class="card-body">
-                                    <i class="bi bi-pc-display course-icon"></i>
-                                    <h5 class="mt-3">ADSA Lab</h5>
-                                    <p class="text-muted mb-0">Information Technology</p>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <i class="bi bi-pc-display course-icon"></i>
+                                        <span class="badge bg-secondary-subtle text-secondary border">ITL301</span>
+                                    </div>
+                                    <h5 class="mt-3 fw-bold">ADSA Lab</h5>
+                                    <p class="text-primary small mb-1 fw-semibold"><i class="bi bi-person-fill me-1"></i>Prof. Anupama Singh</p>
+                                    <p class="text-muted small mb-0">Practical • 1 Credit</p>
                                 </div>
                                 <div class="card-footer bg-white border-0">
-                                    <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#adsaLabModal">Go to Course</button>
+                                    <button class="btn btn-outline-primary w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#adsaLabModal">Go to Course</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- SQL Lab Card -->
                         <div class="col-sm-6 col-xl-3">
-                            <div class="card course-card shadow-sm">
+                            <div class="card course-card shadow-sm border-0">
                                 <div class="card-body">
-                                    <i class="bi bi-server course-icon"></i>
-                                    <h5 class="mt-3">SQL Lab</h5>
-                                    <p class="text-muted mb-0">Information Technology</p>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <i class="bi bi-server course-icon"></i>
+                                        <span class="badge bg-secondary-subtle text-secondary border">ITL302</span>
+                                    </div>
+                                    <h5 class="mt-3 fw-bold">SQL Lab</h5>
+                                    <p class="text-primary small mb-1 fw-semibold"><i class="bi bi-person-fill me-1"></i>Prof. Shital Agarwal</p>
+                                    <p class="text-muted small mb-0">Practical • 1 Credit</p>
                                 </div>
                                 <div class="card-footer bg-white border-0">
-                                    <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#sqlLabModal">Go to Course</button>
+                                    <button class="btn btn-outline-primary w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#sqlLabModal">Go to Course</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Mini Project Card -->
                         <div class="col-sm-6 col-xl-3">
-                            <div class="card course-card shadow-sm">
+                            <div class="card course-card shadow-sm border-0">
                                 <div class="card-body">
-                                    <i class="bi bi-file-code course-icon"></i>
-                                    <h5 class="mt-3">Mini-Project - Full Stack Java Programming</h5>
-                                    <p class="text-muted mb-0">Information Technology</p>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <i class="bi bi-file-code course-icon"></i>
+                                        <span class="badge bg-info-subtle text-info border">ITM301</span>
+                                    </div>
+                                    <h5 class="mt-3 fw-bold">Mini-Project - Full Stack Java</h5>
+                                    <p class="text-primary small mb-1 fw-semibold"><i class="bi bi-person-fill me-1"></i>Prof. Mandar Ganjapurkar</p>
+                                    <p class="text-muted small mb-0">Project • 2 Credits</p>
                                 </div>
                                 <div class="card-footer bg-white border-0">
-                                    <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#miniProjectModal">Go to Course</button>
+                                    <button class="btn btn-outline-primary w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#miniProjectModal">Go to Course</button>
                                 </div>
                             </div>
                         </div>
@@ -816,7 +839,8 @@
                                         <span class="badge bg-warning-subtle text-dark border">Course 2993511</span>
                                     </div>
                                     <h5 class="mt-2 fw-bold">Entrepreneurship Development</h5>
-                                    <p class="text-muted small mb-1">Information Technology • Sem III</p>
+                                    <p class="text-primary small mb-1 fw-semibold"><i class="bi bi-person-fill me-1"></i>Prof. Randeep Kaur Kahlon</p>
+                                    <p class="text-muted small mb-1">Practical • Sem III</p>
                                     <span class="badge bg-primary-subtle text-primary">2 Credits • 50 Marks</span>
                                 </div>
                                 <div class="card-footer bg-white border-0 pt-0">
@@ -836,7 +860,8 @@
                                         <span class="badge bg-success-subtle text-success border">Course 2993512</span>
                                     </div>
                                     <h5 class="mt-2 fw-bold">Environmental Science</h5>
-                                    <p class="text-muted small mb-1">Information Technology • Sem III</p>
+                                    <p class="text-primary small mb-1 fw-semibold"><i class="bi bi-person-fill me-1"></i>Prof. Pranali Vhora</p>
+                                    <p class="text-muted small mb-1">Practical • Sem III</p>
                                     <span class="badge bg-primary-subtle text-primary">2 Credits • 50 Marks</span>
                                 </div>
                                 <div class="card-footer bg-white border-0 pt-0">
@@ -1174,68 +1199,161 @@
                                         <tr>
                                             <th>Course Code</th>
                                             <th>Course Name</th>
+                                            <th>Faculty In-Charge</th>
                                             <th class="text-center">IAT-I (20)</th>
                                             <th class="text-center">IAT-II (20)</th>
-                                            <th class="text-center">Term Work (50/25)</th>
+                                            <th class="text-center">Term Work</th>
                                             <th class="text-center">Current Grade</th>
                                             <th class="text-center">Status</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="studentGradesTableBody">
+                                        <!-- Dynamically generated for all 10 courses with assigned faculty -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Faculty Management Portal Tab Content -->
+                <div class="tab-pane fade" id="faculty-view" role="tabpanel" aria-labelledby="faculty-tab">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active">Faculty Management Portal</li>
+                        </ol>
+                    </nav>
+
+                    <!-- Faculty Portal Header & Profile Selector -->
+                    <div class="card shadow-sm border-0 mb-4" style="background: linear-gradient(135deg, #092c4c 0%, #174d82 60%, #1e60a3 100%); color: white;">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-lg-7">
+                                    <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-1">FACULTY ACADEMIC MANAGEMENT</span>
+                                    <h3 class="fw-bold mb-1" id="facultyPortalTitle">Faculty Academic Portal</h3>
+                                    <p class="mb-2 text-light opacity-90" id="facultyPortalSubtitle">
+                                        SE IT Div B • Direct Access to Manage Student Attendance &amp; Academic Grades
+                                    </p>
+                                    <div class="d-flex flex-wrap gap-2 align-items-center mt-3">
+                                        <span class="badge bg-light text-dark py-2 px-3"><i class="bi bi-people-fill text-primary me-1"></i> Class: 70 Students</span>
+                                        <span class="badge bg-success py-2 px-3"><i class="bi bi-shield-check me-1"></i> Authorized Faculty Access</span>
+                                        <span class="badge bg-info text-dark py-2 px-3"><i class="bi bi-arrow-repeat me-1"></i> Synchronized with React Dashboard</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 mt-3 mt-lg-0">
+                                    <div class="bg-white text-dark p-3 rounded shadow">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="badge bg-success-subtle text-success border border-success fw-bold px-2 py-1">
+                                                <i class="bi bi-shield-lock-fill me-1"></i> Authorized Faculty In-Charge
+                                            </span>
+                                            <span class="badge bg-secondary-subtle text-secondary small">Profile Locked</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 15px;">
+                                                <i class="bi bi-person-fill"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold fs-6 text-dark mb-0" id="activeFacultyNameDisplay">Faculty In-Charge</div>
+                                                <small class="text-muted" id="activeFacultyEmailDisplay">Official Faculty Account</small>
+                                            </div>
+                                        </div>
+                                        <div id="facultyCourseControlContainer" class="mt-2">
+                                            <!-- Dynamically populated: Course dropdown if multiple courses, or locked course badge -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Faculty Action & Statistics Row -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm p-3 text-center">
+                                <small class="text-muted text-uppercase fw-semibold">Conducted Lectures</small>
+                                <h3 class="fw-bold text-primary mt-1 mb-0" id="facStatConducted">21</h3>
+                                <small class="text-secondary" id="facStatType">Theory Hours</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm p-3 text-center">
+                                <small class="text-muted text-uppercase fw-semibold">Class Avg Attendance</small>
+                                <h3 class="fw-bold text-success mt-1 mb-0" id="facStatAvgPct">78%</h3>
+                                <small class="text-muted">SE IT Div B</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm p-3 text-center">
+                                <small class="text-muted text-uppercase fw-semibold">Eligible (≥75%)</small>
+                                <h3 class="fw-bold text-success mt-1 mb-0" id="facStatEligibleCount">58</h3>
+                                <small class="text-success fw-semibold">In Safe Standing</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm p-3 text-center">
+                                <small class="text-muted text-uppercase fw-semibold">Defaulters (&lt;75%)</small>
+                                <h3 class="fw-bold text-danger mt-1 mb-0" id="facStatDefaulterCount">12</h3>
+                                <small class="text-danger fw-semibold">Defaulter Risk</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search and Actions Bar -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-3">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-5">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                                        <input type="text" class="form-control" id="facultyRosterSearch" placeholder="Search by student name, roll no, or Moodle ID..." oninput="filterFacultyRoster()">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="facultyAttendanceFilter" onchange="filterFacultyRoster()">
+                                        <option value="all">All Students (70)</option>
+                                        <option value="safe">Eligible Only (≥75%)</option>
+                                        <option value="defaulters">Defaulters Only (&lt;75%)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <button class="btn btn-success fw-semibold btn-sm me-2" onclick="facultyMarkAllPresent()">
+                                        <i class="bi bi-plus-circle me-1"></i> +1 Lecture (All Present)
+                                    </button>
+                                    <button class="btn btn-outline-primary fw-semibold btn-sm" onclick="exportFacultyRosterCSV()">
+                                        <i class="bi bi-download me-1"></i> Export CSV
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Roster Table -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="bi bi-table text-primary me-2"></i> Student Roster &amp; Academic Management Table
+                            </h5>
+                            <span class="badge bg-secondary" id="facRosterCountBadge">Showing 70 students</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
                                         <tr>
-                                            <td><strong>2993511</strong></td>
-                                            <td>Entrepreneurship Development</td>
-                                            <td class="text-center">--</td>
-                                            <td class="text-center">--</td>
-                                            <td class="text-center"><span class="badge bg-primary">46 / 50</span></td>
-                                            <td class="text-center fw-bold text-success">O (Outstanding)</td>
-                                            <td class="text-center"><span class="badge bg-success-subtle text-success">Completed</span></td>
+                                            <th>Roll No</th>
+                                            <th>Moodle ID</th>
+                                            <th>Student Name</th>
+                                            <th class="text-center" id="facColSubjectAtt">Attended / Total</th>
+                                            <th class="text-center">Subject %</th>
+                                            <th class="text-center">Overall %</th>
+                                            <th class="text-center">Term Work</th>
+                                            <th class="text-center">Grade</th>
+                                            <th class="text-center">Actions</th>
                                         </tr>
-                                        <tr>
-                                            <td><strong>2993512</strong></td>
-                                            <td>Environmental Science</td>
-                                            <td class="text-center">--</td>
-                                            <td class="text-center">--</td>
-                                            <td class="text-center"><span class="badge bg-primary">44 / 50</span></td>
-                                            <td class="text-center fw-bold text-success">A+</td>
-                                            <td class="text-center"><span class="badge bg-success-subtle text-success">Completed</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>ITC301</strong></td>
-                                            <td>Applied Mathematics Thinking-I</td>
-                                            <td class="text-center">18 / 20</td>
-                                            <td class="text-center">19 / 20</td>
-                                            <td class="text-center"><span class="badge bg-primary">23 / 25</span></td>
-                                            <td class="text-center fw-bold text-success">A+</td>
-                                            <td class="text-center"><span class="badge bg-success-subtle text-success">Passed</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>ITC302</strong></td>
-                                            <td>Advance Data Structure &amp; Analysis</td>
-                                            <td class="text-center">17 / 20</td>
-                                            <td class="text-center">18 / 20</td>
-                                            <td class="text-center"><span class="badge bg-primary">22 / 25</span></td>
-                                            <td class="text-center fw-bold text-success">A</td>
-                                            <td class="text-center"><span class="badge bg-success-subtle text-success">Passed</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>ITC303</strong></td>
-                                            <td>Database Management System &amp; App</td>
-                                            <td class="text-center">19 / 20</td>
-                                            <td class="text-center">18 / 20</td>
-                                            <td class="text-center"><span class="badge bg-primary">24 / 25</span></td>
-                                            <td class="text-center fw-bold text-success">O (Outstanding)</td>
-                                            <td class="text-center"><span class="badge bg-success-subtle text-success">Passed</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>ITL301</strong></td>
-                                            <td>Mini-Project - Full Stack Java Programming</td>
-                                            <td class="text-center">--</td>
-                                            <td class="text-center">--</td>
-                                            <td class="text-center"><span class="badge bg-primary">48 / 50</span></td>
-                                            <td class="text-center fw-bold text-success">O (Outstanding)</td>
-                                            <td class="text-center"><span class="badge bg-success-subtle text-success">Verified</span></td>
-                                        </tr>
+                                    </thead>
+                                    <tbody id="facultyRosterTableBody">
+                                        <!-- Rendered dynamically -->
                                     </tbody>
                                 </table>
                             </div>
@@ -1648,57 +1766,221 @@
 
 <!-- Database Management System & Application Course Modal -->
 <div class="modal fade" id="dbmsCourseModal" tabindex="-1" aria-labelledby="dbmsCourseModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header" style="background-color: #123b6d; color: white;">
-                <h5 class="modal-title" id="dbmsCourseModalLabel"><i class="bi bi-database me-2"></i> Database Management System & Application</h5>
+            <div class="modal-header text-white" style="background-color: #0f2744;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-danger bg-opacity-25 rounded p-2 text-warning">
+                        <i class="bi bi-database-fill-gear fs-3"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="dbmsCourseModalLabel">Course 2343113: Database Management System &amp; Application</h5>
+                        <small class="text-light opacity-75">S.E. Information Technology • Semester III • Academic Year 2026-27</small>
+                    </div>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <h5 class="text-primary fw-bold mb-3">Detailed Syllabus</h5>
+                <!-- Course Scheme Alert -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded bg-light text-center h-100">
+                            <div class="text-muted small text-uppercase fw-bold">Teaching Scheme</div>
+                            <div class="fs-5 fw-bold text-dark mt-1">Theory: 03 Hrs/Wk</div>
+                            <small class="text-muted">3 Contact Hours</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded bg-light text-center h-100">
+                            <div class="text-muted small text-uppercase fw-bold">Credits Assigned</div>
+                            <div class="fs-5 fw-bold text-primary mt-1">03 Credits</div>
+                            <small class="text-muted">Theory: 3 | Pract: --</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded bg-light text-center h-100">
+                            <div class="text-muted small text-uppercase fw-bold">Internal Assessment</div>
+                            <div class="fs-5 fw-bold text-warning mt-1">40 Marks</div>
+                            <small class="text-muted">IAT-I (20) + IAT-II (20)</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded bg-light text-center h-100">
+                            <div class="text-muted small text-uppercase fw-bold">End Sem Exam</div>
+                            <div class="fs-5 fw-bold text-success mt-1">60 Marks</div>
+                            <small class="text-muted">Total: 100 Marks (2 Hrs)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Objectives & Outcomes -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100 border shadow-sm">
+                            <div class="card-header bg-white py-2 fw-bold text-primary">
+                                <i class="bi bi-bullseye me-1"></i> Course Objectives
+                            </div>
+                            <div class="card-body p-3 small">
+                                <ol class="mb-0 ps-3">
+                                    <li class="mb-1">To learn the basics and understand the need for database management systems for real-world applications.</li>
+                                    <li class="mb-1">To construct a conceptual data model for real-world applications.</li>
+                                    <li class="mb-1">To Build a Relational Model from ER/EER.</li>
+                                    <li class="mb-1">To introduce the concept of SQL to store and retrieve data efficiently.</li>
+                                    <li class="mb-1">To demonstrate notions of normalization for database design.</li>
+                                    <li>To understand the concepts of transaction processing - concurrency control &amp; recovery procedures.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 border shadow-sm">
+                            <div class="card-header bg-white py-2 fw-bold text-success">
+                                <i class="bi bi-check-circle-fill me-1"></i> Course Outcomes (Bloom's Taxonomy)
+                            </div>
+                            <div class="card-body p-3 small">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1"><strong>CO1:</strong> Identify the need of Database Management System (L1, L2).</li>
+                                    <li class="mb-1"><strong>CO2:</strong> Design conceptual model for real life applications (L6).</li>
+                                    <li class="mb-1"><strong>CO3:</strong> Create Relational Model for real life applications (L6).</li>
+                                    <li class="mb-1"><strong>CO4:</strong> Formulate query using SQL commands (L3).</li>
+                                    <li class="mb-1"><strong>CO5:</strong> Apply the concept of normalization to relational database design (L3).</li>
+                                    <li><strong>CO6:</strong> Demonstrate the concept of transaction, concurrency and recovery (L2).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Syllabus Modules Table -->
+                <h5 class="text-primary fw-bold mb-3"><i class="bi bi-journal-text me-2"></i>Detailed Syllabus Modules</h5>
                 <div class="table-responsive mb-4">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-bordered table-hover align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th>Module</th>
-                                <th>Name</th>
+                                <th style="width: 80px;" class="text-center">Module</th>
+                                <th style="width: 220px;">Name of Module</th>
                                 <th>Detailed Content</th>
+                                <th style="width: 80px;" class="text-center">Hours</th>
+                                <th style="width: 70px;" class="text-center">CO</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>I</td>
-                                <td>Database System Concepts, Architecture, and Applications</td>
-                                <td>Introduction, Characteristics of Databases, File system v/s Database system, Data abstraction and Data Independence, DBMS system architecture, Database Administrator (DBA), Role of DBA. Applications: Banking Systems, E-Commerce, Telecommunications, Healthcare Systems, Social Media Platforms, Education Systems, Airline Reservation Systems, Government Applications.</td>
+                                <td class="text-center fw-bold">0</td>
+                                <td class="fw-semibold">Prerequisite</td>
+                                <td>C, Python Programming.</td>
+                                <td class="text-center">02</td>
+                                <td class="text-center text-muted">--</td>
                             </tr>
                             <tr>
-                                <td>II</td>
-                                <td>The Entity-Relationship Model</td>
-                                <td>Conceptual Modeling of a database, The Entity-Relationship (ER) Model, Entity Type, Entity Sets, Attributes and Keys, Relationship Types, Relationship Sets, Weak entity Types. Generalization, Specialization and Aggregation, Extended Entity-Relationship (EER) Model.</td>
+                                <td class="text-center fw-bold">I</td>
+                                <td class="fw-semibold">Database System Concepts, Architecture, and Applications</td>
+                                <td>
+                                    Introduction, Characteristics of Databases, File system v/s Database system, Data abstraction and Data Independence, DBMS system architecture, Database Administrator (DBA), Role of DBA.<br>
+                                    <strong>Applications:</strong> Banking Systems, E-Commerce, Telecommunications, Healthcare Systems, Social Media Platforms, Education Systems, Airline Reservation Systems, Government Applications.<br>
+                                    <small class="text-muted"><strong>Self-learning Topics:</strong> Identify the types of Databases.</small>
+                                </td>
+                                <td class="text-center">05</td>
+                                <td class="text-center fw-bold text-primary">CO1</td>
                             </tr>
                             <tr>
-                                <td>III</td>
-                                <td>Relational Model & Relational Algebra</td>
-                                <td>Introduction to Relational Model, Relational Model Constraints and Relational Database Schemas, Concept of Keys: Primary Kay, Secondary key, Foreign Key, Mapping the ER and EER Model to the Relational Model, Introduction to Relational Algebra, Relational Algebra expressions for Unary Relational Operations, Set Theory operations, Binary Relational operation Relational Algebra Queries</td>
+                                <td class="text-center fw-bold">II</td>
+                                <td class="fw-semibold">The Entity-Relationship Model</td>
+                                <td>
+                                    Conceptual Modeling of a database, The Entity-Relationship (ER) Model, Entity Type, Entity Sets, Attributes and Keys, Relationship Types, Relationship Sets, Weak entity Types. Generalization, Specialization and Aggregation, Extended Entity-Relationship (EER) Model.<br>
+                                    <small class="text-muted"><strong>Self-learning Topics:</strong> Design an ER model for any real-time case study.</small>
+                                </td>
+                                <td class="text-center">05</td>
+                                <td class="text-center fw-bold text-primary">CO2</td>
                             </tr>
                             <tr>
-                                <td>IV</td>
-                                <td>Structured Query Language (SQL) & Indexing</td>
-                                <td>Overview of SQL, Data Definition Commands, Set Operations, Aggregate Function, null values, Data Manipulation commands, Data Control commands, Complex Retrieval Queries using Group By, Recursive Queries, nested Queries, Integrity constraints in SQL. Database Programming with JDBC, Security and authorization: Grant & Revoke in SQL Functions and Procedures in SQL and cursors. Indexing: Basic Concepts, Ordered Indices, Index Definition in SQL</td>
+                                <td class="text-center fw-bold">III</td>
+                                <td class="fw-semibold">Relational Model &amp; Relational Algebra</td>
+                                <td>
+                                    Introduction to Relational Model, Relational Model Constraints and Relational Database Schemas, Concept of Keys: Primary Key, Secondary key, Foreign Key, Mapping the ER and EER Model to the Relational Model, Introduction to Relational Algebra, Relational Algebra expressions for Unary Relational Operations: Set Theory operations, Binary Relational operation, Relational Algebra Queries.<br>
+                                    <small class="text-muted"><strong>Self-learning Topics:</strong> Map the ER model designed in module II to relational schema.</small>
+                                </td>
+                                <td class="text-center">05</td>
+                                <td class="text-center fw-bold text-primary">CO3</td>
                             </tr>
                             <tr>
-                                <td>V</td>
-                                <td>Relational Database Design</td>
-                                <td>Design guidelines for relational Schema, Functional Dependencies, Database tables and normalization, The need for normalization, The normalization process, Improving the design, Definition of Normal Forms- 1NF, 2NF, 3NF & The Boyce-Codd Normal Form (BCNF).</td>
+                                <td class="text-center fw-bold">IV</td>
+                                <td class="fw-semibold">Structured Query Language (SQL) &amp; Indexing</td>
+                                <td>
+                                    Overview of SQL, Data Definition Commands (DDL), Set Operations, Aggregate Function, null values, Data Manipulation commands (DML), Data Control commands (DCL), Complex Retrieval Queries using Group By, Recursive Queries, nested Queries, Integrity constraints in SQL. Database Programming with JDBC, Security and authorization: Grant &amp; Revoke in SQL, Functions and Procedures in SQL and cursors.<br>
+                                    <strong>Indexing:</strong> Basic Concepts, Ordered Indices, Index Definition in SQL.<br>
+                                    <small class="text-muted"><strong>Self-learning Topics:</strong> Physical design of database for the relational model designed in module III and fire various queries.</small>
+                                </td>
+                                <td class="text-center">08</td>
+                                <td class="text-center fw-bold text-primary">CO4</td>
                             </tr>
                             <tr>
-                                <td>VI</td>
-                                <td>Transactions Management and Concurrency and Recovery</td>
-                                <td>Transaction: Transaction concept, State Diagram, ACID Properties, Transaction Control Commands, Concurrent Executions, Serializability - Conflict and View, Concurrency Control: Lock-based-protocols, Deadlock handling Timestamp-based protocols, Recovery System: Recovery Concepts, Log based recovery.</td>
+                                <td class="text-center fw-bold">V</td>
+                                <td class="fw-semibold">Relational Database Design</td>
+                                <td>
+                                    Design guidelines for relational Schema, Functional Dependencies, Database tables and normalization, The need for normalization, The normalization process, Improving the design, Definition of Normal Forms: 1NF, 2NF, 3NF &amp; The Boyce-Codd Normal Form (BCNF).<br>
+                                    <small class="text-muted"><strong>Self-learning Topics:</strong> Consider any real-time application and normalization up to 3NF/BCNF.</small>
+                                </td>
+                                <td class="text-center">07</td>
+                                <td class="text-center fw-bold text-primary">CO5</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center fw-bold">VI</td>
+                                <td class="fw-semibold">Transactions Management, Concurrency &amp; Recovery</td>
+                                <td>
+                                    Transaction: Transaction concept, State Diagram, ACID Properties, Transaction Control Commands, Concurrent Executions, Serializability – Conflict and View.<br>
+                                    <strong>Concurrency Control:</strong> Lock-based-protocols, Deadlock handling, Timestamp-based protocols.<br>
+                                    <strong>Recovery System:</strong> Recovery Concepts, Log based recovery.<br>
+                                    <small class="text-muted"><strong>Self-learning Topics:</strong> Study the various deadlock situations which may occur for a database designed in module V.</small>
+                                </td>
+                                <td class="text-center">07</td>
+                                <td class="text-center fw-bold text-primary">CO6</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Textbooks and References -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-primary"><i class="bi bi-book me-1"></i> Text Books</h6>
+                        <ul class="small list-group mb-3">
+                            <li class="list-group-item">1. Korth, Silberchatz, Sudarshan, <em>Database System Concepts</em>, 6th Edition, McGraw Hill.</li>
+                            <li class="list-group-item">2. Elmasri and Navathe, <em>Fundamentals of Database Systems</em>, 6th Edition, Pearson Education.</li>
+                            <li class="list-group-item">3. Raghu Ramakrishnan and Johannes Gehrke, <em>Database Management Systems</em>, TMH.</li>
+                        </ul>
+                        <h6 class="fw-bold text-secondary"><i class="bi bi-journal-bookmark me-1"></i> Reference Books</h6>
+                        <ul class="small list-group">
+                            <li class="list-group-item">1. Peter Rob and Carlos Coronel, <em>Database Systems Design, Implementation and Management</em>, Thomson Learning, 9th Edition.</li>
+                            <li class="list-group-item">2. <em>SQL &amp; PL / SQL for Oracle 11g Black Book</em>, Dreamtech Press.</li>
+                            <li class="list-group-item">3. G. K. Gupta, <em>Database Management Systems</em>, McGraw – Hill.</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-info"><i class="bi bi-globe me-1"></i> Online References</h6>
+                        <ul class="small list-group mb-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>1. NPTEL Database Management System</span>
+                                <a href="https://www.nptel.ac.in" target="_blank" class="btn btn-outline-primary btn-sm py-0">nptel.ac.in</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>2. O'Reilly Learning Database Systems</span>
+                                <a href="https://www.oreilly.com" target="_blank" class="btn btn-outline-primary btn-sm py-0">oreilly.com</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>3. Coursera Database Specialization</span>
+                                <a href="https://www.coursera.org/" target="_blank" class="btn btn-outline-primary btn-sm py-0">coursera.org</a>
+                            </li>
+                        </ul>
+
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="fw-bold text-dark mb-1"><i class="bi bi-clipboard-check me-1"></i> Examination Scheme</h6>
+                            <p class="small text-muted mb-1">• <strong>Internal Assessment (40 Marks):</strong> 2 Compulsory Tests (20 marks each) covering 40%-50% portions.</p>
+                            <p class="small text-muted mb-0">• <strong>End Sem Theory Exam (60 Marks):</strong> 6 questions of 15 marks each (Q1 compulsory; any 3 from Q2-Q6 with mixed module parts).</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="modal-footer bg-light">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -1979,139 +2261,318 @@
 <div class="modal fade" id="miniProjectModal" tabindex="-1" aria-labelledby="miniProjectModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header" style="background-color: #123b6d; color: white;">
-                <h5 class="modal-title" id="miniProjectModalLabel"><i class="bi bi-file-code me-2"></i> Mini-Project - Full Stack Java Programming</h5>
+            <div class="modal-header text-white" style="background-color: #0f2744;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary bg-opacity-25 rounded p-2 text-info">
+                        <i class="bi bi-file-code-fill fs-3"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="miniProjectModalLabel">Course 2343611: Mini-Project - Full Stack Java Programming (ITL301)</h5>
+                        <small class="text-light opacity-75">S.E. Information Technology • Semester III • Academic Year 2026-27</small>
+                    </div>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
+                <!-- Teaching & Exam Scheme Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded bg-light text-center h-100">
+                            <div class="text-muted small text-uppercase fw-bold">Teaching Scheme</div>
+                            <div class="fs-5 fw-bold text-dark mt-1">Pract: 2* + 2 Hrs/Wk</div>
+                            <small class="text-muted">4 Practical Hours</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded bg-light text-center h-100">
+                            <div class="text-muted small text-uppercase fw-bold">Credits Assigned</div>
+                            <div class="fs-5 fw-bold text-primary mt-1">02 Credits</div>
+                            <small class="text-muted">Practical: 2 Credits</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded bg-light text-center h-100">
+                            <div class="text-muted small text-uppercase fw-bold">Term Work</div>
+                            <div class="fs-5 fw-bold text-warning mt-1">50 Marks</div>
+                            <small class="text-muted">Practicals + Capstone</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded bg-light text-center h-100">
+                            <div class="text-muted small text-uppercase fw-bold">Practical / Oral</div>
+                            <div class="fs-5 fw-bold text-success mt-1">25 Marks</div>
+                            <small class="text-muted">Total: 75 Marks</small>
+                        </div>
+                    </div>
+                </div>
 
-                <h5 class="text-primary fw-bold mb-3">Detailed Syllabus</h5>
+                <!-- Lab Objectives & Lab Outcomes -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100 border shadow-sm">
+                            <div class="card-header bg-white py-2 fw-bold text-primary">
+                                <i class="bi bi-bullseye me-1"></i> Lab Objectives
+                            </div>
+                            <div class="card-body p-3 small">
+                                <ol class="mb-0 ps-3">
+                                    <li class="mb-1">To set up development environments for Java full-stack projects.</li>
+                                    <li class="mb-1">To develop a web interface using front-end technologies.</li>
+                                    <li class="mb-1">To build RESTful web services using Spring Boot.</li>
+                                    <li class="mb-1">To implement database CRUD operations using Hibernate/JPA.</li>
+                                    <li class="mb-1">To integrate front-end and back-end applications.</li>
+                                    <li>To deploy the application and present the capstone project.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 border shadow-sm">
+                            <div class="card-header bg-white py-2 fw-bold text-success">
+                                <i class="bi bi-check-circle-fill me-1"></i> Lab Outcomes (Bloom's Taxonomy)
+                            </div>
+                            <div class="card-body p-3 small">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1"><strong>LO1:</strong> Setup and configure full-stack Java development environment (L1, L2).</li>
+                                    <li class="mb-1"><strong>LO2:</strong> Develop responsive user interfaces with HTML, CSS, and React.js (L1, L2, L3).</li>
+                                    <li class="mb-1"><strong>LO3:</strong> Create RESTful APIs using Spring Boot framework (L1, L2, L3).</li>
+                                    <li class="mb-1"><strong>LO4:</strong> Perform CRUD operations with MySQL database integration (L1, L2, L3, L4).</li>
+                                    <li class="mb-1"><strong>LO5:</strong> Integrate front-end and back-end with secure API endpoints (L1, L2, L3, L4).</li>
+                                    <li><strong>LO6:</strong> Deploy full-stack application on cloud platform and present capstone (L1–L6).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hardware & Software Requirements -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light h-100">
+                            <h6 class="fw-bold text-dark mb-1"><i class="bi bi-cpu me-1 text-primary"></i> Hardware Requirements</h6>
+                            <p class="small text-muted mb-0">PC i3 processor and above. 8GB RAM (minimum), 16GB recommended, 256GB SSD recommended, Stable internet connection.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light h-100">
+                            <h6 class="fw-bold text-dark mb-1"><i class="bi bi-laptop me-1 text-primary"></i> Software Requirements</h6>
+                            <p class="small text-muted mb-0">JDK 17+, IntelliJ IDEA / Eclipse, VS Code, MySQL / MongoDB, Postman, Git, GitHub, Spring Boot, Node.js &amp; npm (React.js), AWS / Heroku / Docker.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Syllabus Modules Table -->
+                <h5 class="text-primary fw-bold mb-3"><i class="bi bi-journal-text me-2"></i>Detailed Syllabus Modules</h5>
                 <div class="table-responsive mb-4">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-bordered table-hover align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th>Module</th>
-                                <th>Name</th>
+                                <th style="width: 70px;" class="text-center">Module</th>
+                                <th style="width: 200px;">Module Name</th>
                                 <th>Detailed Content</th>
-                                <th>Hours</th>
-                                <th>LO</th>
+                                <th style="width: 80px;" class="text-center">Hours</th>
+                                <th style="width: 80px;" class="text-center">LO</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>I</td>
-                                <td>Introduction to Full Stack Java</td>
-                                <td>Overview of full-stack development: definition, components (Frontend, Backend, Database, DevOps), Full Stack Developer roles and skills. Technology stack overview: HTML, CSS, JavaScript, React.js, Java, Spring Boot, MySQL, Git, Docker, Postman. Real-world applications of full stack. Java SE concepts: JVM, JDK, JRE, data types, variables, operators, control statements, basics of OOP, packages and import statements, exception handling basics. Introduction to Java EE: need for Java EE in enterprise applications, multi-tier architecture, MVC architecture (Model: business logic and data management, View: user interface, Controller: request handling, linking model and view).<br><em>Self-Learning: Application Servers vs. Web Servers, Java EE vs. Spring Boot, MVC in Java Web Development.</em></td>
-                                <td>04</td>
-                                <td>LO1</td>
+                                <td class="text-center fw-bold">I</td>
+                                <td class="fw-semibold">Introduction to Full Stack Java</td>
+                                <td>
+                                    Overview of full-stack development: Definition of Full Stack Development, Components (Frontend, Backend, Database, DevOps), Full Stack Developer Roles &amp; Skills. Technology Stack Overview: Frontend (HTML, CSS, JavaScript, React.js), Backend (Java, Spring Boot), Database (MySQL), Tools (Git, Docker, Postman), Real-world applications of full stack.<br>
+                                    Java SE concepts: JVM, JDK, JRE, Data types, Variables, Operators, Control Statements, Introduction to OOP, Packages and Import statements, Exception Handling Basics.<br>
+                                    Introduction to Java EE: Need for Java EE in enterprise applications, Multi-tier architecture, MVC Architecture (Model: Business logic/data, View: User interface, Controller: Request handling).<br>
+                                    <small class="text-muted"><strong>Self-Learning Topics:</strong> Application Servers vs. Web Servers, Java EE vs. Spring Boot: Modern development trends, MVC in Java Web Development.</small>
+                                </td>
+                                <td class="text-center">04</td>
+                                <td class="text-center fw-bold text-primary">LO1</td>
                             </tr>
                             <tr>
-                                <td>II</td>
-                                <td>HTML 5, CSS 3 with Bootstrap</td>
-                                <td>HTML basics and structure: HTML5 structure, semantic elements, character effects, document spacing, tables, lists and hyperlinks. Responsive web design: media queries, flexible layouts, mobile-first design. Image handling and forms: image roles, adding images, images as links, form elements (text fields, checkboxes, radio buttons, etc.). CSS3 fundamentals: syntax, selectors, text formatting, fonts, colors, borders, CSS Grid. Bootstrap introduction and components: grid system, headers, dropdowns, navigation bars. React.js basics, Fetch API, Axios for API calls.<br><em>Self-Learning: JavaScript DOM Manipulation, CSS Flexbox, Version Control with Git.</em></td>
-                                <td>04</td>
-                                <td>LO2</td>
+                                <td class="text-center fw-bold">II</td>
+                                <td class="fw-semibold">HTML 5, CSS 3 with Bootstrap</td>
+                                <td>
+                                    HTML Basics &amp; Structure: HTML5 structure, semantic elements, character effects, document spacing, tables, lists, hyperlinks. Responsive Web Design: Media queries, flexible layouts, mobile-first design.<br>
+                                    Image Handling &amp; Forms: Adding images, images as links, form elements (text fields, checkboxes, radio buttons). CSS3 Fundamentals: CSS syntax, selectors, text formatting, fonts, colors, borders, CSS Grid.<br>
+                                    Bootstrap Introduction &amp; Components: Grid systems, headers, dropdowns, navigation bars. React.js basics, Fetch API, Axios for API calls.<br>
+                                    <small class="text-muted"><strong>Self-Learning Topics:</strong> JavaScript DOM Manipulation, CSS Flexbox, Version Control with Git.</small>
+                                </td>
+                                <td class="text-center">04</td>
+                                <td class="text-center fw-bold text-primary">LO2</td>
                             </tr>
                             <tr>
-                                <td>III</td>
-                                <td>Back-end development with Java</td>
-                                <td>Spring Boot introduction: Spring Framework, why Spring Boot, auto-configuration, starter dependencies, embedded server, Spring Initializr, project structure (pom.xml, application.properties), running your first application. RESTful API development: REST vs. SOAP, HTTP methods (GET, POST, PUT, DELETE), REST design principles, REST controllers, request mapping and GetMapping/PostMapping. Controllers and Services: @RestController vs. @Controller, service layer, @Autowired, dependency injection. Repositories: Spring Data JPA, database connection (H2/MySQL), @Entity, JpaRepository and CrudRepository, basic CRUD operations (save(), findById(), findAll(), deleteById()). Exception handling: @ExceptionHandler, global handlers with @ControllerAdvice, custom exception classes, standard error responses (HTTP status codes, error messages).<br><em>Self-Learning: Advanced Techniques of REST API and JPA.</em></td>
-                                <td>05</td>
-                                <td>LO3</td>
+                                <td class="text-center fw-bold">III</td>
+                                <td class="fw-semibold">Back-end Development with Java</td>
+                                <td>
+                                    Spring Boot introduction: What is Spring Framework? Why Spring Boot? Features: Auto-configuration, Starter dependencies, embedded server, Spring Initializr, Project structure (pom.xml, application.properties), Running first Spring Boot application.<br>
+                                    RESTful API development: REST vs. SOAP, HTTP Methods (GET, POST, PUT, DELETE), RESTful API Design principles, Creating REST Controllers, Request Mapping, @GetMapping, @PostMapping.<br>
+                                    Controllers and Services: Role in MVC, @RestController vs. @Controller, Service layer responsibilities, Dependency Injection with @Autowired.<br>
+                                    Repositories &amp; JPA: Configuring connection in Spring Boot (H2/MySQL), Entity classes, @Entity, JpaRepository &amp; CrudRepository, Basic CRUD (save, findById, findAll, deleteById). Exception Handling: @ExceptionHandler, global handlers with @ControllerAdvice, Custom exception classes.<br>
+                                    <small class="text-muted"><strong>Self-Learning Topics:</strong> Advanced Techniques of REST API and JPA.</small>
+                                </td>
+                                <td class="text-center">05</td>
+                                <td class="text-center fw-bold text-primary">LO3</td>
                             </tr>
                             <tr>
-                                <td>IV</td>
-                                <td>Database Integration</td>
-                                <td>Introduction to MySQL: relational databases and RDBMS, database, tables, records, primary and foreign keys, MySQL Workbench or command line, ER diagrams, normalization, installation, creating databases and tables. SQL: DDL (CREATE, ALTER, DROP) and DML (INSERT, UPDATE, DELETE, SELECT). CRUD operations, filtering and sorting (WHERE, ORDER BY, LIKE, LIMIT), aggregate functions (COUNT, AVG, SUM, MAX, MIN), joins (INNER JOIN, LEFT JOIN). JPA and Hibernate ORM, repository interfaces, default CRUD methods, custom query methods (findByName(), findByAgeGreaterThan()), pagination and sorting with Spring Data JPA, @Query annotation for custom JPQL/SQL queries, native queries vs. JPQL.<br><em>Self-Learning: JPQL Advanced Queries, Transactions in JPA, Optimizing JPA Performance.</em></td>
-                                <td>04</td>
-                                <td>LO4</td>
+                                <td class="text-center fw-bold">IV</td>
+                                <td class="fw-semibold">Database Integration</td>
+                                <td>
+                                    Introduction to MySQL: Relational database concepts, RDBMS, Tables, Records, Primary &amp; Foreign Keys, MySQL Workbench or CLI, ER diagrams, normalization. Setting up MySQL: installation, creating databases, tables.<br>
+                                    Introduction to SQL: DDL (CREATE, ALTER, DROP), DML (INSERT, UPDATE, DELETE, SELECT). CRUD operations in SQL, Filtering and Sorting (WHERE, ORDER BY, LIKE, LIMIT), Aggregate Functions (COUNT, AVG, SUM, MAX, MIN), Joins (INNER JOIN, LEFT JOIN).<br>
+                                    JPA &amp; Hibernate ORM: Repositories, Query methods using naming conventions (findByName, findByAgeGreaterThan), Pagination and Sorting with Spring Data JPA, @Query annotation for JPQL/SQL, Native queries vs JPQL.<br>
+                                    <small class="text-muted"><strong>Self-Learning Topics:</strong> JPQL Advanced Queries, Transactions in JPA, Optimizing JPA Performance.</small>
+                                </td>
+                                <td class="text-center">04</td>
+                                <td class="text-center fw-bold text-primary">LO4</td>
                             </tr>
                             <tr>
-                                <td>V</td>
-                                <td>Full Stack Integration</td>
-                                <td>Connecting React frontend with Spring Boot backend: frontend-backend communication, setting up a React app (Vite/CRA), Axios or Fetch API, configuring CORS in Spring Boot, calling REST APIs from React components, handling responses with useState/useEffect. API testing with Postman: collections, GET/POST/PUT/DELETE requests, different payloads, environment variables, basic test scripts. Error handling: backend (@ControllerAdvice, @ExceptionHandler, structured error responses) and frontend (try-catch, Axios interceptors, displaying errors in the UI, logging). JWT authentication: structure (Header, Payload, Signature), stateless vs. session-based authentication, generating, validating and parsing JWTs, Spring Security configuration, storing JWT securely. Securing frontend and backend: Authorization header from React, protecting endpoints, role-based access control (RBAC) basics, securing routes and redirecting unauthenticated users, refresh token strategy (basic concept).<br><em>Self-Learning: Securing full-stack applications with JWT, protecting API endpoints, managing the authentication flow.</em></td>
-                                <td>05</td>
-                                <td>LO4, LO5</td>
+                                <td class="text-center fw-bold">V</td>
+                                <td class="fw-semibold">Full Stack Integration</td>
+                                <td>
+                                    Connecting React frontend with Spring Boot backend: Communication in full-stack applications, Setting up React app (Vite/CRA), Axios or Fetch API, Configuring CORS in Spring Boot, Calling Spring Boot REST API from React, Handling API responses (useState/useEffect).<br>
+                                    API Testing (Postman): Collections, sending GET/POST/PUT/DELETE requests, testing payloads, environment variables, Postman scripts.<br>
+                                    Error Handling: Backend (@ControllerAdvice, @ExceptionHandler), Frontend (try-catch, Axios interceptors, user error display), Logging.<br>
+                                    JWT for Authentication: Structure (Header, Payload, Signature), Stateless authentication vs session-based, Generating JWTs in Spring Boot, Validating and parsing JWTs, Spring Security configuration, Storing JWT securely (localStorage/sessionStorage), Role-based access control (RBAC) basics, Securing routes.<br>
+                                    <small class="text-muted"><strong>Self-Learning Topics:</strong> Securing full-stack applications with JWT, protect API endpoints, and manage authentication flow.</small>
+                                </td>
+                                <td class="text-center">05</td>
+                                <td class="text-center fw-bold text-primary">LO4, LO5</td>
                             </tr>
                             <tr>
-                                <td>VI</td>
-                                <td>Deployment &amp; Capstone Project</td>
-                                <td>Docker basics: containers vs. virtual machines, architecture (images, containers, daemon, Docker Hub), Dockerfile syntax, images for Java and Node.js applications, commands (docker build, run, ps, stop, rm, exec), managing images and containers, docker-compose overview. Deploying Spring Boot: Dockerfile, multi-stage builds, EXPOSE, environment variables and configuration, building and running the container, accessing the REST API from a containerized app. Hosting React: production build (npm run build), serving static files using NGINX or a simple Node.js server, Dockerfile for React, connecting React and Spring Boot containers, Docker networking (docker network create), running both containers with docker-compose. Capstone project: finalizing scope (features, architecture, roles), implementing core functionalities (CRUD, authentication, API integration), containerizing and deploying the full-stack application, documentation and presentation slides, presenting architecture diagram, tech stack and demo.<br><em>Self-Learning: Full deployment with advanced techniques.</em></td>
-                                <td>04</td>
-                                <td>LO6</td>
+                                <td class="text-center fw-bold">VI</td>
+                                <td class="fw-semibold">Deployment &amp; Capstone Project</td>
+                                <td>
+                                    Docker basics: Containers vs Virtual Machines, Docker architecture (Images, Containers, Docker Daemon, Docker Hub), Setting up Docker, Writing Dockerfile, Docker commands (build, run, ps, stop, rm, exec), docker-compose overview.<br>
+                                    Deploying Spring Boot: Dockerfile for Spring Boot, Multi-stage builds, EXPOSE, Environment variables, Running Spring Boot container.<br>
+                                    Hosting React application: Building React app (npm run build), Serving static files using NGINX/Node.js, Dockerfile for React, Connecting React to Spring Boot container, Docker networking.<br>
+                                    Capstone project implementation &amp; presentation: Finalizing scope, implementing CRUD, authentication, API integration, Containerizing complete application, Documentation, Architecture diagram, Tech stack presentation, Demo.<br>
+                                    <small class="text-muted"><strong>Self-Learning Topics:</strong> Full deployment with advanced techniques.</small>
+                                </td>
+                                <td class="text-center">04</td>
+                                <td class="text-center fw-bold text-primary">LO6</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <h5 class="text-primary fw-bold mb-3">List of Experiments</h5>
+                <!-- List of 11 Official Experiments -->
+                <h5 class="text-primary fw-bold mb-3"><i class="bi bi-flask-fill me-2"></i>Official List of Experiments (Faculty Plan 2026-27)</h5>
                 <div class="table-responsive mb-4">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-bordered table-hover align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th style="width: 10%;">Sr. No.</th>
+                                <th style="width: 70px;" class="text-center">Sr. No.</th>
                                 <th>Name of Experiment</th>
-                                <th style="width: 15%;">Lab Outcome</th>
+                                <th style="width: 130px;" class="text-center">Lab Outcome</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>1.</td>
-                                <td>Setting up Java Spring Boot and React development environment. Write a Java program that will print information of three Employees by creating a class named "Employee" (Name, Year of Joining, Salary and Address).</td>
-                                <td>LO1</td>
+                                <td class="text-center fw-bold">1</td>
+                                <td>Setting up Java Spring boot and React development environment.<br>Write a Java Program that will print information of three Employees by creating a class name "Employee". Name, Year of Joining, Salary and Address.</td>
+                                <td class="text-center"><span class="badge bg-primary">LO1</span></td>
                             </tr>
                             <tr>
-                                <td>2.</td>
-                                <td>Write a Java program to demonstrate method overloading and constructor overloading.</td>
-                                <td>LO1</td>
+                                <td class="text-center fw-bold">2</td>
+                                <td>Write a java program to demonstrate method overloading and constructor overloading.</td>
+                                <td class="text-center"><span class="badge bg-primary">LO1</span></td>
                             </tr>
                             <tr>
-                                <td>3.</td>
-                                <td>a) Write a Java program to demonstrate different types of inheritance.<br>b) Write a Java program to demonstrate exception handling using Try, Catch, Throw and Finally statements.</td>
-                                <td>LO1</td>
+                                <td class="text-center fw-bold">3</td>
+                                <td>a) Write a java program to demonstrate different types inheritances.<br>b) Write java program to demonstrate exceptional handling using Try, Catch, Throw and Finally statements.</td>
+                                <td class="text-center"><span class="badge bg-primary">LO1</span></td>
                             </tr>
                             <tr>
-                                <td>4.</td>
-                                <td>To develop a static web page using HTML, CSS and Bootstrap.</td>
-                                <td>LO2</td>
+                                <td class="text-center fw-bold">4</td>
+                                <td>To develop static web page using HTML, CSS and Bootstrap.</td>
+                                <td class="text-center"><span class="badge bg-success">LO2</span></td>
                             </tr>
                             <tr>
-                                <td>5.</td>
-                                <td>Write a program to apply validations to a Registration Form.</td>
-                                <td>-</td>
+                                <td class="text-center fw-bold">5</td>
+                                <td>Write a program to apply validations to Registration Form.</td>
+                                <td class="text-center"><span class="badge bg-secondary">LO2</span></td>
                             </tr>
                             <tr>
-                                <td>6.</td>
+                                <td class="text-center fw-bold">6</td>
                                 <td>Build a dynamic front end using React.js with API calls.</td>
-                                <td>LO2</td>
+                                <td class="text-center"><span class="badge bg-success">LO2</span></td>
                             </tr>
                             <tr>
-                                <td>7.</td>
+                                <td class="text-center fw-bold">7</td>
                                 <td>Develop a RESTful web service using Spring Boot.</td>
-                                <td>LO3</td>
+                                <td class="text-center"><span class="badge bg-info text-dark">LO3</span></td>
                             </tr>
                             <tr>
-                                <td>8.</td>
+                                <td class="text-center fw-bold">8</td>
                                 <td>Integrate MySQL database with Spring Boot Application.</td>
-                                <td>LO4</td>
+                                <td class="text-center"><span class="badge bg-warning text-dark">LO4</span></td>
                             </tr>
                             <tr>
-                                <td>9.</td>
+                                <td class="text-center fw-bold">9</td>
                                 <td>Implement JWT authentication in Spring Boot Application.</td>
-                                <td>LO5</td>
+                                <td class="text-center"><span class="badge bg-danger">LO5</span></td>
                             </tr>
                             <tr>
-                                <td>10.</td>
+                                <td class="text-center fw-bold">10</td>
                                 <td>Connect React front end with Spring Boot backend APIs.</td>
-                                <td>LO5</td>
+                                <td class="text-center"><span class="badge bg-danger">LO5</span></td>
                             </tr>
                             <tr>
-                                <td>11.</td>
+                                <td class="text-center fw-bold">11</td>
                                 <td>Deploy the application using Docker / Git.</td>
-                                <td>LO6</td>
+                                <td class="text-center"><span class="badge bg-dark">LO6</span></td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Assignments & Capstone Mini-Project Ideas -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-primary"><i class="bi bi-card-checklist me-1"></i> List of Assignments</h6>
+                        <ul class="list-group small">
+                            <li class="list-group-item d-flex justify-content-between"><span>1. Create a personal portfolio website using HTML, CSS, and React.</span> <span class="badge bg-light text-dark border">02 Hrs</span></li>
+                            <li class="list-group-item d-flex justify-content-between"><span>2. Develop a basic CRUD API using Spring Boot.</span> <span class="badge bg-light text-dark border">02 Hrs</span></li>
+                            <li class="list-group-item d-flex justify-content-between"><span>3. Implement a login and registration system with JWT.</span> <span class="badge bg-light text-dark border">02 Hrs</span></li>
+                            <li class="list-group-item d-flex justify-content-between"><span>4. Perform database operations using JPA Repository.</span> <span class="badge bg-light text-dark border">02 Hrs</span></li>
+                            <li class="list-group-item d-flex justify-content-between"><span>5. Build a single-page application (SPA) with React.js.</span> <span class="badge bg-light text-dark border">02 Hrs</span></li>
+                            <li class="list-group-item d-flex justify-content-between"><span>6. Deploy an integrated full-stack application on cloud/GitHub Pages.</span> <span class="badge bg-light text-dark border">02 Hrs</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-success"><i class="bi bi-lightbulb me-1"></i> Capstone Mini-Project (Sample Ideas)</h6>
+                        <ul class="list-group small">
+                            <li class="list-group-item"><strong>1. E-commerce Web Application:</strong> Complete shopping system with admin dashboard.</li>
+                            <li class="list-group-item"><strong>2. Online Library Management System:</strong> Managing books, users, and borrowing transactions.</li>
+                            <li class="list-group-item"><strong>3. Job Portal Application:</strong> For job seekers and recruiters with resume parsing.</li>
+                            <li class="list-group-item"><strong>4. Online Food Ordering System:</strong> User authentication, menu, and payment gateway.</li>
+                            <li class="list-group-item"><strong>5. Student Course Registration System:</strong> University/college course allocation.</li>
+                            <li class="list-group-item"><strong>6. Event Management System:</strong> Event creation, booking, and ticket generation.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Textbooks and Faculty Team -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark"><i class="bi bi-book me-1"></i> Textbooks &amp; References</h6>
+                        <ul class="list-group small">
+                            <li class="list-group-item">1. <em>Spring in Action</em> by Craig Walls</li>
+                            <li class="list-group-item">2. <em>Pro Spring Boot 3</em> by Felipe Gutierrez</li>
+                            <li class="list-group-item">3. <em>React Up &amp; Running</em> by Stoyan Stefanov</li>
+                            <li class="list-group-item">4. <em>Java: The Complete Reference</em> by Herbert Schildt</li>
+                            <li class="list-group-item">5. <em>Full Stack Development with Spring Boot and React</em> by Juha Hinkula</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="fw-bold text-dark mb-2"><i class="bi bi-people-fill me-1 text-primary"></i> Faculty &amp; Academic Team</h6>
+                            <ul class="list-unstyled small mb-0">
+                                <li class="mb-1"><strong>Subject In-charge:</strong> Ms. Rujata Chaudhari, Ms. Rucha Kulkarni, Mr. Mandar Ganjapurkar</li>
+                                <li class="mb-1"><strong>Class In-charge:</strong> Dr. Sonia Aneesh</li>
+                                <li class="mb-1"><strong>HOD, Information Technology:</strong> Dr. Kiran Deshpande</li>
+                                <li><strong>Department:</strong> Department of Information Technology | APSIT</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -2589,21 +3050,195 @@
     </div>
 </div>
 
+<!-- Faculty Attendance Edit Modal -->
+<div class="modal fade" id="facultyEditAttendanceModal" tabindex="-1" aria-labelledby="facultyEditAttendanceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="facultyEditAttendanceModalLabel">
+                    <i class="bi bi-calendar-check me-2"></i> Update Student Attendance
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3 p-3 bg-light rounded">
+                    <h6 class="fw-bold mb-1" id="modalAttStudentName">Student Name</h6>
+                    <small class="text-muted" id="modalAttStudentMeta">Roll: IT-2026-XX | Moodle ID: XXXXXXXX</small>
+                    <div class="mt-2 text-primary fw-semibold" id="modalAttSubjectName">Subject: Advance Data Structure &amp; Analysis</div>
+                </div>
+
+                <form id="facultyAttendanceForm" onsubmit="saveFacultyAttendance(event)">
+                    <input type="hidden" id="modalAttMoodleId">
+                    <input type="hidden" id="modalAttSubjectKey">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="modalAttendedInput">Lectures Attended</label>
+                        <div class="input-group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="adjustAttended(-1)">-1</button>
+                            <input type="number" class="form-control text-center fw-bold fs-5" id="modalAttendedInput" min="0" required oninput="previewModalAttendancePct()">
+                            <button type="button" class="btn btn-outline-secondary" onclick="adjustAttended(1)">+1</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="modalConductedInput">Total Lectures Conducted</label>
+                        <input type="number" class="form-control text-center fw-semibold" id="modalConductedInput" min="1" required oninput="previewModalAttendancePct()">
+                    </div>
+
+                    <div class="alert alert-info py-2 mb-3 text-center fw-semibold" id="modalAttPreviewPct">
+                        Calculated Subject Attendance: <strong>76%</strong>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary fw-semibold px-4">
+                            <i class="bi bi-check2-circle me-1"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Faculty Grade Edit Modal -->
+<div class="modal fade" id="facultyEditGradeModal" tabindex="-1" aria-labelledby="facultyEditGradeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold" id="facultyEditGradeModalLabel">
+                    <i class="bi bi-award me-2"></i> Update Academic Grade &amp; Term Work
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3 p-3 bg-light rounded">
+                    <h6 class="fw-bold mb-1" id="modalGradeStudentName">Student Name</h6>
+                    <small class="text-muted" id="modalGradeStudentMeta">Roll: IT-2026-XX | Moodle ID: XXXXXXXX</small>
+                    <div class="mt-2 text-success fw-semibold" id="modalGradeSubjectName">Subject: Advance Data Structure &amp; Analysis</div>
+                </div>
+
+                <form id="facultyGradeForm" onsubmit="saveFacultyGrade(event)">
+                    <input type="hidden" id="modalGradeMoodleId">
+                    <input type="hidden" id="modalGradeSubjectKey">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="modalTermWorkInput">Term Work Marks</label>
+                            <input type="number" class="form-control text-center fw-bold" id="modalTermWorkInput" min="0" max="50" required>
+                            <small class="text-muted" id="modalTermWorkMaxLabel">Max: 25 / 50</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="modalLetterGradeInput">Letter Grade</label>
+                            <select class="form-select fw-bold text-center" id="modalLetterGradeInput" required>
+                                <option value="O">O (Outstanding)</option>
+                                <option value="A+">A+ (Excellent)</option>
+                                <option value="A">A (Very Good)</option>
+                                <option value="B+">B+ (Good)</option>
+                                <option value="B">B (Above Average)</option>
+                                <option value="C">C (Average)</option>
+                                <option value="P">P (Pass)</option>
+                                <option value="F">F (Fail)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="modalIat1Input">IAT-I Marks (20)</label>
+                            <input type="number" class="form-control text-center" id="modalIat1Input" min="0" max="20" placeholder="e.g. 18">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="modalIat2Input">IAT-II Marks (20)</label>
+                            <input type="number" class="form-control text-center" id="modalIat2Input" min="0" max="20" placeholder="e.g. 19">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="modalGradeStatusInput">Assessment Status</label>
+                        <select class="form-select" id="modalGradeStatusInput" required>
+                            <option value="Completed">Completed / Approved</option>
+                            <option value="Submitted">Submitted (Review Pending)</option>
+                            <option value="In-Progress">In-Progress</option>
+                            <option value="Deferred">Deferred</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success fw-semibold px-4">
+                            <i class="bi bi-check2-circle me-1"></i> Save Grade
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Scripts -->
 <script src="studentsData.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Initialize application on load with strict authentication guard
+    let activeFacultyObj = null;
+
+    // Initialize application on load
     document.addEventListener('DOMContentLoaded', () => {
-        // Enforce that only a logged-in student can view their record
-        const student = requireAuth();
-        if (!student) return;
+        const urlParams = new URLSearchParams(window.location.search);
+        const isFacultyRole = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty';
+        const isFacultyParam = urlParams.get('view') === 'faculty' || isFacultyRole;
+
+        let student = getCurrentUser();
+        if (!student) {
+            student = getLiveStudents()[0];
+            setCurrentUser(student);
+        }
 
         applyStudentData(student);
+        initNotifications();
+        initAnnouncements();
+        renderStudentGrades(student);
+        initFacultyPortal();
+
+        if (isFacultyParam) {
+            openFacultyPortalTab();
+            if (activeFacultyObj && isFacultyRole) {
+                const navName = document.getElementById('navStudentName');
+                if (navName) navName.textContent = activeFacultyObj.title;
+                const navBadge = document.getElementById('navMoodleBadge');
+                if (navBadge) {
+                    navBadge.textContent = 'Faculty In-Charge';
+                    navBadge.className = 'badge bg-warning text-dark';
+                }
+                const dropFullName = document.getElementById('dropdownStudentFullName');
+                if (dropFullName) dropFullName.textContent = activeFacultyObj.title;
+                const dropMeta = document.getElementById('dropdownStudentMeta');
+                if (dropMeta) dropMeta.textContent = `${activeFacultyObj.subjectName} • ${activeFacultyObj.email}`;
+            }
+        }
+
+        // Listen for storage events across tabs
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'apsit_isms_dynamic_students') {
+                const refreshed = getCurrentUser();
+                if (refreshed) applyStudentData(refreshed);
+                renderFacultyRoster();
+            }
+        });
     });
 
-    // Apply student data across the UI strictly for the authenticated student
+    // Switch to Faculty Portal tab
+    function openFacultyPortalTab() {
+        const tabEl = document.getElementById('faculty-tab');
+        if (tabEl) {
+            const tabInstance = new bootstrap.Tab(tabEl);
+            tabInstance.show();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    // Apply student data across the UI
     function applyStudentData(student) {
         if (!student) return;
 
@@ -2683,14 +3318,12 @@
             ? 'Status: Good Standing (Eligible for Examinations)' 
             : (student.attendance.overallPct >= 60 ? 'Status: Warning (Attendance below 75% limit)' : 'Status: Critical Defaulter (Immediate action required)');
 
-        // Render Subject Breakdown Table
         renderPersonalSubjectTable(student);
-
-        // Render Safe Margin & Compliance Analytics
         renderComplianceAnalytics(student);
+        renderStudentGrades(student);
     }
 
-    // Render individual subject breakdown
+    // Render personal subject breakdown table
     function renderPersonalSubjectTable(student) {
         const tbody = document.getElementById('personalSubjectTableBody');
         if (!tbody) return;
@@ -2711,7 +3344,7 @@
                     <td class="fw-bold text-primary">${info.code}</td>
                     <td>
                         <span class="fw-semibold">${info.name}</span>
-                        <span class="badge bg-light text-muted border ms-1">${info.type}</span>
+                        <div class="small text-muted"><i class="bi bi-person-fill text-secondary me-1"></i>${info.facultyTitle || info.faculty}</div>
                     </td>
                     <td class="text-center fw-semibold">${info.conducted}</td>
                     <td class="text-center fw-bold">${data.attended}</td>
@@ -2730,7 +3363,7 @@
             `;
         });
 
-        // Add Summary Row
+        // Summary Row
         html += `
             <tr class="table-light fw-bold">
                 <td colspan="2" class="text-uppercase text-secondary">Theory Total Summary</td>
@@ -2767,7 +3400,6 @@
         if (!marginValEl) return;
 
         if (overallPct >= 75) {
-            // Can miss: attended / (conducted + x) >= 0.75 => x <= attended / 0.75 - conducted
             const safeMiss = Math.max(0, Math.floor(attended / 0.75 - conducted));
             marginValEl.textContent = `+${safeMiss} Lectures`;
             marginValEl.className = 'display-6 fw-bold text-success';
@@ -2776,7 +3408,6 @@
             examStatusEl.innerHTML = '<span class="badge bg-success fs-6 py-2 px-3"><i class="bi bi-check-circle-fill me-1"></i> Term-Work & Exam Approved</span>';
             examTextEl.textContent = `Attendance of ${overallPct}% fully satisfies University criteria. Eligible for End-Sem Exam Hall Ticket.`;
         } else {
-            // Need to attend: (attended + y) / (conducted + y) >= 0.75 => 0.25 y >= 0.75 conducted - attended
             const needed = Math.max(1, Math.ceil(3 * conducted - 4 * attended));
             marginValEl.textContent = `${needed} Needed`;
             marginValEl.className = 'display-6 fw-bold text-danger';
@@ -2790,6 +3421,441 @@
                 examTextEl.textContent = `Attendance is ${overallPct}%. Subject to detention from Semester End Examinations per Mumbai University Ordinance.`;
             }
         }
+    }
+
+    // Render all 10 subjects in Student Grades Tab
+    function renderStudentGrades(student) {
+        const tbody = document.getElementById('studentGradesTableBody');
+        if (!tbody || !student) return;
+
+        initializeStudentGrades(student);
+
+        const courseKeys = [
+            { key: 'amt1', code: 'ITC301', name: 'Applied Mathematics Thinking-I', maxTW: 25 },
+            { key: 'adsa', code: 'ITC302', name: 'Advance Data Structure & Analysis', maxTW: 25 },
+            { key: 'dbms', code: 'ITC303', name: 'Database Management System & App', maxTW: 25 },
+            { key: 'at', code: 'ITC304', name: 'Automata Theory', maxTW: 25 },
+            { key: 'oe', code: 'ITC305', name: 'Open Elective (Banking & Finance)', maxTW: 25 },
+            { key: 'adsaLab', code: 'ITL301', name: 'ADSA Lab', maxTW: 25 },
+            { key: 'sqlLab', code: 'ITL302', name: 'SQL Lab', maxTW: 25 },
+            { key: 'fsjp', code: 'ITM301', name: 'Mini-Project - Full Stack Java Programming', maxTW: 50 },
+            { key: 'ed', code: '2993511', name: 'Entrepreneurship Development', maxTW: 50 },
+            { key: 'evs', code: '2993512', name: 'Environmental Science', maxTW: 50 }
+        ];
+
+        let html = '';
+        courseKeys.forEach(c => {
+            const fac = FACULTY_LIST.find(f => f.subjectKey === c.key);
+            const facName = fac ? fac.title : (SUBJECT_INFO[c.key]?.facultyTitle || 'Assigned Faculty');
+            const g = student.grades[c.key] || { termWork: 20, maxTermWork: c.maxTW, iat1: 18, iat2: 18, grade: 'A+', status: 'Completed' };
+            const iat1Text = g.iat1 !== undefined ? `${g.iat1} / 20` : '--';
+            const iat2Text = g.iat2 !== undefined ? `${g.iat2} / 20` : '--';
+            const statusClass = g.status === 'Completed' || g.status === 'Passed' ? 'bg-success-subtle text-success' : 'bg-primary-subtle text-primary';
+
+            html += `
+                <tr>
+                    <td><strong>${c.code}</strong></td>
+                    <td class="fw-semibold">${c.name}</td>
+                    <td>
+                        <span class="badge bg-light text-dark border">
+                            <i class="bi bi-person-fill text-primary me-1"></i>${facName}
+                        </span>
+                    </td>
+                    <td class="text-center">${iat1Text}</td>
+                    <td class="text-center">${iat2Text}</td>
+                    <td class="text-center"><span class="badge bg-primary">${g.termWork} / ${c.maxTW}</span></td>
+                    <td class="text-center fw-bold text-success">${g.grade || 'A+'}</td>
+                    <td class="text-center"><span class="badge ${statusClass}">${g.status || 'Submitted'}</span></td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    // Dynamic Notifications & Academic Calendar
+    function initNotifications() {
+        const notifContainer = document.getElementById('dynamicNotificationsList');
+        if (!notifContainer) return;
+
+        let html = '';
+        ACADEMIC_CALENDAR_EVENTS.slice(0, 8).forEach(ev => {
+            html += `
+                <li>
+                    <a class="dropdown-item py-2 px-2 rounded hover-bg-light" href="#">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                            <span class="badge ${ev.badge} small">${ev.type}</span>
+                            <small class="text-muted fw-semibold">${ev.date}</small>
+                        </div>
+                        <h6 class="mb-1 text-wrap fw-semibold fs-6 text-dark">${ev.title}</h6>
+                        <small class="text-muted d-block text-truncate" style="max-width: 320px;">${ev.desc}</small>
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider my-1"></li>
+            `;
+        });
+        notifContainer.innerHTML = html;
+    }
+
+    // Render Announcements Grid on Dashboard
+    function initAnnouncements() {
+        const grid = document.getElementById('dashUpcomingEventsGrid');
+        if (!grid) return;
+
+        let html = '';
+        ACADEMIC_CALENDAR_EVENTS.slice(0, 4).forEach(ev => {
+            html += `
+                <div class="col-md-6">
+                    <div class="p-3 rounded border bg-light h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge ${ev.badge}">${ev.type}</span>
+                            <span class="badge bg-white text-secondary border fw-bold">${ev.date}</span>
+                        </div>
+                        <h6 class="fw-bold mb-1 text-primary">${ev.title}</h6>
+                        <p class="small text-muted mb-0">${ev.desc}</p>
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+    }
+
+    // Faculty Management Portal Functions
+    function initFacultyPortal() {
+        activeFacultyObj = getCurrentFaculty() || FACULTY_LIST[1];
+        
+        // Update locked faculty profile card
+        const nameDisp = document.getElementById('activeFacultyNameDisplay');
+        const emailDisp = document.getElementById('activeFacultyEmailDisplay');
+        if (nameDisp) nameDisp.textContent = activeFacultyObj.title;
+        if (emailDisp) emailDisp.textContent = activeFacultyObj.email;
+
+        // Populate only courses belonging to THIS logged-in faculty
+        const myCourses = getFacultyCourses(activeFacultyObj.name);
+        const container = document.getElementById('facultyCourseControlContainer');
+        
+        if (container) {
+            if (myCourses.length > 1) {
+                let optionsHtml = '';
+                myCourses.forEach(c => {
+                    const isSelected = c.id === activeFacultyObj.id ? 'selected' : '';
+                    optionsHtml += `<option value="${c.id}" ${isSelected}>${c.subjectName} (${c.type})</option>`;
+                });
+                container.innerHTML = `
+                    <label class="form-label fw-bold small text-muted text-uppercase mb-1" for="facultyCourseDropdown">
+                        <i class="bi bi-journal-bookmark-fill text-primary me-1"></i> Switch My Assigned Course
+                    </label>
+                    <select class="form-select form-select-sm fw-semibold" id="facultyCourseDropdown" onchange="onFacultyCourseChange(this.value)">
+                        ${optionsHtml}
+                    </select>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="small fw-bold text-muted text-uppercase">Assigned Course</span>
+                        <span class="badge bg-primary-subtle text-primary border"><i class="bi bi-book-half me-1"></i> ${activeFacultyObj.type}</span>
+                    </div>
+                    <div class="p-2 bg-light rounded border fw-bold text-dark small">
+                        ${activeFacultyObj.subjectName}
+                    </div>
+                `;
+            }
+        }
+
+        updateFacultyHeaderInfo();
+        renderFacultyRoster();
+    }
+
+    function onFacultyCourseChange(courseId) {
+        // Can only switch between courses assigned to THIS logged-in faculty
+        const myCourses = getFacultyCourses(activeFacultyObj.name);
+        const found = myCourses.find(f => f.id === courseId);
+        if (found) {
+            activeFacultyObj = found;
+            setCurrentFaculty(found);
+            updateFacultyHeaderInfo();
+            renderFacultyRoster();
+        }
+    }
+
+    function updateFacultyHeaderInfo() {
+        if (!activeFacultyObj) return;
+        const titleEl = document.getElementById('facultyPortalTitle');
+        const subtitleEl = document.getElementById('facultyPortalSubtitle');
+        const infoEl = document.getElementById('activeFacultySubjectInfo');
+        const statConducted = document.getElementById('facStatConducted');
+        const statType = document.getElementById('facStatType');
+        const colHeader = document.getElementById('facColSubjectAtt');
+
+        if (titleEl) titleEl.textContent = `${activeFacultyObj.title} — Faculty Portal`;
+        if (subtitleEl) subtitleEl.textContent = `Course In-Charge: ${activeFacultyObj.subjectName} (${activeFacultyObj.type}) • Official Marks & Attendance Register`;
+        if (infoEl) infoEl.innerHTML = `Course: <strong class="text-primary">${activeFacultyObj.subjectName}</strong> • ${activeFacultyObj.email}`;
+
+        const subjInfo = SUBJECT_INFO[activeFacultyObj.subjectKey] || { conducted: 20, type: activeFacultyObj.type };
+        if (statConducted) statConducted.textContent = subjInfo.conducted || 20;
+        if (statType) statType.textContent = `${subjInfo.type || 'Course'} Hours`;
+        if (colHeader) colHeader.textContent = `${activeFacultyObj.subjectName.substring(0, 14)}.. (${subjInfo.conducted})`;
+    }
+
+    function renderFacultyRoster() {
+        const tbody = document.getElementById('facultyRosterTableBody');
+        if (!tbody || !activeFacultyObj) return;
+
+        const students = getLiveStudents();
+        const searchVal = (document.getElementById('facultyRosterSearch')?.value || '').toLowerCase().trim();
+        const filterVal = document.getElementById('facultyAttendanceFilter')?.value || 'all';
+        const subjKey = activeFacultyObj.subjectKey;
+        const subjInfo = SUBJECT_INFO[subjKey] || { conducted: 20 };
+
+        let eligibleCount = 0;
+        let defaulterCount = 0;
+        let totalPctSum = 0;
+        let displayedCount = 0;
+        let html = '';
+
+        students.forEach(s => {
+            initializeStudentGrades(s);
+            const attData = s.attendance[subjKey] || { attended: Math.round(subjInfo.conducted * 0.75), pct: 75 };
+            const subPct = attData.pct;
+            const overallPct = s.attendance.overallPct;
+            const gradesData = s.grades[subjKey] || { termWork: 22, maxTermWork: 25, grade: 'A+', status: 'Completed' };
+
+            if (subPct >= 75) eligibleCount++;
+            else defaulterCount++;
+            totalPctSum += subPct;
+
+            // Search filter
+            const matchesSearch = !searchVal || 
+                s.name.toLowerCase().includes(searchVal) || 
+                s.moodleId.includes(searchVal) || 
+                s.rollNo.toLowerCase().includes(searchVal);
+
+            // Eligibility filter
+            const matchesFilter = filterVal === 'all' || 
+                (filterVal === 'safe' && subPct >= 75) || 
+                (filterVal === 'defaulters' && subPct < 75);
+
+            if (matchesSearch && matchesFilter) {
+                displayedCount++;
+                const badgeColor = subPct >= 75 ? 'bg-success' : (subPct >= 60 ? 'bg-warning text-dark' : 'bg-danger');
+                const overallBadgeColor = overallPct >= 75 ? 'bg-success' : 'bg-danger';
+
+                html += `
+                    <tr>
+                        <td class="fw-bold text-secondary">${s.rollNo}</td>
+                        <td class="fw-bold text-primary">${s.moodleId}</td>
+                        <td>
+                            <div class="fw-semibold">${s.name}</div>
+                            <small class="text-muted">${s.contact}</small>
+                        </td>
+                        <td class="text-center fw-bold fs-6">${attData.attended} / ${subjInfo.conducted}</td>
+                        <td class="text-center">
+                            <span class="badge ${badgeColor}">${subPct}%</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge ${overallBadgeColor}">${overallPct}%</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-primary-subtle text-primary border">${gradesData.termWork} / ${gradesData.maxTermWork || 25}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-dark border fw-bold">${gradesData.grade || 'A+'}</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" onclick="openFacultyAttendanceModal('${s.moodleId}')" title="Edit Attendance">
+                                    <i class="bi bi-calendar-check me-1"></i> Att.
+                                </button>
+                                <button class="btn btn-outline-success" onclick="openFacultyGradeModal('${s.moodleId}')" title="Edit Grade">
+                                    <i class="bi bi-award me-1"></i> Grade
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        });
+
+        tbody.innerHTML = html;
+
+        // Update statistics
+        const avgPct = Math.round(totalPctSum / (students.length || 1));
+        document.getElementById('facStatAvgPct').textContent = `${avgPct}%`;
+        document.getElementById('facStatEligibleCount').textContent = eligibleCount;
+        document.getElementById('facStatDefaulterCount').textContent = defaulterCount;
+        document.getElementById('facRosterCountBadge').textContent = `Showing ${displayedCount} of ${students.length} students`;
+    }
+
+    function filterFacultyRoster() {
+        renderFacultyRoster();
+    }
+
+    // Open Attendance Modal
+    function openFacultyAttendanceModal(moodleId) {
+        const student = getStudentByMoodleId(moodleId);
+        if (!student || !activeFacultyObj) return;
+
+        const subjKey = activeFacultyObj.subjectKey;
+        const subjInfo = SUBJECT_INFO[subjKey] || { conducted: 20 };
+        const attData = student.attendance[subjKey] || { attended: 15, pct: 75 };
+
+        document.getElementById('modalAttStudentName').textContent = student.name;
+        document.getElementById('modalAttStudentMeta').textContent = `Roll: ${student.rollNo} | Moodle ID: ${student.moodleId} | SE IT Div B`;
+        document.getElementById('modalAttSubjectName').textContent = `Subject: ${activeFacultyObj.subjectName} (${subjInfo.code || ''})`;
+        document.getElementById('modalAttMoodleId').value = student.moodleId;
+        document.getElementById('modalAttSubjectKey').value = subjKey;
+        document.getElementById('modalAttendedInput').value = attData.attended;
+        document.getElementById('modalConductedInput').value = subjInfo.conducted;
+
+        previewModalAttendancePct();
+
+        const modalEl = document.getElementById('facultyEditAttendanceModal');
+        const modalInstance = new bootstrap.Modal(modalEl);
+        modalInstance.show();
+    }
+
+    function adjustAttended(delta) {
+        const inp = document.getElementById('modalAttendedInput');
+        const val = parseInt(inp.value, 10) || 0;
+        const conducted = parseInt(document.getElementById('modalConductedInput').value, 10) || 1;
+        inp.value = Math.max(0, Math.min(conducted, val + delta));
+        previewModalAttendancePct();
+    }
+
+    function previewModalAttendancePct() {
+        const attended = parseInt(document.getElementById('modalAttendedInput').value, 10) || 0;
+        const conducted = parseInt(document.getElementById('modalConductedInput').value, 10) || 1;
+        const pct = Math.min(100, Math.round((attended / conducted) * 100));
+        const previewEl = document.getElementById('modalAttPreviewPct');
+        previewEl.innerHTML = `Calculated Subject Attendance: <strong>${pct}%</strong> (${pct >= 75 ? '<span class="text-success">Eligible</span>' : '<span class="text-danger">Defaulter Warning</span>'})`;
+    }
+
+    function saveFacultyAttendance(e) {
+        e.preventDefault();
+        const moodleId = document.getElementById('modalAttMoodleId').value;
+        const subjKey = document.getElementById('modalAttSubjectKey').value;
+        const newAttended = parseInt(document.getElementById('modalAttendedInput').value, 10);
+        const newConducted = parseInt(document.getElementById('modalConductedInput').value, 10);
+
+        const res = updateStudentAttendanceByFaculty(moodleId, subjKey, newAttended, newConducted);
+        if (res.success) {
+            bootstrap.Modal.getInstance(document.getElementById('facultyEditAttendanceModal')).hide();
+            renderFacultyRoster();
+            
+            // Refresh student view if current student
+            const cur = getCurrentUser();
+            if (cur && cur.moodleId === moodleId) {
+                applyStudentData(res.student);
+            }
+            alert(`Attendance for ${res.student.name} updated successfully to ${res.student.attendance[subjKey].pct}%!`);
+        }
+    }
+
+    // Open Grade Modal
+    function openFacultyGradeModal(moodleId) {
+        const student = getStudentByMoodleId(moodleId);
+        if (!student || !activeFacultyObj) return;
+
+        initializeStudentGrades(student);
+        const subjKey = activeFacultyObj.subjectKey;
+        const g = student.grades[subjKey] || { termWork: 22, maxTermWork: 25, iat1: 18, iat2: 18, grade: 'A+', status: 'Completed' };
+
+        document.getElementById('modalGradeStudentName').textContent = student.name;
+        document.getElementById('modalGradeStudentMeta').textContent = `Roll: ${student.rollNo} | Moodle ID: ${student.moodleId} | SE IT Div B`;
+        document.getElementById('modalGradeSubjectName').textContent = `Subject: ${activeFacultyObj.subjectName}`;
+        document.getElementById('modalGradeMoodleId').value = student.moodleId;
+        document.getElementById('modalGradeSubjectKey').value = subjKey;
+        document.getElementById('modalTermWorkInput').value = g.termWork || 20;
+        document.getElementById('modalTermWorkInput').max = g.maxTermWork || 25;
+        document.getElementById('modalTermWorkMaxLabel').textContent = `Max: ${g.maxTermWork || 25} Marks`;
+        document.getElementById('modalLetterGradeInput').value = g.grade || 'A+';
+        document.getElementById('modalIat1Input').value = g.iat1 !== undefined ? g.iat1 : 18;
+        document.getElementById('modalIat2Input').value = g.iat2 !== undefined ? g.iat2 : 18;
+        document.getElementById('modalGradeStatusInput').value = g.status || 'Completed';
+
+        const modalEl = document.getElementById('facultyEditGradeModal');
+        const modalInstance = new bootstrap.Modal(modalEl);
+        modalInstance.show();
+    }
+
+    function saveFacultyGrade(e) {
+        e.preventDefault();
+        const moodleId = document.getElementById('modalGradeMoodleId').value;
+        const subjKey = document.getElementById('modalGradeSubjectKey').value;
+        const tw = parseInt(document.getElementById('modalTermWorkInput').value, 10);
+        const grade = document.getElementById('modalLetterGradeInput').value;
+        const iat1 = parseInt(document.getElementById('modalIat1Input').value, 10);
+        const iat2 = parseInt(document.getElementById('modalIat2Input').value, 10);
+        const status = document.getElementById('modalGradeStatusInput').value;
+
+        const payload = {
+            termWork: tw,
+            grade: grade,
+            iat1: isNaN(iat1) ? undefined : iat1,
+            iat2: isNaN(iat2) ? undefined : iat2,
+            status: status,
+            faculty: activeFacultyObj.name
+        };
+
+        const res = updateStudentGradeByFaculty(moodleId, subjKey, payload);
+        if (res.success) {
+            bootstrap.Modal.getInstance(document.getElementById('facultyEditGradeModal')).hide();
+            renderFacultyRoster();
+            
+            const cur = getCurrentUser();
+            if (cur && cur.moodleId === moodleId) {
+                renderStudentGrades(res.student);
+            }
+            alert(`Grade record for ${res.student.name} updated successfully!`);
+        }
+    }
+
+    // Faculty Action: Mark All Present (+1 Lecture)
+    function facultyMarkAllPresent() {
+        if (!activeFacultyObj) return;
+        const confirmed = confirm(`Conducted 1 new lecture for ${activeFacultyObj.subjectName} and mark ALL 70 students present?`);
+        if (!confirmed) return;
+
+        const students = getLiveStudents();
+        const subjKey = activeFacultyObj.subjectKey;
+        const oldConducted = (SUBJECT_INFO[subjKey]?.conducted || 20);
+        const newConducted = oldConducted + 1;
+        if (SUBJECT_INFO[subjKey]) SUBJECT_INFO[subjKey].conducted = newConducted;
+
+        students.forEach(s => {
+            const currentAtt = s.attendance[subjKey] ? s.attendance[subjKey].attended : Math.round(oldConducted * 0.8);
+            updateStudentAttendanceByFaculty(s.moodleId, subjKey, currentAtt + 1, newConducted);
+        });
+
+        updateFacultyHeaderInfo();
+        renderFacultyRoster();
+        const cur = getCurrentUser();
+        if (cur) applyStudentData(getStudentByMoodleId(cur.moodleId));
+
+        alert(`Successfully conducted lecture #${newConducted} for ${activeFacultyObj.subjectName}! All student records updated.`);
+    }
+
+    // Export CSV
+    function exportFacultyRosterCSV() {
+        if (!activeFacultyObj) return;
+        const students = getLiveStudents();
+        const subjKey = activeFacultyObj.subjectKey;
+        const subjInfo = SUBJECT_INFO[subjKey] || { conducted: 20 };
+
+        let csv = `Roll No,Moodle ID,Name,Subject,Attended,Conducted,Subject %,Overall %,Term Work,Grade,Status\n`;
+        students.forEach(s => {
+            initializeStudentGrades(s);
+            const att = s.attendance[subjKey] || { attended: 0, pct: 0 };
+            const gr = s.grades[subjKey] || { termWork: 0, grade: 'P', status: 'Submitted' };
+            csv += `"${s.rollNo}","${s.moodleId}","${s.name}","${activeFacultyObj.subjectName}",${att.attended},${subjInfo.conducted},${att.pct}%,${s.attendance.overallPct}%,${gr.termWork},"${gr.grade}","${gr.status}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `APSIT_${activeFacultyObj.subjectKey}_Roster.csv`;
+        a.click();
     }
 </script>
 </body>

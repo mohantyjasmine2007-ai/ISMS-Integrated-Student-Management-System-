@@ -175,6 +175,55 @@ INSERT INTO experiments (course_code, exp_number, exp_title, hours) VALUES ('299
 INSERT INTO experiments (course_code, exp_number, exp_title, hours) VALUES ('2993512', 12, 'Report on Role of IT in Environmental Protection.', 2);
 
 -- -------------------------------------------------------------
+-- Insert ADSA (ITC302 / 2343112) Syllabus Modules
+-- -------------------------------------------------------------
+INSERT INTO syllabus_modules (course_code, module_number, module_title, detailed_content, teaching_hours, lo_mapping) VALUES
+('ITC302', '0', 'Prerequisite', 'Overview of Data Structures: Revision of basic data structures (arrays, stacks, queues, linked lists, trees).', 1, '--'),
+('ITC302', 'I', 'Introduction to Analysis of Algorithms', 'Fundamentals of the analysis of algorithms: Time and Space complexity, Asymptotic notation, Recurrence Relations (Substitution, Recursion tree, Master theorem).', 3, 'CO1'),
+('ITC302', 'II', 'Advanced Data Structures', 'AVL trees, B tree & B+ tree, Red-Black Trees, Tries. Graph Traversals: BFS, DFS and time complexity analysis.', 8, 'CO2'),
+('ITC302', 'III', 'Greedy Algorithms and Applications', 'Fractional Knapsack problem, Minimum Spanning Trees (Prim and Kruskal), Job sequencing with deadlines, Optimal storage on tapes.', 6, 'CO3'),
+('ITC302', 'IV', 'Backtracking and Maximum Flow Networks', 'Backtracking: N-Queens, sum of subsets, graph coloring, Hamiltonian cycles. Max Flow Networks: Ford-Fulkerson method, Augmenting paths.', 7, 'CO4'),
+('ITC302', 'V', 'Dynamic Algorithms', 'Greedy vs Dynamic, Single source shortest path (Dijkstra, Bellman-Ford), All pair shortest path (Floyd-Warshall), 0/1 Knapsack, TSP.', 8, 'CO5'),
+('ITC302', 'VI', 'String Matching Algorithms', 'Naive string matching, Rabin-Karp, Knuth-Morris-Pratt (KMP), Longest Common Subsequence (LCS). Applications: DNA sequencing, compression.', 6, 'CO6');
+
+-- -------------------------------------------------------------
+-- Insert DBMSA (ITC303 / 2343113) Syllabus Modules
+-- -------------------------------------------------------------
+INSERT INTO syllabus_modules (course_code, module_number, module_title, detailed_content, teaching_hours, lo_mapping) VALUES
+('ITC303', '0', 'Prerequisite', 'C, Python Programming.', 2, '--'),
+('ITC303', 'I', 'Database System Concepts, Architecture, and Applications', 'Characteristics of Databases, File system vs DBMS, Data Abstraction & Independence, System architecture, DBA role. Real-world applications.', 5, 'CO1'),
+('ITC303', 'II', 'The Entity-Relationship Model', 'Conceptual Modeling, ER Model, Entity Types, Sets, Attributes & Keys, Relationship Types, Weak entities, EER Model.', 5, 'CO2'),
+('ITC303', 'III', 'Relational Model & Relational Algebra', 'Constraints, Keys (Primary, Secondary, Foreign), Mapping ER/EER to Relational Model, Relational Algebra: Unary, Set operations, Binary operations.', 5, 'CO3'),
+('ITC303', 'IV', 'Structured Query Language (SQL) & Indexing', 'DDL, DML, DCL, Aggregate Functions, Complex Queries with Group By, Nested Queries, Integrity Constraints, JDBC, Indexing: Ordered Indices.', 8, 'CO4'),
+('ITC303', 'V', 'Relational Database Design', 'Design guidelines, Functional Dependencies, Normalization need, Normal Forms: 1NF, 2NF, 3NF & Boyce-Codd Normal Form (BCNF).', 7, 'CO5'),
+('ITC303', 'VI', 'Transactions Management, Concurrency & Recovery', 'Transaction concept, State Diagram, ACID Properties, Concurrency: Lock-based protocols, Deadlock Handling, Timestamp protocols, Log-based Recovery.', 7, 'CO6');
+
+-- -------------------------------------------------------------
+-- Insert Full Stack Java Programming (ITL301 / 2343611) Syllabus & Experiments
+-- -------------------------------------------------------------
+INSERT INTO syllabus_modules (course_code, module_number, module_title, detailed_content, teaching_hours, lo_mapping) VALUES
+('ITL301', 'I', 'Introduction to Full Stack Java', 'Overview of full-stack development, Roles & Skills, Technology Stack (HTML, CSS, React, Java, Spring Boot, MySQL, Git, Docker). Core Java OOP & MVC.', 4, 'LO1'),
+('ITL301', 'II', 'HTML 5, CSS 3 with Bootstrap', 'Semantic HTML5, Responsive Web Design, Media queries, Forms, CSS Grid, Bootstrap components, React basics, Fetch API/Axios.', 4, 'LO2'),
+('ITL301', 'III', 'Back-end development with Java', 'Spring Boot architecture, Auto-configuration, Spring Initializr, RESTful API design, Controllers, Services, Dependency Injection (@Autowired), JPA.', 5, 'LO3'),
+('ITL301', 'IV', 'Database Integration', 'MySQL setup, SQL CRUD operations, Filtering/Sorting, Joins, Spring Data JPA, Custom query methods (@Query), Hibernate ORM.', 4, 'LO4'),
+('ITL301', 'V', 'Full Stack Integration', 'Connecting React frontend with Spring Boot backend, Axios, CORS, Postman API testing, Exception Handling, JWT Stateless Authentication.', 5, 'LO5'),
+('ITL301', 'VI', 'Deployment & Capstone Project', 'Docker containers, Dockerfile syntax, Containerizing React and Spring Boot, Docker Compose, Capstone project implementation & presentation.', 4, 'LO6');
+
+INSERT INTO experiments (course_code, exp_number, exp_title, hours) VALUES
+('ITL301', 1, 'Setting up Java Spring Boot and React development environment. Write a Java program that will print Employee information.', 2),
+('ITL301', 2, 'Write a Java program to demonstrate method overloading and constructor overloading.', 2),
+('ITL301', 3, 'Write a Java program to demonstrate inheritance and exception handling (Try, Catch, Throw, Finally).', 2),
+('ITL301', 4, 'To develop static web page using HTML, CSS and Bootstrap.', 2),
+('ITL301', 5, 'Write a program to apply validations to Registration Form.', 2),
+('ITL301', 6, 'Build a dynamic front end using React.js with API calls.', 2),
+('ITL301', 7, 'Develop a RESTful web service using Spring Boot.', 2),
+('ITL301', 8, 'Integrate MySQL database with Spring Boot Application.', 2),
+('ITL301', 9, 'Implement JWT authentication in Spring Boot Application.', 2),
+('ITL301', 10, 'Connect React front end with Spring Boot backend APIs.', 2),
+('ITL301', 11, 'Deploy the application using Docker / Git.', 2);
+
+
+-- -------------------------------------------------------------
 -- Insert 70 SE IT Div B Students
 -- -------------------------------------------------------------
 INSERT INTO students (moodle_id, roll_no, full_name, first_name, dob, blood_group, contact, password_hash) VALUES ('25104023', 'IT-2026-01', 'NILANCHAL SUNILKUMAR JENA', 'NILANCHAL', '08/04/2007', 'A+', '+91 980135791', '25104023@Apsit');

@@ -161,22 +161,40 @@
             box-shadow: none;
         }
 
-        .password-hint {
-            font-size: 11.5px;
-            color: #64748b;
-            margin-top: 6px;
+        /* Login Portal Switcher Tabs */
+        .portal-tabs {
+            background: #e2e8f0;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 22px;
             display: flex;
-            align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
-        .password-hint code {
+        .portal-tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 9px 12px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .portal-tab-btn.active {
+            background: #ffffff;
             color: #0f2744;
-            background: #e2e8f0;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .portal-tab-btn:hover:not(.active) {
+            color: #0f2744;
         }
 
         .btn-login {
@@ -205,55 +223,6 @@
             transform: translateY(0);
         }
 
-        .demo-selector-wrap {
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px dashed #e2e8f0;
-        }
-
-        .demo-title {
-            font-size: 11.5px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #64748b;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chip-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .demo-chip {
-            font-size: 11.5px;
-            padding: 5px 10px;
-            border-radius: 20px;
-            background: #edf2f7;
-            color: #334155;
-            border: 1px solid #cbd5e1;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            font-weight: 600;
-        }
-
-        .demo-chip:hover {
-            background: #1d5fbf;
-            color: white;
-            border-color: #1d5fbf;
-            transform: translateY(-1px);
-        }
-
-        .demo-chip.active {
-            background: #0f2744;
-            color: white;
-            border-color: #0f2744;
-        }
-
         .info-pill {
             background: #eff6ff;
             border: 1px solid #bfdbfe;
@@ -261,7 +230,7 @@
             font-size: 12px;
             border-radius: 8px;
             padding: 8px 12px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         #loginAlert {
@@ -284,97 +253,149 @@
             <p class="login-subtitle">Integrated Student Management System • SE IT Div B</p>
         </div>
 
-        <div class="card-body">
+        <div class="card-body p-4">
             <div id="loginAlert" class="alert alert-danger py-2 px-3 mb-3"></div>
 
-            <div class="info-pill d-flex align-items-center">
-                <i class="bi bi-shield-check fs-5 me-2 text-primary"></i>
-                <div>
-                    <strong>Secure Student Portal</strong>
-                    <div style="font-size: 11px;">Access Attendance, Notes, Grades & Syllabi</div>
-                </div>
+            <!-- Portal Mode Selector -->
+            <div class="portal-tabs">
+                <button type="button" class="portal-tab-btn active" id="tabStudentBtn" onclick="switchLoginMode('student')">
+                    <i class="bi bi-person-fill"></i> Student Portal
+                </button>
+                <button type="button" class="portal-tab-btn" id="tabFacultyBtn" onclick="switchLoginMode('faculty')">
+                    <i class="bi bi-person-badge-fill"></i> Faculty Portal
+                </button>
             </div>
 
-            <form id="loginForm" autocomplete="off">
+            <!-- Student Login Form -->
+            <form id="studentLoginForm" autocomplete="off">
+                <div class="info-pill d-flex align-items-center">
+                    <i class="bi bi-shield-lock-fill fs-5 me-2 text-primary"></i>
+                    <div>
+                        <strong>Confidential Student Access</strong>
+                        <div style="font-size: 11px;">View your individual attendance, syllabi, grades & ID card</div>
+                    </div>
+                </div>
+
                 <div class="mb-3">
                     <label class="form-label" for="studentId">Moodle ID</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                        <input type="text" class="form-control" id="studentId" placeholder="e.g. 25104021" required autofocus>
+                        <input type="text" class="form-control" id="studentId" placeholder="Enter your 8-digit Moodle ID" required autofocus>
                     </div>
-                    <small class="text-muted" style="font-size: 11px;">Enter your 8-digit Moodle ID registered in SE IT Div B</small>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label" for="password">Password</label>
+                    <label class="form-label" for="studentPassword">Password</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                        <input type="password" class="form-control" id="password" placeholder="Enter password" required>
-                        <button class="btn btn-link text-muted border-0 pe-3" type="button" id="togglePassword">
-                            <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                        <input type="password" class="form-control" id="studentPassword" placeholder="Enter your account password" required>
+                        <button class="btn btn-link text-muted border-0 pe-3" type="button" id="toggleStudentPassword">
+                            <i class="bi bi-eye" id="toggleStudentPasswordIcon"></i>
                         </button>
-                    </div>
-                    <div class="password-hint">
-                        <i class="bi bi-info-circle-fill text-primary"></i>
-                        <span>Format: <code>&lt;MoodleID&gt;@Apsit</code></span>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-login w-100 mt-4" id="submitBtn">
-                    <span>Login to Dashboard</span>
+                <button type="submit" class="btn btn-login w-100 mt-4" id="studentSubmitBtn">
+                    <span>Sign In to Student Portal</span>
                     <i class="bi bi-arrow-right"></i>
                 </button>
             </form>
 
-            <!-- Quick Demo Roster Selector for Testing -->
-            <div class="demo-selector-wrap">
-                <div class="demo-title">
-                    <span><i class="bi bi-people-fill me-1"></i> Quick Test (SE IT Div B)</span>
-                    <span class="badge bg-secondary-subtle text-secondary">70 Students</span>
+            <!-- Faculty Login Form -->
+            <form id="facultyLoginForm" autocomplete="off" style="display: none;">
+                <div class="info-pill d-flex align-items-center" style="background: #f0fdf4; border-color: #bbf7d0; color: #166534;">
+                    <i class="bi bi-award-fill fs-5 me-2 text-success"></i>
+                    <div>
+                        <strong>Faculty Academic Management</strong>
+                        <div style="font-size: 11px;">Update student attendance & academic grades for SE IT Div B</div>
+                    </div>
                 </div>
-                <div class="chip-list">
-                    <span class="demo-chip active" onclick="fillStudent('25104021')">Jasmine Mohanty (25104021)</span>
-                    <span class="demo-chip" onclick="fillStudent('25104023')">Nilanchal Jena (25104023)</span>
-                    <span class="demo-chip" onclick="fillStudent('25104039')">Harsh Pandey (25104039)</span>
-                    <span class="demo-chip" onclick="fillStudent('25104046')">Vedant Rane (25104046)</span>
+
+                <div class="mb-3">
+                    <label class="form-label" for="facultyNameInput">Faculty Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person-workspace"></i></span>
+                        <input type="text" class="form-control" id="facultyNameInput" placeholder="Enter your full name" list="facultyDatalist" required>
+                        <datalist id="facultyDatalist">
+                            <option value="Prof. Puja Chavan">Applied Mathematics Thinking-I</option>
+                            <option value="Dr. Sonia Aneesh">Advance Data Structure &amp; Analysis</option>
+                            <option value="Prof. Shital Agarwal">Database Management &amp; SQL Lab</option>
+                            <option value="Prof. Charul Singh">Automata Theory</option>
+                            <option value="Prof. Anupama Singh">Open Elective &amp; ADSA Lab</option>
+                            <option value="Prof. Mandar Ganjapurkar">Mini-Project Java</option>
+                            <option value="Prof. Randeep Kaur Kahlon">Entrepreneurship Development</option>
+                            <option value="Prof. Pranali Vhora">Environmental Science</option>
+                        </datalist>
+                    </div>
                 </div>
-            </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="facultyPassword">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control" id="facultyPassword" placeholder="Enter your password" required>
+                        <button class="btn btn-link text-muted border-0 pe-3" type="button" id="toggleFacultyPassword">
+                            <i class="bi bi-eye" id="toggleFacultyPasswordIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-login w-100 mt-4" id="facultySubmitBtn" style="background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #059669 100%);">
+                    <span>Access Faculty Portal</span>
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </form>
+
         </div>
     </div>
 
-    <!-- Load Students and Attendance Data -->
+    <!-- Load Students, Faculty and Attendance Data -->
     <script src="studentsData.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Password visibility toggle
-        const togglePasswordBtn = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
-        const toggleIcon = document.getElementById('togglePasswordIcon');
-
-        togglePasswordBtn.addEventListener('click', function() {
-            const isPassword = passwordInput.getAttribute('type') === 'password';
-            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-            toggleIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
-        });
-
-        // Quick filler function for evaluation
-        function fillStudent(moodleId) {
-            const idInput = document.getElementById('studentId');
-            const passInput = document.getElementById('password');
-            idInput.value = moodleId;
-            passInput.value = moodleId + '@Apsit';
+        // Tab switching logic
+        function switchLoginMode(mode) {
             hideAlert();
+            const tabStudentBtn = document.getElementById('tabStudentBtn');
+            const tabFacultyBtn = document.getElementById('tabFacultyBtn');
+            const studentForm = document.getElementById('studentLoginForm');
+            const facultyForm = document.getElementById('facultyLoginForm');
 
-            // Highlight chip
-            document.querySelectorAll('.demo-chip').forEach(chip => {
-                chip.classList.toggle('active', chip.textContent.includes(moodleId));
-            });
+            if (mode === 'student') {
+                tabStudentBtn.classList.add('active');
+                tabFacultyBtn.classList.remove('active');
+                studentForm.style.display = 'block';
+                facultyForm.style.display = 'none';
+                document.getElementById('studentId').focus();
+            } else {
+                tabFacultyBtn.classList.add('active');
+                tabStudentBtn.classList.remove('active');
+                facultyForm.style.display = 'block';
+                studentForm.style.display = 'none';
+            }
         }
 
-        // Auto-update password template as user types Moodle ID
-        document.getElementById('studentId').addEventListener('input', function(e) {
-            hideAlert();
+        // Student Password visibility toggle
+        const toggleStudentPasswordBtn = document.getElementById('toggleStudentPassword');
+        const studentPasswordInput = document.getElementById('studentPassword');
+        const toggleStudentPasswordIcon = document.getElementById('toggleStudentPasswordIcon');
+
+        toggleStudentPasswordBtn.addEventListener('click', function() {
+            const isPassword = studentPasswordInput.getAttribute('type') === 'password';
+            studentPasswordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            toggleStudentPasswordIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+        });
+
+        // Faculty Password visibility toggle
+        const toggleFacultyPasswordBtn = document.getElementById('toggleFacultyPassword');
+        const facultyPasswordInput = document.getElementById('facultyPassword');
+        const toggleFacultyPasswordIcon = document.getElementById('toggleFacultyPasswordIcon');
+
+        toggleFacultyPasswordBtn.addEventListener('click', function() {
+            const isPassword = facultyPasswordInput.getAttribute('type') === 'password';
+            facultyPasswordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            toggleFacultyPasswordIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
         });
 
         function showAlert(msg, isSuccess = false) {
@@ -389,16 +410,21 @@
             alertBox.style.display = 'none';
         }
 
-        // Login Submission
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
+        document.getElementById('studentId').addEventListener('input', hideAlert);
+        document.getElementById('studentPassword').addEventListener('input', hideAlert);
+        document.getElementById('facultyNameInput').addEventListener('input', hideAlert);
+        document.getElementById('facultyPassword').addEventListener('input', hideAlert);
+
+        // Student Login Submission
+        document.getElementById('studentLoginForm').addEventListener('submit', function(event) {
             event.preventDefault();
             hideAlert();
 
             const studentId = document.getElementById('studentId').value.trim();
-            const pass = document.getElementById('password').value.trim();
+            const pass = document.getElementById('studentPassword').value.trim();
 
             if (!studentId || !pass) {
-                showAlert('Please fill in both Moodle ID and Password.');
+                showAlert('Please enter both your Moodle ID and Password.');
                 return;
             }
 
@@ -412,7 +438,7 @@
 
             // Success state
             showAlert(`Welcome, ${authResult.student.name}! Redirecting to your dashboard...`, true);
-            const submitBtn = document.getElementById('submitBtn');
+            const submitBtn = document.getElementById('studentSubmitBtn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading Dashboard...';
 
@@ -421,11 +447,33 @@
             }, 600);
         });
 
-        // Default fill Jasmine Mohanty for seamless testing
-        window.addEventListener('DOMContentLoaded', () => {
-            if (!document.getElementById('studentId').value) {
-                fillStudent('25104021');
+        // Faculty Login Submission
+        document.getElementById('facultyLoginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            hideAlert();
+
+            const facultyName = document.getElementById('facultyNameInput').value.trim();
+            const pass = document.getElementById('facultyPassword').value.trim();
+
+            if (!facultyName || !pass) {
+                showAlert('Please enter both your Faculty Name and Password.');
+                return;
             }
+
+            const authResult = authenticateFaculty(facultyName, pass);
+            if (!authResult.success) {
+                showAlert(authResult.message);
+                return;
+            }
+
+            showAlert(`Welcome, ${authResult.faculty.title}! Loading Faculty Academic Portal...`, true);
+            const submitBtn = document.getElementById('facultySubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Opening Faculty Portal...';
+
+            setTimeout(() => {
+                window.location.href = 'dashboard1.html?view=faculty';
+            }, 600);
         });
     </script>
 </body>

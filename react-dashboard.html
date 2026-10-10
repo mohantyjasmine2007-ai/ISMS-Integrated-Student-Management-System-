@@ -156,14 +156,50 @@
 
         function App() {
             const [currentStudent, setCurrentStudent] = useState(() => getCurrentUser());
-            const [activeTab, setActiveTab] = useState('dashboard');
-            const [activeModal, setActiveModal] = useState(null); // 'ed', 'evs', 'idCard'
+            const [activeTab, setActiveTab] = useState(() => {
+                const p = new URLSearchParams(window.location.search);
+                if (p.get('view') === 'faculty') return 'faculty';
+                if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty') return 'faculty';
+                return 'dashboard';
+            });
+            const isFacultyAuth = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty';
+            const [activeModal, setActiveModal] = useState(null); // 'ed', 'evs', etc.
+            const [selectedFaculty, setSelectedFaculty] = useState(() => getCurrentFaculty() || FACULTY_LIST[1]);
+            const [rosterSearch, setRosterSearch] = useState('');
+            const [rosterFilter, setRosterFilter] = useState('all');
+            const [facultyEditModal, setFacultyEditModal] = useState(null); // { type: 'attendance'|'grade', student }
+            const [editAttended, setEditAttended] = useState(0);
+            const [editConducted, setEditConducted] = useState(20);
+            const [editTW, setEditTW] = useState(20);
+            const [editGrade, setEditGrade] = useState('A+');
+            const [editIat1, setEditIat1] = useState(18);
+            const [editIat2, setEditIat2] = useState(18);
+            const [editStatus, setEditStatus] = useState('Completed');
+            const [refreshTick, setRefreshTick] = useState(0);
 
             useEffect(() => {
                 if (!currentStudent) {
-                    window.location.href = 'index.html';
+                    const fallback = getLiveStudents()[0];
+                    if (fallback) setCurrentStudent(fallback);
+                    else window.location.href = 'index.html';
                 }
             }, [currentStudent]);
+
+            useEffect(() => {
+                const handleStorage = (e) => {
+                    if (e.key === 'apsit_isms_dynamic_students' || e.key === 'apsit_current_user') {
+                        const fresh = getCurrentUser();
+                        if (fresh) setCurrentStudent(fresh);
+                        setRefreshTick(t => t + 1);
+                    }
+                };
+                window.addEventListener('storage', handleStorage);
+                return () => window.removeEventListener('storage', handleStorage);
+            }, []);
+
+            const liveStudents = useMemo(() => {
+                return getLiveStudents();
+            }, [refreshTick]);
 
             const compliance = useMemo(() => {
                 if (!currentStudent) return null;
@@ -213,32 +249,76 @@
                                 <span>APSIT ISMS <span class="badge bg-primary text-light small fw-normal ms-1">React Edition</span></span>
                             </a>
 
-                            <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-2 gap-md-3">
+                                {/* Academic Calendar Notifications Dropdown */}
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-light dropdown-toggle d-flex align-items-center gap-1" data-bs-toggle="dropdown">
+                                        <i class="bi bi-bell-fill text-warning"></i>
+                                        <span class="d-none d-md-inline">Notifications</span>
+                                        <span class="badge bg-danger rounded-pill">16</span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-lg p-2" style={{ width: '340px', maxHeight: '450px', overflowY: 'auto' }}>
+                                        <li class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
+                                            <h6 class="dropdown-header text-primary fw-bold p-0 mb-0">Upcoming Academic Calendar</h6>
+                                            <span class="badge bg-primary-subtle text-primary">Sem III 2026</span>
+                                        </li>
+                                        {ACADEMIC_CALENDAR_EVENTS.slice(0, 8).map(ev => (
+                                            <li key={ev.id}>
+                                                <a class="dropdown-item py-2 px-2 rounded" href="dashboard1.html">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <span class={`badge ${ev.badge} small`}>{ev.type}</span>
+                                                        <small class="text-muted fw-semibold">{ev.date}</small>
+                                                    </div>
+                                                    <h6 class="mb-1 text-wrap fw-semibold small text-dark">{ev.title}</h6>
+                                                    <small class="text-muted d-block text-truncate" style={{ maxWidth: '300px' }}>{ev.desc}</small>
+                                                </a>
+                                                <hr class="dropdown-divider my-1" />
+                                            </li>
+                                        ))}
+                                        <li class="text-center pt-1">
+                                            <a class="small text-decoration-none fw-semibold text-primary" href="dashboard1.html">
+                                                View Complete Academic Calendar <i class="bi bi-arrow-right"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                {/* Faculty Portal Direct Button */}
+                                <button 
+                                    class={`btn btn-sm ${activeTab === 'faculty' ? 'btn-warning text-dark fw-bold' : 'btn-outline-warning text-white fw-bold'} d-flex align-items-center gap-1`}
+                                    onClick={() => setActiveTab('faculty')}
+                                >
+                                    <i class="bi bi-person-workspace"></i>
+                                    <span>Faculty Portal</span>
+                                </button>
                                 
+                                {/* Profile Dropdown */}
                                 <div class="dropdown">
                                     <button class="btn btn-sm btn-light dropdown-toggle d-flex align-items-center gap-2 fw-semibold" data-bs-toggle="dropdown">
-                                        <i class="bi bi-person-circle fs-5 text-primary"></i>
-                                        <span>{currentStudent.name}</span>
-                                        <span class="badge bg-primary text-white">{currentStudent.moodleId}</span>
+                                        <i class={`bi ${isFacultyAuth ? 'bi-person-badge-fill text-warning' : 'bi-person-circle text-primary'} fs-5`}></i>
+                                        <span class="d-none d-sm-inline">{isFacultyAuth ? selectedFaculty.title : currentStudent.name}</span>
+                                        <span class={`badge ${isFacultyAuth ? 'bg-warning text-dark' : 'bg-primary text-white'}`}>{isFacultyAuth ? 'Faculty' : currentStudent.moodleId}</span>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                         <li class="px-3 py-2 border-bottom">
-                                            <div class="fw-bold">{currentStudent.fullName}</div>
-                                            <small class="text-muted">Roll: {currentStudent.rollNo} • SE IT Div B</small>
+                                            <div class="fw-bold">{isFacultyAuth ? selectedFaculty.title : currentStudent.fullName}</div>
+                                            <small class="text-muted">{isFacultyAuth ? `${selectedFaculty.subjectName} • ${selectedFaculty.email}` : `Roll: ${currentStudent.rollNo} • SE IT Div B`}</small>
                                         </li>
+                                        {!isFacultyAuth && (
+                                            <li>
+                                                <button class="dropdown-item py-2" onClick={() => setActiveModal('idCard')}>
+                                                    <i class="bi bi-person-badge text-primary me-2"></i> View ID Card
+                                                </button>
+                                            </li>
+                                        )}
                                         <li>
-                                            <button class="dropdown-item py-2" onClick={() => setActiveModal('idCard')}>
-                                                <i class="bi bi-person-badge text-primary me-2"></i> View ID Card
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item py-2" href="dashboard1.html">
+                                            <a class="dropdown-item py-2" href={isFacultyAuth ? "dashboard1.html?view=faculty" : "dashboard1.html"}>
                                                 <i class="bi bi-layout-text-window text-secondary me-2"></i> Classic HTML Version
                                             </a>
                                         </li>
                                         <li><hr class="dropdown-divider" /></li>
                                         <li>
-                                            <button class="dropdown-item py-2 text-danger fw-semibold" onClick={logoutStudent}>
+                                            <button class="dropdown-item py-2 text-danger fw-semibold" onClick={isFacultyAuth ? logoutFaculty : logoutStudent}>
                                                 <i class="bi bi-box-arrow-right me-2"></i> Logout
                                             </button>
                                         </li>
@@ -278,6 +358,12 @@
                                             <span><i class="bi bi-award me-2"></i> Grades & Marks</span>
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class={`nav-link text-success fw-bold ${activeTab === 'faculty' ? 'active text-white' : ''}`} onClick={() => setActiveTab('faculty')}>
+                                            <span><i class="bi bi-person-workspace me-2"></i> Faculty Portal</span>
+                                            <span class="badge bg-success">Live</span>
+                                        </a>
+                                    </li>
                                 </ul>
 
                                 <hr />
@@ -311,7 +397,7 @@
                                                         Roll No: <strong>{currentStudent.rollNo}</strong> | Moodle ID: <strong>{currentStudent.moodleId}</strong> | Semester III
                                                     </p>
                                                     <p class="mb-0 small text-light opacity-75">
-                                                        Access your syllabus, detailed attendance statistics, notes, and grades built with React & Spring Boot.
+                                                        Access your syllabus, detailed attendance statistics, safe margin calculator, and grades built with React &amp; Spring Boot.
                                                     </p>
                                                 </div>
                                                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
@@ -362,31 +448,85 @@
                                         {/* Quick Course Syllabus Access */}
                                         <div class="card section-card p-4 shadow-sm mb-4">
                                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h5 class="fw-bold mb-0"><i class="bi bi-star-fill text-warning me-2"></i>Updated Syllabi & Practicals</h5>
-                                                <button class="btn btn-outline-primary btn-sm" onClick={() => setActiveTab('courses')}>View All 10 Courses</button>
+                                                <div>
+                                                    <h5 class="fw-bold mb-0"><i class="bi bi-journal-bookmark-fill text-primary me-2"></i>Official Syllabi &amp; Experiment Manuals</h5>
+                                                    <small class="text-muted">Updated as per University syllabus specifications &amp; faculty plan</small>
+                                                </div>
+                                                <button class="btn btn-outline-primary btn-sm" onClick={() => setActiveTab('courses')}>View All Courses</button>
                                             </div>
                                             <div class="row g-3">
-                                                <div class="col-md-6">
-                                                    <div class="border rounded p-3 bg-light d-flex justify-content-between align-items-center">
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div class="border rounded p-3 bg-light d-flex flex-column justify-content-between h-100">
                                                         <div>
-                                                            <span class="badge bg-warning-subtle text-dark border mb-1">Course 2993511</span>
+                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                <span class="badge bg-warning-subtle text-dark border">Course 2993511</span>
+                                                                <span class="badge bg-light text-muted border">2 Credits</span>
+                                                            </div>
                                                             <h6 class="fw-bold mb-1">Entrepreneurship Development</h6>
-                                                            <small class="text-muted">Detailed Syllabus (Mod 0-VI) • 10 Experiments • 2 Credits</small>
+                                                            <small class="text-muted d-block mb-2">Modules 0–VI • 10 Experiments • 6 Assignments • Term Work: 50M</small>
                                                         </div>
-                                                        <button class="btn btn-primary btn-sm" onClick={() => setActiveModal('ed')}>
-                                                            View Syllabus
+                                                        <button class="btn btn-primary btn-sm w-100" onClick={() => setActiveModal('ed')}>
+                                                            <i class="bi bi-eye me-1"></i> View Syllabus
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="border rounded p-3 bg-light d-flex justify-content-between align-items-center">
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div class="border rounded p-3 bg-light d-flex flex-column justify-content-between h-100">
                                                         <div>
-                                                            <span class="badge bg-success-subtle text-success border mb-1">Course 2993512</span>
+                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                <span class="badge bg-success-subtle text-success border">Course 2993512</span>
+                                                                <span class="badge bg-light text-muted border">2 Credits</span>
+                                                            </div>
                                                             <h6 class="fw-bold mb-1">Environmental Science</h6>
-                                                            <small class="text-muted">Detailed Syllabus (Unit I-VI) • 12 Experiments • 2 Credits</small>
+                                                            <small class="text-muted d-block mb-2">Units I–VI • 12 Experiments • 10 Assignments • Term Work: 50M</small>
                                                         </div>
-                                                        <button class="btn btn-success btn-sm text-white" onClick={() => setActiveModal('evs')}>
-                                                            View Syllabus
+                                                        <button class="btn btn-success btn-sm text-white w-100" onClick={() => setActiveModal('evs')}>
+                                                            <i class="bi bi-eye me-1"></i> View Syllabus
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div class="border rounded p-3 bg-light d-flex flex-column justify-content-between h-100">
+                                                        <div>
+                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                <span class="badge bg-info-subtle text-dark border">Course 2343112</span>
+                                                                <span class="badge bg-light text-muted border">3 Credits</span>
+                                                            </div>
+                                                            <h6 class="fw-bold mb-1">Advance Data Structure &amp; Analysis</h6>
+                                                            <small class="text-muted d-block mb-2">Modules 0–VI • Theory 3 Hrs • IAT: 40M • ESE: 60M (100M)</small>
+                                                        </div>
+                                                        <button class="btn btn-info btn-sm text-dark w-100 fw-semibold" onClick={() => setActiveModal('adsa')}>
+                                                            <i class="bi bi-eye me-1"></i> View Syllabus
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-lg-6">
+                                                    <div class="border rounded p-3 bg-light d-flex flex-column justify-content-between h-100">
+                                                        <div>
+                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                <span class="badge bg-danger-subtle text-danger border">Course 2343113</span>
+                                                                <span class="badge bg-light text-muted border">3 Credits</span>
+                                                            </div>
+                                                            <h6 class="fw-bold mb-1">Database Management System &amp; Application</h6>
+                                                            <small class="text-muted d-block mb-2">Modules 0–VI • ER/EER • Relational Algebra • SQL &amp; JDBC • ACID • 100M</small>
+                                                        </div>
+                                                        <button class="btn btn-danger btn-sm text-white w-100" onClick={() => setActiveModal('dbms')}>
+                                                            <i class="bi bi-eye me-1"></i> View Syllabus
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-lg-6">
+                                                    <div class="border rounded p-3 bg-light d-flex flex-column justify-content-between h-100">
+                                                        <div>
+                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                <span class="badge bg-primary-subtle text-primary border">Course 2343611</span>
+                                                                <span class="badge bg-light text-muted border">2 Credits • 75 Marks</span>
+                                                            </div>
+                                                            <h6 class="fw-bold mb-1">Mini-Project: Full Stack Java Programming</h6>
+                                                            <small class="text-muted d-block mb-2">Modules I–VI • 11 Official Experiments • 6 Assignments • Docker • Capstone</small>
+                                                        </div>
+                                                        <button class="btn btn-dark btn-sm w-100" onClick={() => setActiveModal('fsjp')}>
+                                                            <i class="bi bi-eye me-1"></i> View Syllabus &amp; Lab Manual
                                                         </button>
                                                     </div>
                                                 </div>
@@ -397,67 +537,35 @@
 
                                 {activeTab === 'courses' && (
                                     <div>
-                                        <h3 class="fw-bold mb-3"><i class="bi bi-book-fill text-primary me-2"></i>Semester III Courses & Syllabi</h3>
+                                        <h3 class="fw-bold mb-3"><i class="bi bi-book-fill text-primary me-2"></i>Semester III Courses &amp; Syllabi</h3>
                                         <div class="row g-4">
-                                            {/* ED Card */}
-                                            <div class="col-md-6 col-xl-4">
-                                                <div class="card course-card shadow-sm border-0 p-3">
-                                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                                        <i class="bi bi-lightbulb fs-2 text-warning"></i>
-                                                        <span class="badge bg-warning-subtle text-dark border">Course 2993511</span>
-                                                    </div>
-                                                    <h5 class="fw-bold">Entrepreneurship Development</h5>
-                                                    <p class="text-muted small">Term Work: 50 Marks • Credits: 2</p>
-                                                    <div class="small mb-3">
-                                                        <span class="badge bg-light text-dark border me-1">6 Modules</span>
-                                                        <span class="badge bg-light text-dark border me-1">10 Experiments</span>
-                                                        <span class="badge bg-light text-dark border">6 Assignments</span>
-                                                    </div>
-                                                    <button class="btn btn-outline-primary btn-sm w-100" onClick={() => setActiveModal('ed')}>
-                                                        <i class="bi bi-book me-1"></i> Open Detailed Syllabus
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* EVS Card */}
-                                            <div class="col-md-6 col-xl-4">
-                                                <div class="card course-card shadow-sm border-0 p-3">
-                                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                                        <i class="bi bi-tree fs-2 text-success"></i>
-                                                        <span class="badge bg-success-subtle text-success border">Course 2993512</span>
-                                                    </div>
-                                                    <h5 class="fw-bold">Environmental Science</h5>
-                                                    <p class="text-muted small">Term Work: 50 Marks • Credits: 2</p>
-                                                    <div class="small mb-3">
-                                                        <span class="badge bg-light text-dark border me-1">6 Units</span>
-                                                        <span class="badge bg-light text-dark border me-1">12 Experiments</span>
-                                                        <span class="badge bg-light text-dark border">10 Assignments</span>
-                                                    </div>
-                                                    <button class="btn btn-outline-success btn-sm w-100" onClick={() => setActiveModal('evs')}>
-                                                        <i class="bi bi-book me-1"></i> Open Detailed Syllabus
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Other Sem III Courses */}
                                             {[
-                                                { code: 'ITC301', title: 'Applied Mathematics Thinking-I', icon: 'bi-calculator', color: 'text-primary' },
-                                                { code: 'ITC302', title: 'Advance Data Structure & Analysis', icon: 'bi-diagram-3', color: 'text-info' },
-                                                { code: 'ITC303', title: 'Database Management System & App', icon: 'bi-database', color: 'text-danger' },
-                                                { code: 'ITC304', title: 'Automata Theory', icon: 'bi-cpu', color: 'text-secondary' },
-                                                { code: 'ITC305', title: 'Open Elective (Banking)', icon: 'bi-bank', color: 'text-warning' },
-                                                { code: 'ITL301', title: 'Mini-Project: Full Stack Java', icon: 'bi-file-code', color: 'text-primary' }
+                                                { code: 'Course ITC301', title: 'Applied Mathematics Thinking-I', faculty: 'Prof. Puja Chavan', icon: 'bi-calculator', color: 'text-primary', modal: 'math', scheme: 'Theory: 3 Hrs • Credits: 3 • Total: 100 Marks' },
+                                                { code: 'Course ITC302', title: 'Advance Data Structure & Analysis', faculty: 'Dr. Sonia Aneesh', icon: 'bi-diagram-3', color: 'text-info', modal: 'adsa', scheme: 'Theory: 3 Hrs • Credits: 3 • Total: 100 Marks' },
+                                                { code: 'Course ITC303', title: 'Database Management System & App', faculty: 'Prof. Shital Agarwal', icon: 'bi-database', color: 'text-danger', modal: 'dbms', scheme: 'Theory: 3 Hrs • Credits: 3 • Total: 100 Marks' },
+                                                { code: 'Course ITC304', title: 'Automata Theory', faculty: 'Prof. Charul Singh', icon: 'bi-cpu', color: 'text-secondary', modal: 'automata', scheme: 'Theory: 3 Hrs • Credits: 3 • Total: 100 Marks' },
+                                                { code: 'Course ITC305', title: 'Open Elective (Banking & Finance)', faculty: 'Prof. Anupama Singh', icon: 'bi-bank', color: 'text-warning', modal: 'oe', scheme: 'Theory: 2 Hrs • Credits: 2' },
+                                                { code: 'Course ITL301', title: 'ADSA Lab', faculty: 'Prof. Anupama Singh', icon: 'bi-pc-display', color: 'text-info', modal: 'adsaLab', scheme: 'Practical: 2 Hrs • Credits: 1 • 25 Marks' },
+                                                { code: 'Course ITL302', title: 'SQL Lab', faculty: 'Prof. Shital Agarwal', icon: 'bi-server', color: 'text-primary', modal: 'sqlLab', scheme: 'Practical: 2 Hrs • Credits: 1 • 25 Marks' },
+                                                { code: 'Course ITM301', title: 'Mini-Project: Full Stack Java', faculty: 'Prof. Mandar Ganjapurkar', icon: 'bi-file-code', color: 'text-dark', modal: 'fsjp', scheme: 'Pract: 2*+2 Hrs • Credits: 2 • 75 Marks • 11 Exp' },
+                                                { code: 'Course 2993511', title: 'Entrepreneurship Development', faculty: 'Prof. Randeep Kaur Kahlon', icon: 'bi-lightbulb', color: 'text-warning', modal: 'ed', scheme: 'Pract: 2*+2 Hrs • Credits: 2 • Term Work: 50 Marks • 10 Exp' },
+                                                { code: 'Course 2993512', title: 'Environmental Science', faculty: 'Prof. Pranali Vhora', icon: 'bi-tree', color: 'text-success', modal: 'evs', scheme: 'Pract: 2 Hrs • Credits: 2 • Term Work: 50 Marks • 12 Exp' }
                                             ].map(c => (
                                                 <div class="col-md-6 col-xl-4" key={c.code}>
-                                                    <div class="card course-card shadow-sm border-0 p-3">
-                                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                                            <i class={`bi ${c.icon} fs-2 ${c.color}`}></i>
-                                                            <span class="badge bg-light text-muted border">{c.code}</span>
+                                                    <div class="card course-card shadow-sm border-0 p-3 h-100 d-flex flex-column justify-content-between">
+                                                        <div>
+                                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                <i class={`bi ${c.icon} fs-2 ${c.color}`}></i>
+                                                                <span class="badge bg-light text-muted border">{c.code}</span>
+                                                            </div>
+                                                            <h5 class="fw-bold mb-1">{c.title}</h5>
+                                                            <div class="text-primary small fw-semibold mb-2">
+                                                                <i class="bi bi-person-fill me-1"></i>Faculty: {c.faculty}
+                                                            </div>
+                                                            <p class="text-muted small mb-3">{c.scheme}</p>
                                                         </div>
-                                                        <h5 class="fw-bold">{c.title}</h5>
-                                                        <p class="text-muted small">Information Technology • Sem III</p>
-                                                        <button class="btn btn-outline-secondary btn-sm w-100" onClick={() => alert(`${c.title} syllabus active in dashboard1.html`)}>
-                                                            Course Details
+                                                        <button class="btn btn-outline-primary btn-sm w-100" onClick={() => setActiveModal(c.modal)}>
+                                                            <i class="bi bi-book me-1"></i> Open Detailed Syllabus
                                                         </button>
                                                     </div>
                                                 </div>
@@ -605,40 +713,372 @@
 
                                 {activeTab === 'grades' && (
                                     <div>
-                                        <h3 class="fw-bold mb-3"><i class="bi bi-award-fill text-warning me-2"></i>Academic Assessment & Grades</h3>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h3 class="fw-bold mb-0"><i class="bi bi-award-fill text-warning me-2"></i>Academic Assessment &amp; Grades</h3>
+                                            <button class="btn btn-outline-success btn-sm fw-semibold" onClick={() => setActiveTab('faculty')}>
+                                                <i class="bi bi-pencil-square me-1"></i> Faculty Grade Entry Portal
+                                            </button>
+                                        </div>
                                         <div class="card section-card shadow-sm p-3">
                                             <div class="table-responsive">
                                                 <table class="table table-hover align-middle mb-0">
                                                     <thead class="table-light">
                                                         <tr>
-                                                            <th>Course</th>
-                                                            <th>Name</th>
+                                                            <th>Course Code</th>
+                                                            <th>Course Name</th>
+                                                            <th>Faculty In-Charge</th>
+                                                            <th class="text-center">IAT-I (20)</th>
+                                                            <th class="text-center">IAT-II (20)</th>
                                                             <th class="text-center">Term Work</th>
-                                                            <th class="text-center">Grade</th>
+                                                            <th class="text-center">Current Grade</th>
                                                             <th class="text-center">Status</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <td><strong>2993511</strong></td>
-                                                            <td>Entrepreneurship Development</td>
-                                                            <td class="text-center"><span class="badge bg-primary">46 / 50</span></td>
-                                                            <td class="text-center fw-bold text-success">O (Outstanding)</td>
-                                                            <td class="text-center"><span class="badge bg-success-subtle text-success">Completed</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><strong>2993512</strong></td>
-                                                            <td>Environmental Science</td>
-                                                            <td class="text-center"><span class="badge bg-primary">44 / 50</span></td>
-                                                            <td class="text-center fw-bold text-success">A+</td>
-                                                            <td class="text-center"><span class="badge bg-success-subtle text-success">Completed</span></td>
-                                                        </tr>
+                                                        {[
+                                                            { key: 'amt1', code: 'ITC301', name: 'Applied Mathematics Thinking-I', maxTW: 25 },
+                                                            { key: 'adsa', code: 'ITC302', name: 'Advance Data Structure & Analysis', maxTW: 25 },
+                                                            { key: 'dbms', code: 'ITC303', name: 'Database Management System & App', maxTW: 25 },
+                                                            { key: 'at', code: 'ITC304', name: 'Automata Theory', maxTW: 25 },
+                                                            { key: 'oe', code: 'ITC305', name: 'Open Elective (Banking & Finance)', maxTW: 25 },
+                                                            { key: 'adsaLab', code: 'ITL301', name: 'ADSA Lab', maxTW: 25 },
+                                                            { key: 'sqlLab', code: 'ITL302', name: 'SQL Lab', maxTW: 25 },
+                                                            { key: 'fsjp', code: 'ITM301', name: 'Mini-Project - Full Stack Java', maxTW: 50 },
+                                                            { key: 'ed', code: '2993511', name: 'Entrepreneurship Development', maxTW: 50 },
+                                                            { key: 'evs', code: '2993512', name: 'Environmental Science', maxTW: 50 }
+                                                        ].map(c => {
+                                                            const fac = FACULTY_LIST.find(f => f.subjectKey === c.key);
+                                                            const facTitle = fac ? fac.title : (SUBJECT_INFO[c.key]?.facultyTitle || 'Faculty');
+                                                            const g = (currentStudent.grades && currentStudent.grades[c.key]) || { termWork: 22, maxTermWork: c.maxTW, grade: 'A+', status: 'Completed' };
+                                                            const iat1Val = g.iat1 !== undefined ? `${g.iat1} / 20` : '--';
+                                                            const iat2Val = g.iat2 !== undefined ? `${g.iat2} / 20` : '--';
+                                                            return (
+                                                                <tr key={c.key}>
+                                                                    <td><strong>{c.code}</strong></td>
+                                                                    <td class="fw-semibold">{c.name}</td>
+                                                                    <td>
+                                                                        <span class="badge bg-light text-dark border">
+                                                                            <i class="bi bi-person-fill text-primary me-1"></i>{facTitle}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td class="text-center">{iat1Val}</td>
+                                                                    <td class="text-center">{iat2Val}</td>
+                                                                    <td class="text-center"><span class="badge bg-primary">{g.termWork} / {c.maxTW}</span></td>
+                                                                    <td class="text-center fw-bold text-success">{g.grade || 'A+'}</td>
+                                                                    <td class="text-center">
+                                                                        <span class="badge bg-success-subtle text-success">{g.status || 'Completed'}</span>
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })}
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
                                 )}
+
+                                {activeTab === 'faculty' && (() => {
+                                    const subjKey = selectedFaculty.subjectKey;
+                                    const subjInfo = SUBJECT_INFO[subjKey] || { conducted: 20, type: selectedFaculty.type };
+                                    
+                                    const filtered = liveStudents.filter(s => {
+                                        initializeStudentGrades(s);
+                                        const att = s.attendance[subjKey] || { attended: Math.round(subjInfo.conducted * 0.75), pct: 75 };
+                                        const matchesQuery = !rosterSearch || 
+                                            s.name.toLowerCase().includes(rosterSearch.toLowerCase()) || 
+                                            s.moodleId.includes(rosterSearch) || 
+                                            s.rollNo.toLowerCase().includes(rosterSearch.toLowerCase());
+                                        const matchesFilter = rosterFilter === 'all' || 
+                                            (rosterFilter === 'safe' && att.pct >= 75) || 
+                                            (rosterFilter === 'defaulters' && att.pct < 75);
+                                        return matchesQuery && matchesFilter;
+                                    });
+
+                                    let safeCount = 0;
+                                    let defaulterCount = 0;
+                                    let sumPct = 0;
+                                    liveStudents.forEach(s => {
+                                        const att = s.attendance[subjKey] || { pct: 75 };
+                                        if (att.pct >= 75) safeCount++; else defaulterCount++;
+                                        sumPct += att.pct;
+                                    });
+                                    const avgPct = Math.round(sumPct / (liveStudents.length || 1));
+
+                                    return (
+                                        <div>
+                                            {/* Header */}
+                                            <div class="card shadow-sm border-0 mb-4 p-4 text-white" style={{ background: 'linear-gradient(135deg, #092c4c 0%, #174d82 60%, #1e60a3 100%)' }}>
+                                                <div class="row align-items-center">
+                                                    <div class="col-lg-7">
+                                                        <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-1">FACULTY PORTAL (REACT)</span>
+                                                        <h3 class="fw-bold mb-1">{selectedFaculty.title} — Academic Management</h3>
+                                                        <p class="mb-2 text-light opacity-90 small">
+                                                            Course In-Charge: <strong>{selectedFaculty.subjectName}</strong> ({selectedFaculty.type}) • Live Multi-User Sync
+                                                        </p>
+                                                        <div class="d-flex flex-wrap gap-2 mt-2">
+                                                            <span class="badge bg-light text-dark"><i class="bi bi-people-fill text-primary me-1"></i>70 Students Enrolled</span>
+                                                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Exam Authority Mode</span>
+                                                            <span class="badge bg-info text-dark"><i class="bi bi-arrow-repeat me-1"></i>Syncs with dashboard1.html</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-5 mt-3 mt-lg-0">
+                                                        <div class="bg-white text-dark p-3 rounded shadow-sm">
+                                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                                <span class="badge bg-success-subtle text-success border border-success fw-bold px-2 py-1">
+                                                                    <i class="bi bi-shield-lock-fill me-1"></i> Authorized Faculty In-Charge
+                                                                </span>
+                                                                <span class="badge bg-secondary-subtle text-secondary small">Profile Locked</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style={{ width: '38px', height: '38px', fontSize: '15px' }}>
+                                                                    <i class="bi bi-person-fill"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="fw-bold fs-6 text-dark mb-0">{selectedFaculty.title}</div>
+                                                                    <small class="text-muted">{selectedFaculty.email}</small>
+                                                                </div>
+                                                            </div>
+                                                            {(() => {
+                                                                const myCourses = getFacultyCourses(selectedFaculty.name);
+                                                                if (myCourses.length > 1) {
+                                                                    return (
+                                                                        <div class="mt-2">
+                                                                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">
+                                                                                <i class="bi bi-journal-bookmark-fill text-primary me-1"></i> Switch My Assigned Course
+                                                                            </label>
+                                                                            <select 
+                                                                                class="form-select form-select-sm fw-semibold"
+                                                                                value={selectedFaculty.id}
+                                                                                onChange={(e) => {
+                                                                                    const f = myCourses.find(x => x.id === e.target.value);
+                                                                                    if (f) {
+                                                                                        setSelectedFaculty(f);
+                                                                                        setCurrentFaculty(f);
+                                                                                    }
+                                                                                }}
+                                                                            >
+                                                                                {myCourses.map(f => (
+                                                                                    <option key={f.id} value={f.id}>
+                                                                                        {f.subjectName} ({f.type})
+                                                                                    </option>
+                                                                                ))}
+                                                                            </select>
+                                                                        </div>
+                                                                    );
+                                                                } else {
+                                                                    return (
+                                                                        <div class="mt-2">
+                                                                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                                                                <span class="small fw-bold text-muted text-uppercase">Assigned Course</span>
+                                                                                <span class="badge bg-primary-subtle text-primary border"><i class="bi bi-book-half me-1"></i> {selectedFaculty.type}</span>
+                                                                            </div>
+                                                                            <div class="p-2 bg-light rounded border fw-bold text-dark small">
+                                                                                {selectedFaculty.subjectName}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                            })()}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Metric Stats */}
+                                            <div class="row g-3 mb-4">
+                                                <div class="col-md-3">
+                                                    <div class="card border-0 shadow-sm p-3 text-center">
+                                                        <small class="text-muted text-uppercase fw-semibold">Conducted Lectures</small>
+                                                        <h3 class="fw-bold text-primary mt-1 mb-0">{subjInfo.conducted}</h3>
+                                                        <small class="text-secondary">{subjInfo.type} Hours</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="card border-0 shadow-sm p-3 text-center">
+                                                        <small class="text-muted text-uppercase fw-semibold">Class Avg Attendance</small>
+                                                        <h3 class="fw-bold text-success mt-1 mb-0">{avgPct}%</h3>
+                                                        <small class="text-muted">SE IT Div B</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="card border-0 shadow-sm p-3 text-center">
+                                                        <small class="text-muted text-uppercase fw-semibold">Safe Standing (≥75%)</small>
+                                                        <h3 class="fw-bold text-success mt-1 mb-0">{safeCount}</h3>
+                                                        <small class="text-success fw-semibold">Eligible for Exams</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="card border-0 shadow-sm p-3 text-center">
+                                                        <small class="text-muted text-uppercase fw-semibold">Defaulters (&lt;75%)</small>
+                                                        <h3 class="fw-bold text-danger mt-1 mb-0">{defaulterCount}</h3>
+                                                        <small class="text-danger fw-semibold">Detention Risk</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Action bar */}
+                                            <div class="card border-0 shadow-sm mb-4 p-3">
+                                                <div class="row g-2 align-items-center">
+                                                    <div class="col-md-5">
+                                                        <div class="input-group">
+                                                            <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                                                            <input 
+                                                                type="text" 
+                                                                class="form-control" 
+                                                                placeholder="Search by student name, roll no, or Moodle ID..."
+                                                                value={rosterSearch}
+                                                                onChange={(e) => setRosterSearch(e.target.value)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <select 
+                                                            class="form-select"
+                                                            value={rosterFilter}
+                                                            onChange={(e) => setRosterFilter(e.target.value)}
+                                                        >
+                                                            <option value="all">All Students (70)</option>
+                                                            <option value="safe">Eligible Only (≥75%)</option>
+                                                            <option value="defaulters">Defaulters Only (&lt;75%)</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4 text-md-end">
+                                                        <button 
+                                                            class="btn btn-success fw-semibold btn-sm me-2"
+                                                            onClick={() => {
+                                                                if (window.confirm(`Mark 1 new lecture conducted for ${selectedFaculty.subjectName} and mark ALL 70 students present?`)) {
+                                                                    const oldConducted = (SUBJECT_INFO[subjKey]?.conducted || 20);
+                                                                    const newConducted = oldConducted + 1;
+                                                                    if (SUBJECT_INFO[subjKey]) SUBJECT_INFO[subjKey].conducted = newConducted;
+                                                                    liveStudents.forEach(s => {
+                                                                        const cur = s.attendance[subjKey] ? s.attendance[subjKey].attended : Math.round(oldConducted * 0.8);
+                                                                        updateStudentAttendanceByFaculty(s.moodleId, subjKey, cur + 1, newConducted);
+                                                                    });
+                                                                    setRefreshTick(t => t + 1);
+                                                                    const updatedCurrent = getStudentByMoodleId(currentStudent.moodleId);
+                                                                    if (updatedCurrent) setCurrentStudent(updatedCurrent);
+                                                                    alert(`Successfully conducted lecture #${newConducted} for ${selectedFaculty.subjectName}! All student records updated.`);
+                                                                }
+                                                            }}
+                                                        >
+                                                            <i class="bi bi-plus-circle me-1"></i> +1 Lecture (All Present)
+                                                        </button>
+                                                        <button 
+                                                            class="btn btn-outline-primary fw-semibold btn-sm"
+                                                            onClick={() => {
+                                                                let csv = "Roll No,Moodle ID,Name,Subject,Attended,Conducted,Subject %,Overall %,Term Work,Grade,Status\n";
+                                                                liveStudents.forEach(s => {
+                                                                    initializeStudentGrades(s);
+                                                                    const att = s.attendance[subjKey] || { attended: 0, pct: 0 };
+                                                                    const gr = s.grades[subjKey] || { termWork: 0, grade: 'P', status: 'Submitted' };
+                                                                    csv += `"${s.rollNo}","${s.moodleId}","${s.name}","${selectedFaculty.subjectName}",${att.attended},${subjInfo.conducted},${att.pct}%,${s.attendance.overallPct}%,${gr.termWork},"${gr.grade}","${gr.status}"\n`;
+                                                                });
+                                                                const blob = new Blob([csv], { type: 'text/csv' });
+                                                                const url = window.URL.createObjectURL(blob);
+                                                                const a = document.createElement('a');
+                                                                a.href = url;
+                                                                a.download = `APSIT_${selectedFaculty.subjectKey}_Roster.csv`;
+                                                                a.click();
+                                                            }}
+                                                        >
+                                                            <i class="bi bi-download me-1"></i> Export CSV
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Roster Table */}
+                                            <div class="card border-0 shadow-sm mb-4">
+                                                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                                    <h5 class="mb-0 fw-bold">
+                                                        <i class="bi bi-table text-primary me-2"></i> Student Roster &amp; Academic Management
+                                                    </h5>
+                                                    <span class="badge bg-secondary">Showing {filtered.length} of {liveStudents.length} students</span>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover align-middle mb-0">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Roll No</th>
+                                                                <th>Moodle ID</th>
+                                                                <th>Student Name</th>
+                                                                <th class="text-center">{selectedFaculty.subjectName.substring(0, 15)}.. ({subjInfo.conducted})</th>
+                                                                <th class="text-center">Subject %</th>
+                                                                <th class="text-center">Overall %</th>
+                                                                <th class="text-center">Term Work</th>
+                                                                <th class="text-center">Grade</th>
+                                                                <th class="text-center">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {filtered.map(s => {
+                                                                const attData = s.attendance[subjKey] || { attended: Math.round(subjInfo.conducted * 0.75), pct: 75 };
+                                                                const subPct = attData.pct;
+                                                                const overallPct = s.attendance.overallPct;
+                                                                const gradesData = (s.grades && s.grades[subjKey]) || { termWork: 22, maxTermWork: 25, grade: 'A+', status: 'Completed' };
+                                                                const badgeColor = subPct >= 75 ? 'bg-success' : (subPct >= 60 ? 'bg-warning text-dark' : 'bg-danger');
+
+                                                                return (
+                                                                    <tr key={s.moodleId}>
+                                                                        <td class="fw-bold text-secondary">{s.rollNo}</td>
+                                                                        <td class="fw-bold text-primary">{s.moodleId}</td>
+                                                                        <td>
+                                                                            <div class="fw-semibold">{s.name}</div>
+                                                                            <small class="text-muted">{s.contact}</small>
+                                                                        </td>
+                                                                        <td class="text-center fw-bold">{attData.attended} / {subjInfo.conducted}</td>
+                                                                        <td class="text-center">
+                                                                            <span class={`badge ${badgeColor}`}>{subPct}%</span>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <span class={`badge ${overallPct >= 75 ? 'bg-success' : 'bg-danger'}`}>{overallPct}%</span>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <span class="badge bg-primary-subtle text-primary border">{gradesData.termWork} / {gradesData.maxTermWork || 25}</span>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <span class="badge bg-light text-dark border fw-bold">{gradesData.grade || 'A+'}</span>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <div class="btn-group btn-group-sm">
+                                                                                <button 
+                                                                                    class="btn btn-outline-primary"
+                                                                                    title="Edit Attendance"
+                                                                                    onClick={() => {
+                                                                                        setEditAttended(attData.attended);
+                                                                                        setEditConducted(subjInfo.conducted);
+                                                                                        setFacultyEditModal({ type: 'attendance', student: s });
+                                                                                    }}
+                                                                                >
+                                                                                    <i class="bi bi-calendar-check me-1"></i> Att.
+                                                                                </button>
+                                                                                <button 
+                                                                                    class="btn btn-outline-success"
+                                                                                    title="Edit Grade"
+                                                                                    onClick={() => {
+                                                                                        setEditTW(gradesData.termWork || 20);
+                                                                                        setEditGrade(gradesData.grade || 'A+');
+                                                                                        setEditIat1(gradesData.iat1 !== undefined ? gradesData.iat1 : 18);
+                                                                                        setEditIat2(gradesData.iat2 !== undefined ? gradesData.iat2 : 18);
+                                                                                        setEditStatus(gradesData.status || 'Completed');
+                                                                                        setFacultyEditModal({ type: 'grade', student: s });
+                                                                                    }}
+                                                                                >
+                                                                                    <i class="bi bi-award me-1"></i> Grade
+                                                                                </button>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                );
+                                                            })}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                             </main>
                         </div>
                     </div>
@@ -754,6 +1194,476 @@
                         </div>
                     )}
 
+                    {/* ADSA Modal */}
+                    {activeModal === 'adsa' && (
+                        <div class="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header text-white" style={{ backgroundColor: '#0f2744' }}>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-info bg-opacity-25 rounded p-2 text-info">
+                                                <i class="bi bi-diagram-3-fill fs-3"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="modal-title fw-bold mb-0">Course 2343112: Advance Data Structure &amp; Analysis</h5>
+                                                <small class="text-light opacity-75">S.E. Information Technology • Semester III • Academic Year 2026-27</small>
+                                            </div>
+                                        </div>
+                                        <button class="btn-close btn-close-white" onClick={() => setActiveModal(null)}></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="row g-3 mb-4">
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">Teaching Scheme</div>
+                                                    <div class="fs-5 fw-bold text-dark mt-1">Theory: 03 Hrs/Wk</div>
+                                                    <small class="text-muted">3 Contact Hours</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">Credits Assigned</div>
+                                                    <div class="fs-5 fw-bold text-primary mt-1">03 Credits</div>
+                                                    <small class="text-muted">Theory: 3</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">Internal Assessment</div>
+                                                    <div class="fs-5 fw-bold text-warning mt-1">40 Marks</div>
+                                                    <small class="text-muted">IAT-I (20) + IAT-II (20)</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">End Sem Exam</div>
+                                                    <div class="fs-5 fw-bold text-success mt-1">60 Marks</div>
+                                                    <small class="text-muted">Total: 100 Marks (2 Hrs)</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-3 mb-4">
+                                            <div class="col-md-6">
+                                                <div class="card h-100 border shadow-sm">
+                                                    <div class="card-header bg-white py-2 fw-bold text-primary">
+                                                        <i class="bi bi-bullseye me-1"></i> Course Objectives
+                                                    </div>
+                                                    <div class="card-body p-3 small">
+                                                        <ol class="mb-0 ps-3">
+                                                            <li class="mb-1">To learn mathematical background for analysis of algorithm.</li>
+                                                            <li class="mb-1">To learn various advanced data structures.</li>
+                                                            <li class="mb-1">To learn greedy approach to solve problems.</li>
+                                                            <li class="mb-1">To learn backtracking algorithm and maximum flow networks.</li>
+                                                            <li class="mb-1">To learn dynamic programming methods.</li>
+                                                            <li>To understand the concept of pattern matching.</li>
+                                                        </ol>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card h-100 border shadow-sm">
+                                                    <div class="card-header bg-white py-2 fw-bold text-success">
+                                                        <i class="bi bi-check-circle-fill me-1"></i> Course Outcomes (Bloom's Taxonomy)
+                                                    </div>
+                                                    <div class="card-body p-3 small">
+                                                        <ul class="list-unstyled mb-0">
+                                                            <li class="mb-1"><strong>CO1:</strong> Understand analysis of algorithms and recurrence (L1, L2).</li>
+                                                            <li class="mb-1"><strong>CO2:</strong> Choose advanced data structures and calculate complexity (L2, L3, L4).</li>
+                                                            <li class="mb-1"><strong>CO3:</strong> Analyze greedy programming techniques to solve problems (L2–L5).</li>
+                                                            <li class="mb-1"><strong>CO4:</strong> Evaluate backtracking and max flow networks (L2–L5).</li>
+                                                            <li class="mb-1"><strong>CO5:</strong> Analyze dynamic programming technique to solve problems (L2–L5).</li>
+                                                            <li><strong>CO6:</strong> Select proper pattern matching algorithm for given problem (L3–L5).</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <h6 class="fw-bold text-primary mb-2"><i class="bi bi-journal-text me-2"></i>Detailed Syllabus Modules</h6>
+                                        <div class="table-responsive mb-4">
+                                            <table class="table table-bordered table-sm">
+                                                <thead class="table-light">
+                                                    <tr><th style={{ width: '60px' }}>Mod</th><th style={{ width: '220px' }}>Module Name</th><th>Detailed Content</th><th style={{ width: '60px' }}>Hrs</th><th style={{ width: '60px' }}>CO</th></tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td>0</td><td>Prerequisite</td><td>Overview of Data Structures: Revision of basic data structures (arrays, stacks, queues, linked lists, trees).</td><td>01</td><td>--</td></tr>
+                                                    <tr><td>I</td><td>Analysis of Algorithms</td><td>Time and Space complexity, Asymptotic notation, Recurrence Relations (Substitution, Recursion tree, Master theorem).</td><td>03</td><td>CO1</td></tr>
+                                                    <tr><td>II</td><td>Advanced Data Structures</td><td>AVL trees, B tree &amp; B+ tree, Red-Black Trees, Tries. Graph Traversals: BFS, DFS and time complexity analysis.</td><td>08</td><td>CO2</td></tr>
+                                                    <tr><td>III</td><td>Greedy Algorithms</td><td>Fractional Knapsack problem, Minimum Spanning Trees (Prim's and Kruskal's), Job sequencing with deadlines, Optimal storage.</td><td>06</td><td>CO3</td></tr>
+                                                    <tr><td>IV</td><td>Backtracking &amp; Max Flow</td><td>N-Queens, sum of subsets, graph coloring, Hamiltonian cycles. Max Flow Networks: Ford-Fulkerson method, Augmenting paths.</td><td>07</td><td>CO4</td></tr>
+                                                    <tr><td>V</td><td>Dynamic Algorithms</td><td>Greedy vs. Dynamic, Dijkstra's Algorithm, Bellman-Ford, Floyd-Warshall, 0/1 Knapsack, Travelling Salesman Problem (TSP).</td><td>08</td><td>CO5</td></tr>
+                                                    <tr><td>VI</td><td>String Matching</td><td>Naive string matching, Rabin-Karp, Knuth-Morris-Pratt (KMP), Longest Common Subsequence (LCS). Applications: DNA, text search.</td><td>06</td><td>CO6</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold text-dark"><i class="bi bi-book me-1"></i> Textbooks</h6>
+                                                <ul class="small list-group">
+                                                    <li class="list-group-item">1. Cormen, Leiserson, Rivest, Stein, <em>Introduction to Algorithms</em>, 3rd Ed, PHI.</li>
+                                                    <li class="list-group-item">2. Jon Kleinberg, Éva Tardos, <em>Algorithm Design</em>, Pearson.</li>
+                                                    <li class="list-group-item">3. Mark Allen Weiss, <em>Data Structures and Algorithm Analysis in C++</em>, Pearson.</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold text-info"><i class="bi bi-globe me-1"></i> Online Portals</h6>
+                                                <ul class="small list-group">
+                                                    <li class="list-group-item">1. NPTEL Algorithms Course (Prof. Madhavan Mukund)</li>
+                                                    <li class="list-group-item">2. MIT OpenCourseWare 6.006 (Introduction to Algorithms)</li>
+                                                    <li class="list-group-item">3. Coursera Algorithms Specialization (Stanford / Princeton)</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" onClick={() => setActiveModal(null)}>Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* DBMSA Modal */}
+                    {activeModal === 'dbms' && (
+                        <div class="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header text-white" style={{ backgroundColor: '#0f2744' }}>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-danger bg-opacity-25 rounded p-2 text-warning">
+                                                <i class="bi bi-database-fill-gear fs-3"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="modal-title fw-bold mb-0">Course 2343113: Database Management System &amp; Application</h5>
+                                                <small class="text-light opacity-75">S.E. Information Technology • Semester III • Academic Year 2026-27</small>
+                                            </div>
+                                        </div>
+                                        <button class="btn-close btn-close-white" onClick={() => setActiveModal(null)}></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="row g-3 mb-4">
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">Teaching Scheme</div>
+                                                    <div class="fs-5 fw-bold text-dark mt-1">Theory: 03 Hrs/Wk</div>
+                                                    <small class="text-muted">3 Contact Hours</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">Credits Assigned</div>
+                                                    <div class="fs-5 fw-bold text-primary mt-1">03 Credits</div>
+                                                    <small class="text-muted">Theory: 3</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">Internal Assessment</div>
+                                                    <div class="fs-5 fw-bold text-warning mt-1">40 Marks</div>
+                                                    <small class="text-muted">IAT-I (20) + IAT-II (20)</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">End Sem Exam</div>
+                                                    <div class="fs-5 fw-bold text-success mt-1">60 Marks</div>
+                                                    <small class="text-muted">Total: 100 Marks (2 Hrs)</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-3 mb-4">
+                                            <div class="col-md-6">
+                                                <div class="card h-100 border shadow-sm">
+                                                    <div class="card-header bg-white py-2 fw-bold text-primary">
+                                                        <i class="bi bi-bullseye me-1"></i> Course Objectives
+                                                    </div>
+                                                    <div class="card-body p-3 small">
+                                                        <ol class="mb-0 ps-3">
+                                                            <li class="mb-1">To learn the basics and need for DBMS in real-world applications.</li>
+                                                            <li class="mb-1">To construct a conceptual data model for real-world applications.</li>
+                                                            <li class="mb-1">To Build a Relational Model from ER/EER.</li>
+                                                            <li class="mb-1">To introduce SQL concepts to store and retrieve data efficiently.</li>
+                                                            <li class="mb-1">To demonstrate notions of normalization for database design.</li>
+                                                            <li>To understand transaction processing, concurrency control &amp; recovery.</li>
+                                                        </ol>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card h-100 border shadow-sm">
+                                                    <div class="card-header bg-white py-2 fw-bold text-success">
+                                                        <i class="bi bi-check-circle-fill me-1"></i> Course Outcomes (Bloom's Taxonomy)
+                                                    </div>
+                                                    <div class="card-body p-3 small">
+                                                        <ul class="list-unstyled mb-0">
+                                                            <li class="mb-1"><strong>CO1:</strong> Identify the need of Database Management System (L1, L2).</li>
+                                                            <li class="mb-1"><strong>CO2:</strong> Design conceptual model for real life applications (L6).</li>
+                                                            <li class="mb-1"><strong>CO3:</strong> Create Relational Model for real life applications (L6).</li>
+                                                            <li class="mb-1"><strong>CO4:</strong> Formulate queries using SQL commands (L3).</li>
+                                                            <li class="mb-1"><strong>CO5:</strong> Apply normalization to relational database design (L3).</li>
+                                                            <li><strong>CO6:</strong> Demonstrate transaction, concurrency, and recovery (L2).</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <h6 class="fw-bold text-primary mb-2"><i class="bi bi-journal-text me-2"></i>Detailed Syllabus Modules</h6>
+                                        <div class="table-responsive mb-4">
+                                            <table class="table table-bordered table-sm">
+                                                <thead class="table-light">
+                                                    <tr><th style={{ width: '60px' }}>Mod</th><th style={{ width: '220px' }}>Module Name</th><th>Detailed Content</th><th style={{ width: '60px' }}>Hrs</th><th style={{ width: '60px' }}>CO</th></tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td>0</td><td>Prerequisite</td><td>C, Python Programming.</td><td>02</td><td>--</td></tr>
+                                                    <tr><td>I</td><td>Concepts &amp; Architecture</td><td>Introduction, Characteristics, File system vs DBMS, Data Abstraction &amp; Independence, Architecture, DBA Role. Applications: Banking, E-commerce, Telecom, Healthcare.</td><td>05</td><td>CO1</td></tr>
+                                                    <tr><td>II</td><td>Entity-Relationship Model</td><td>Conceptual Modeling, ER Model, Entity Types, Sets, Attributes &amp; Keys, Relationship Types, Weak Entities, Generalization, Specialization, Aggregation, EER Model.</td><td>05</td><td>CO2</td></tr>
+                                                    <tr><td>III</td><td>Relational Model &amp; Algebra</td><td>Relational Model Constraints, Keys (Primary, Secondary, Foreign), Mapping ER/EER to Relational Model, Relational Algebra: Unary, Set operations, Binary operations.</td><td>05</td><td>CO3</td></tr>
+                                                    <tr><td>IV</td><td>SQL &amp; Indexing</td><td>DDL, DML, DCL, Set Operations, Aggregate Functions, Complex Queries with Group By, Nested Queries, Integrity Constraints, JDBC Programming, Indexing: Ordered Indices.</td><td>08</td><td>CO4</td></tr>
+                                                    <tr><td>V</td><td>Relational DB Design</td><td>Schema Guidelines, Functional Dependencies, Need for Normalization, Normal Forms: 1NF, 2NF, 3NF &amp; Boyce-Codd Normal Form (BCNF).</td><td>07</td><td>CO5</td></tr>
+                                                    <tr><td>VI</td><td>Transactions &amp; Recovery</td><td>Transaction Concept, State Diagram, ACID Properties, Concurrency: Lock-based protocols, Deadlock Handling, Timestamp protocols, Log-based Recovery.</td><td>07</td><td>CO6</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold text-dark"><i class="bi bi-book me-1"></i> Textbooks &amp; References</h6>
+                                                <ul class="small list-group">
+                                                    <li class="list-group-item">1. Korth, Silberschatz, Sudarshan, <em>Database System Concepts</em>, 6th Ed, McGraw Hill.</li>
+                                                    <li class="list-group-item">2. Elmasri &amp; Navathe, <em>Fundamentals of Database Systems</em>, 6th Ed, Pearson.</li>
+                                                    <li class="list-group-item">3. Raghu Ramakrishnan &amp; Johannes Gehrke, <em>Database Management Systems</em>, TMH.</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold text-info"><i class="bi bi-globe me-1"></i> Online Portals</h6>
+                                                <ul class="small list-group">
+                                                    <li class="list-group-item">1. NPTEL Database Systems Portal: nptel.ac.in</li>
+                                                    <li class="list-group-item">2. O'Reilly Database Architecture Collection</li>
+                                                    <li class="list-group-item">3. Coursera Database Management Specialization</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" onClick={() => setActiveModal(null)}>Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* FSJP Modal */}
+                    {activeModal === 'fsjp' && (
+                        <div class="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header text-white" style={{ backgroundColor: '#0f2744' }}>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-primary bg-opacity-25 rounded p-2 text-info">
+                                                <i class="bi bi-file-code-fill fs-3"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="modal-title fw-bold mb-0">Course 2343611: Mini-Project - Full Stack Java Programming (ITL301)</h5>
+                                                <small class="text-light opacity-75">S.E. Information Technology • Semester III • Academic Year 2026-27</small>
+                                            </div>
+                                        </div>
+                                        <button class="btn-close btn-close-white" onClick={() => setActiveModal(null)}></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="row g-3 mb-4">
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">Teaching Scheme</div>
+                                                    <div class="fs-5 fw-bold text-dark mt-1">Pract: 2* + 2 Hrs/Wk</div>
+                                                    <small class="text-muted">4 Practical Hours</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">Credits Assigned</div>
+                                                    <div class="fs-5 fw-bold text-primary mt-1">02 Credits</div>
+                                                    <small class="text-muted">Practical: 2 Credits</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">Term Work</div>
+                                                    <div class="fs-5 fw-bold text-warning mt-1">50 Marks</div>
+                                                    <small class="text-muted">Practicals + Capstone</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 border rounded bg-light text-center h-100">
+                                                    <div class="text-muted small text-uppercase fw-bold">Practical / Oral</div>
+                                                    <div class="fs-5 fw-bold text-success mt-1">25 Marks</div>
+                                                    <small class="text-muted">Total: 75 Marks</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <h6 class="fw-bold text-primary mb-2"><i class="bi bi-journal-text me-2"></i>Detailed Syllabus Modules</h6>
+                                        <div class="table-responsive mb-4">
+                                            <table class="table table-bordered table-sm">
+                                                <thead class="table-light">
+                                                    <tr><th style={{ width: '60px' }}>Mod</th><th style={{ width: '220px' }}>Module Name</th><th>Detailed Content</th><th style={{ width: '60px' }}>Hrs</th><th style={{ width: '60px' }}>LO</th></tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td>I</td><td>Introduction to Full Stack</td><td>Definition, Roles, Tech Stack (HTML, CSS, React, Spring Boot, MySQL, Git, Docker). Core Java OOP &amp; MVC Architecture.</td><td>04</td><td>LO1</td></tr>
+                                                    <tr><td>II</td><td>HTML 5, CSS 3 &amp; Bootstrap</td><td>Semantic elements, Responsive Web Design, Media queries, Forms, CSS Grid, Bootstrap components, React basics.</td><td>04</td><td>LO2</td></tr>
+                                                    <tr><td>III</td><td>Back-end with Java</td><td>Spring Boot architecture, RESTful API design, Controllers, Services, Dependency Injection (@Autowired), JPA Repositories.</td><td>05</td><td>LO3</td></tr>
+                                                    <tr><td>IV</td><td>Database Integration</td><td>MySQL setup, SQL CRUD operations, Filtering/Sorting, Joins, Spring Data JPA, Custom query methods (@Query), Hibernate ORM.</td><td>04</td><td>LO4</td></tr>
+                                                    <tr><td>V</td><td>Full Stack Integration</td><td>Connecting React with Spring Boot, Axios HTTP calls, CORS configuration, Postman API testing, JWT Stateless Authentication.</td><td>05</td><td>LO4, LO5</td></tr>
+                                                    <tr><td>VI</td><td>Deployment &amp; Capstone</td><td>Docker containers, Dockerfile creation, Containerizing React and Spring Boot, Docker Compose, Capstone project submission.</td><td>04</td><td>LO6</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <h6 class="fw-bold text-primary mb-2"><i class="bi bi-flask-fill me-2"></i>Official List of Experiments (Faculty Plan 2026-27)</h6>
+                                        <div class="table-responsive mb-4">
+                                            <table class="table table-bordered table-sm">
+                                                <thead class="table-light">
+                                                    <tr><th style={{ width: '50px' }}>Sr</th><th>Experiment Title</th><th style={{ width: '80px' }}>Outcome</th></tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td>1</td><td>Setting up Java Spring Boot and React development environment. Write a Java program that will print information of three Employees by creating Employee class (Name, Year of Joining, Salary, Address).</td><td>LO1</td></tr>
+                                                    <tr><td>2</td><td>Write a Java program to demonstrate method overloading and constructor overloading.</td><td>LO1</td></tr>
+                                                    <tr><td>3</td><td>a) Write a Java program to demonstrate different types of inheritance.<br />b) Write a Java program to demonstrate exception handling using Try, Catch, Throw and Finally statements.</td><td>LO1</td></tr>
+                                                    <tr><td>4</td><td>To develop static web page using HTML, CSS and Bootstrap.</td><td>LO2</td></tr>
+                                                    <tr><td>5</td><td>Write a program to apply validations to Registration Form.</td><td>LO2</td></tr>
+                                                    <tr><td>6</td><td>Build a dynamic front end using React.js with API calls.</td><td>LO2</td></tr>
+                                                    <tr><td>7</td><td>Develop a RESTful web service using Spring Boot.</td><td>LO3</td></tr>
+                                                    <tr><td>8</td><td>Integrate MySQL database with Spring Boot Application.</td><td>LO4</td></tr>
+                                                    <tr><td>9</td><td>Implement JWT authentication in Spring Boot Application.</td><td>LO5</td></tr>
+                                                    <tr><td>10</td><td>Connect React front end with Spring Boot backend APIs.</td><td>LO5</td></tr>
+                                                    <tr><td>11</td><td>Deploy the application using Docker / Git.</td><td>LO6</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold text-primary"><i class="bi bi-card-checklist me-1"></i> List of Assignments (6)</h6>
+                                                <ul class="small list-group">
+                                                    <li class="list-group-item">1. Personal portfolio website using HTML, CSS, React</li>
+                                                    <li class="list-group-item">2. Basic CRUD REST API using Spring Boot</li>
+                                                    <li class="list-group-item">3. Login and registration system with JWT</li>
+                                                    <li class="list-group-item">4. Database operations using JPA Repository</li>
+                                                    <li class="list-group-item">5. Single-Page Application (SPA) with React.js</li>
+                                                    <li class="list-group-item">6. Deploy integrated app on cloud/GitHub Pages</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold text-success"><i class="bi bi-people-fill me-1"></i> Faculty Team &amp; Capstone Ideas</h6>
+                                                <ul class="small list-group">
+                                                    <li class="list-group-item"><strong>Subject In-charge:</strong> Ms. Rujata Chaudhari, Ms. Rucha Kulkarni, Mr. Mandar Ganjapurkar</li>
+                                                    <li class="list-group-item"><strong>Class In-charge:</strong> Dr. Sonia Aneesh</li>
+                                                    <li class="list-group-item"><strong>HOD IT:</strong> Dr. Kiran Deshpande</li>
+                                                    <li class="list-group-item"><strong>Capstone Ideas:</strong> E-commerce, Online Library, Job Portal, Food Ordering, Course Registration, Event Management</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" onClick={() => setActiveModal(null)}>Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Math Modal */}
+                    {activeModal === 'math' && (
+                        <div class="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-primary text-white">
+                                        <h5 class="modal-title fw-bold"><i class="bi bi-calculator me-2"></i> Course 2343111: Applied Mathematics Thinking-I</h5>
+                                        <button class="btn-close btn-close-white" onClick={() => setActiveModal(null)}></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="alert alert-primary py-2">
+                                            <strong>Teaching Scheme:</strong> Theory: 3 Hrs/Wk | <strong>Credits:</strong> 3 | <strong>Total Marks:</strong> 100
+                                        </div>
+                                        <h6 class="fw-bold text-primary">Syllabus Overview</h6>
+                                        <ul class="list-group small">
+                                            <li class="list-group-item"><strong>Module 1:</strong> Laplace Transform (Definition, Linearity, First &amp; Second Shifting Theorem, Periodic Functions).</li>
+                                            <li class="list-group-item"><strong>Module 2:</strong> Inverse Laplace Transform (Partial Fractions, Convolution Theorem, Solving ODEs).</li>
+                                            <li class="list-group-item"><strong>Module 3:</strong> Fourier Series (Orthogonal Functions, Dirichlet's Conditions, Half-range Expansions).</li>
+                                            <li class="list-group-item"><strong>Module 4:</strong> Linear Algebra (Matrices, Eigenvalues &amp; Eigenvectors, Cayley-Hamilton Theorem).</li>
+                                            <li class="list-group-item"><strong>Module 5:</strong> Complex Variables &amp; Vector Calculus (Analytic Functions, Line &amp; Surface Integrals).</li>
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" onClick={() => setActiveModal(null)}>Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Automata Modal */}
+                    {activeModal === 'automata' && (
+                        <div class="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-secondary text-white">
+                                        <h5 class="modal-title fw-bold"><i class="bi bi-cpu me-2"></i> Course 2343114: Automata Theory</h5>
+                                        <button class="btn-close btn-close-white" onClick={() => setActiveModal(null)}></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="alert alert-secondary py-2">
+                                            <strong>Teaching Scheme:</strong> Theory: 3 Hrs/Wk | <strong>Credits:</strong> 3 | <strong>Total Marks:</strong> 100
+                                        </div>
+                                        <h6 class="fw-bold text-dark">Syllabus Overview</h6>
+                                        <ul class="list-group small">
+                                            <li class="list-group-item"><strong>Module 1:</strong> Finite Automata (DFA, NFA, Equivalence of DFA &amp; NFA, Minimization of DFA, Moore &amp; Mealy Machines).</li>
+                                            <li class="list-group-item"><strong>Module 2:</strong> Regular Expressions &amp; Languages (Arden's Theorem, Pumping Lemma for Regular Languages).</li>
+                                            <li class="list-group-item"><strong>Module 3:</strong> Context-Free Grammars (Derivation Trees, Ambiguity, Normal Forms: CNF &amp; GNF).</li>
+                                            <li class="list-group-item"><strong>Module 4:</strong> Pushdown Automata (PDA design, Deterministic vs Non-deterministic PDA).</li>
+                                            <li class="list-group-item"><strong>Module 5:</strong> Turing Machines &amp; Undecidability (Turing Machine Design, Halting Problem, Chomsky Hierarchy).</li>
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" onClick={() => setActiveModal(null)}>Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Open Elective Modal */}
+                    {activeModal === 'oe' && (
+                        <div class="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-warning text-dark">
+                                        <h5 class="modal-title fw-bold"><i class="bi bi-bank me-2"></i> Course 2343511: Open Elective (Banking &amp; Financial Systems)</h5>
+                                        <button class="btn-close" onClick={() => setActiveModal(null)}></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="alert alert-warning py-2">
+                                            <strong>Teaching Scheme:</strong> Theory: 2 Hrs/Wk | <strong>Credits:</strong> 2
+                                        </div>
+                                        <h6 class="fw-bold text-dark">Syllabus Overview</h6>
+                                        <ul class="list-group small">
+                                            <li class="list-group-item"><strong>Module 1:</strong> Overview of Indian Banking System, RBI Functions, Commercial Banks.</li>
+                                            <li class="list-group-item"><strong>Module 2:</strong> Digital Banking, Core Banking Solutions (CBS), NEFT, RTGS, IMPS, UPI.</li>
+                                            <li class="list-group-item"><strong>Module 3:</strong> Risk Management in Banking, NPA Management, Basel Norms.</li>
+                                            <li class="list-group-item"><strong>Module 4:</strong> Fintech Trends, Cybersecurity in Banking, Blockchain &amp; Smart Contracts.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" onClick={() => setActiveModal(null)}>Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* ID Card Modal */}
                     {activeModal === 'idCard' && (
                         <div class="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
@@ -807,6 +1717,233 @@
                                                 <button class="btn btn-sm btn-dark w-100" onClick={() => setActiveModal(null)}>Close ID Card</button>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Faculty Edit Attendance Modal */}
+                    {facultyEditModal && facultyEditModal.type === 'attendance' && (
+                        <div class="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content shadow">
+                                    <div class="modal-header bg-primary text-white">
+                                        <h5 class="modal-title fw-bold">
+                                            <i class="bi bi-calendar-check me-2"></i> Update Attendance Record
+                                        </h5>
+                                        <button class="btn-close btn-close-white" onClick={() => setFacultyEditModal(null)}></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="p-3 bg-light rounded mb-3 border">
+                                            <div class="fw-bold fs-6 text-dark">{facultyEditModal.student.name}</div>
+                                            <div class="small text-muted">
+                                                Roll No: <strong>{facultyEditModal.student.rollNo}</strong> | Moodle ID: <strong class="text-primary">{facultyEditModal.student.moodleId}</strong>
+                                            </div>
+                                            <div class="small text-secondary mt-1">
+                                                Course: <strong>{selectedFaculty.subjectName}</strong>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Lectures Conducted</label>
+                                            <input 
+                                                type="number" 
+                                                class="form-control" 
+                                                min="1" 
+                                                max="100" 
+                                                value={editConducted}
+                                                onChange={(e) => setEditConducted(parseInt(e.target.value) || 0)}
+                                            />
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Lectures Attended</label>
+                                            <div class="input-group">
+                                                <button 
+                                                    class="btn btn-outline-secondary" 
+                                                    type="button"
+                                                    onClick={() => setEditAttended(Math.max(0, editAttended - 1))}
+                                                >
+                                                    <i class="bi bi-dash"></i>
+                                                </button>
+                                                <input 
+                                                    type="number" 
+                                                    class="form-control text-center fw-bold fs-5" 
+                                                    min="0" 
+                                                    max={editConducted} 
+                                                    value={editAttended}
+                                                    onChange={(e) => setEditAttended(parseInt(e.target.value) || 0)}
+                                                />
+                                                <button 
+                                                    class="btn btn-outline-secondary" 
+                                                    type="button"
+                                                    onClick={() => setEditAttended(Math.min(editConducted, editAttended + 1))}
+                                                >
+                                                    <i class="bi bi-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {(() => {
+                                            const pct = editConducted > 0 ? Math.round((editAttended / editConducted) * 100) : 0;
+                                            const badgeColor = pct >= 75 ? 'bg-success' : (pct >= 60 ? 'bg-warning text-dark' : 'bg-danger');
+                                            return (
+                                                <div class="alert alert-secondary d-flex justify-content-between align-items-center py-2 mb-0">
+                                                    <span>Computed Percentage:</span>
+                                                    <span class={`badge ${badgeColor} fs-6`}>{pct}%</span>
+                                                </div>
+                                            );
+                                        })()}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-outline-secondary" onClick={() => setFacultyEditModal(null)}>Cancel</button>
+                                        <button 
+                                            class="btn btn-primary"
+                                            onClick={() => {
+                                                const res = updateStudentAttendanceByFaculty(
+                                                    facultyEditModal.student.moodleId,
+                                                    selectedFaculty.subjectKey,
+                                                    editAttended,
+                                                    editConducted
+                                                );
+                                                if (res) {
+                                                    const updated = getCurrentUser();
+                                                    if (updated && updated.moodleId === currentStudent.moodleId) {
+                                                        setCurrentStudent(updated);
+                                                    }
+                                                    setRefreshTick(t => t + 1);
+                                                    setFacultyEditModal(null);
+                                                }
+                                            }}
+                                        >
+                                            <i class="bi bi-check2-circle me-1"></i> Save Changes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Faculty Edit Grade Modal */}
+                    {facultyEditModal && facultyEditModal.type === 'grade' && (
+                        <div class="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content shadow">
+                                    <div class="modal-header bg-success text-white">
+                                        <h5 class="modal-title fw-bold">
+                                            <i class="bi bi-award me-2"></i> Update Academic Marks &amp; Grade
+                                        </h5>
+                                        <button class="btn-close btn-close-white" onClick={() => setFacultyEditModal(null)}></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="p-3 bg-light rounded mb-3 border">
+                                            <div class="fw-bold fs-6 text-dark">{facultyEditModal.student.name}</div>
+                                            <div class="small text-muted">
+                                                Roll No: <strong>{facultyEditModal.student.rollNo}</strong> | Moodle ID: <strong class="text-primary">{facultyEditModal.student.moodleId}</strong>
+                                            </div>
+                                            <div class="small text-secondary mt-1">
+                                                Course: <strong>{selectedFaculty.subjectName}</strong>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-6">
+                                                <label class="form-label fw-bold small">Term Work (Max 25)</label>
+                                                <input 
+                                                    type="number" 
+                                                    class="form-control" 
+                                                    min="0" 
+                                                    max="25" 
+                                                    value={editTW}
+                                                    onChange={(e) => setEditTW(parseInt(e.target.value) || 0)}
+                                                />
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label fw-bold small">Letter Grade</label>
+                                                <select 
+                                                    class="form-select" 
+                                                    value={editGrade}
+                                                    onChange={(e) => setEditGrade(e.target.value)}
+                                                >
+                                                    <option value="O">O (Outstanding)</option>
+                                                    <option value="A+">A+ (Excellent)</option>
+                                                    <option value="A">A (Very Good)</option>
+                                                    <option value="B+">B+ (Good)</option>
+                                                    <option value="B">B (Above Average)</option>
+                                                    <option value="C">C (Pass)</option>
+                                                    <option value="F">F (Fail)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-6">
+                                                <label class="form-label fw-bold small">IAT-1 (Max 20)</label>
+                                                <input 
+                                                    type="number" 
+                                                    class="form-control" 
+                                                    min="0" 
+                                                    max="20" 
+                                                    value={editIat1}
+                                                    onChange={(e) => setEditIat1(parseInt(e.target.value) || 0)}
+                                                />
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label fw-bold small">IAT-2 (Max 20)</label>
+                                                <input 
+                                                    type="number" 
+                                                    class="form-control" 
+                                                    min="0" 
+                                                    max="20" 
+                                                    value={editIat2}
+                                                    onChange={(e) => setEditIat2(parseInt(e.target.value) || 0)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold small">Status</label>
+                                            <select 
+                                                class="form-select" 
+                                                value={editStatus}
+                                                onChange={(e) => setEditStatus(e.target.value)}
+                                            >
+                                                <option value="Completed">Completed</option>
+                                                <option value="In Progress">In Progress</option>
+                                                <option value="Pending Submission">Pending Submission</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-outline-secondary" onClick={() => setFacultyEditModal(null)}>Cancel</button>
+                                        <button 
+                                            class="btn btn-success"
+                                            onClick={() => {
+                                                const res = updateStudentGradeByFaculty(
+                                                    facultyEditModal.student.moodleId,
+                                                    selectedFaculty.subjectKey,
+                                                    {
+                                                        termWork: editTW,
+                                                        maxTermWork: 25,
+                                                        grade: editGrade,
+                                                        iat1: editIat1,
+                                                        iat2: editIat2,
+                                                        status: editStatus
+                                                    }
+                                                );
+                                                if (res) {
+                                                    const updated = getCurrentUser();
+                                                    if (updated && updated.moodleId === currentStudent.moodleId) {
+                                                        setCurrentStudent(updated);
+                                                    }
+                                                    setRefreshTick(t => t + 1);
+                                                    setFacultyEditModal(null);
+                                                }
+                                            }}
+                                        >
+                                            <i class="bi bi-check2-circle me-1"></i> Save Grade
+                                        </button>
                                     </div>
                                 </div>
                             </div>
