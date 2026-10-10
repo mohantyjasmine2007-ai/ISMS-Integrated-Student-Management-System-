@@ -984,17 +984,22 @@ let activeFacultyObj = null;
 
     function getThemePreference() {
         try {
-            return localStorage.getItem(THEME_STORAGE_KEY) || 'system';
+            // Default to 'light'. Only use stored value if user explicitly saved their preference!
+            return localStorage.getItem(THEME_STORAGE_KEY) || 'light';
         } catch(e) {
-            return 'system';
+            return 'light';
         }
     }
 
     function resolveTheme(preference) {
+        if (preference === 'dark') {
+            return 'dark';
+        }
         if (preference === 'system') {
             return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
         }
-        return (preference === 'dark') ? 'dark' : 'light';
+        // Default is light
+        return 'light';
     }
 
     function applyTheme(preference, isLivePreview = false) {
@@ -1019,11 +1024,11 @@ let activeFacultyObj = null;
 
     function saveThemePreferenceConfirm() {
         const activeCard = document.querySelector('.theme-card.active');
-        let selected = 'system';
+        let selected = 'light';
         if (activeCard) {
-            if (activeCard.id === 'themeCardLight') selected = 'light';
-            else if (activeCard.id === 'themeCardDark') selected = 'dark';
-            else selected = 'system';
+            if (activeCard.id === 'themeCardDark') selected = 'dark';
+            else if (activeCard.id === 'themeCardSystem') selected = 'system';
+            else selected = 'light';
         }
         applyTheme(selected, false);
         showSettingsAlert('success', `<i class="bi bi-check-circle-fill me-2"></i>Theme preference <strong>${selected.toUpperCase()}</strong> saved permanently!`);
@@ -1039,12 +1044,12 @@ let activeFacultyObj = null;
         lightCard.classList.remove('active');
         darkCard.classList.remove('active');
 
-        if (preference === 'light') {
-            lightCard.classList.add('active');
-        } else if (preference === 'dark') {
+        if (preference === 'dark') {
             darkCard.classList.add('active');
-        } else {
+        } else if (preference === 'system') {
             systemCard.classList.add('active');
+        } else {
+            lightCard.classList.add('active');
         }
     }
 
@@ -1055,17 +1060,19 @@ let activeFacultyObj = null;
         if (preference === 'system') {
             badge.textContent = `Theme: System (${res === 'dark' ? 'Dark' : 'Light'})`;
             badge.className = 'badge bg-primary px-3 py-1';
-        } else if (preference === 'light') {
-            badge.textContent = 'Theme: Light (Active)';
-            badge.className = 'badge bg-warning text-dark px-3 py-1';
-        } else {
+        } else if (preference === 'dark') {
             badge.textContent = 'Theme: Dark (Active)';
             badge.className = 'badge bg-info px-3 py-1';
+        } else {
+            badge.textContent = 'Theme: Light (Active)';
+            badge.className = 'badge bg-warning text-dark px-3 py-1';
         }
     }
 
     function initTheme() {
-        const pref = getThemePreference();
+        const storedPref = localStorage.getItem(THEME_STORAGE_KEY);
+        // Default strictly to 'light' until user explicitly chooses their preference!
+        const pref = storedPref || 'light';
         const resolved = resolveTheme(pref);
         document.documentElement.setAttribute('data-theme', resolved);
         document.documentElement.setAttribute('data-bs-theme', resolved);
@@ -1073,8 +1080,8 @@ let activeFacultyObj = null;
         if (window.matchMedia) {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const handleOSThemeChange = (e) => {
-                const currentPref = getThemePreference();
-                // IMPORTANT: Only auto-update if the user's preference is 'system'!
+                const currentPref = localStorage.getItem(THEME_STORAGE_KEY);
+                // IMPORTANT: Only auto-update if the user explicitly saved 'system' as their preference!
                 if (currentPref === 'system') {
                     const newResolved = e.matches ? 'dark' : 'light';
                     document.documentElement.setAttribute('data-theme', newResolved);
@@ -1098,6 +1105,13 @@ let activeFacultyObj = null;
         if (settingsModalEl) {
             settingsModalEl.addEventListener('show.bs.modal', () => {
                 populateSettingsModal();
+            });
+            settingsModalEl.addEventListener('hidden.bs.modal', () => {
+                // Revert any unsaved preview back to saved preference on modal close
+                const savedPref = getThemePreference();
+                const resolved = resolveTheme(savedPref);
+                document.documentElement.setAttribute('data-theme', resolved);
+                document.documentElement.setAttribute('data-bs-theme', resolved);
             });
         }
     }

@@ -5,14 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APSIT Moodle - Student Dashboard</title>
     
-    <!-- Theme Early Initializer (Prevents theme flash on load) -->
+    <!-- Theme Early Initializer (Defaults to original Light theme until user explicitly saves preference) -->
     <script>
         (function() {
             try {
-                var storedPref = localStorage.getItem('apsit-isms-theme-preference') || 'system';
-                var resolvedTheme = storedPref;
-                if (storedPref === 'system') {
+                var storedPref = localStorage.getItem('apsit-isms-theme-preference');
+                // Default: preserve original Light theme unless explicitly saved by user
+                var resolvedTheme = 'light';
+                if (storedPref === 'dark') {
+                    resolvedTheme = 'dark';
+                } else if (storedPref === 'system') {
                     resolvedTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+                } else if (storedPref === 'light') {
+                    resolvedTheme = 'light';
                 }
                 document.documentElement.setAttribute('data-theme', resolvedTheme);
                 document.documentElement.setAttribute('data-bs-theme', resolvedTheme);
