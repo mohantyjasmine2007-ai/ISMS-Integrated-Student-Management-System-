@@ -56,24 +56,15 @@ let activeFacultyObj = null;
             }
         }
 
-        // Open About APSIT tab if URL specifies ?view=about
+        // Open About or Help tab if URL specifies it
         if (urlParams.get('view') === 'about') {
             openAboutApsitTab();
+        } else if (urlParams.get('view') === 'help') {
+            openHelpSupportTab();
         }
 
-        // Synchronize active states between main sidebar tabs and support tabs (About APSIT)
-        const aboutTabBtn = document.getElementById('about-tab');
-        if (aboutTabBtn) {
-            aboutTabBtn.addEventListener('shown.bs.tab', () => {
-                document.querySelectorAll('#sidebarTabs .nav-link').forEach(link => link.classList.remove('active'));
-                aboutTabBtn.classList.add('active');
-            });
-            document.querySelectorAll('#sidebarTabs .nav-link').forEach(link => {
-                link.addEventListener('shown.bs.tab', () => {
-                    aboutTabBtn.classList.remove('active');
-                });
-            });
-        }
+        // Initialize Help & Support Module
+        initHelpSupportModule();
 
         // Listen for storage events across tabs
         window.addEventListener('storage', (e) => {
@@ -93,14 +84,23 @@ let activeFacultyObj = null;
     function openAboutApsitTab() {
         const aboutTab = document.getElementById('about-tab');
         if (aboutTab) {
-            document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
-            aboutTab.classList.add('active');
             const tabInstance = bootstrap.Tab.getOrCreateInstance(aboutTab);
             tabInstance.show();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
     window.openAboutApsitTab = openAboutApsitTab;
+
+    // Switch to Help & Support tab
+    function openHelpSupportTab() {
+        const helpTab = document.getElementById('help-tab');
+        if (helpTab) {
+            const tabInstance = bootstrap.Tab.getOrCreateInstance(helpTab);
+            tabInstance.show();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+    window.openHelpSupportTab = openHelpSupportTab;
 
     // Switch to Faculty Portal tab
     function openFacultyPortalTab() {
@@ -1653,3 +1653,197 @@ let activeFacultyObj = null;
         const alertEl = document.getElementById('settingsFeedbackAlert');
         if (alertEl) alertEl.classList.add('d-none');
     }
+
+    // ==========================================================================
+    // Help & Support Module Logic (Tickets, FAQs Search, Grievances)
+    // ==========================================================================
+    const STORAGE_KEY_TICKETS = 'apsit_isms_support_tickets';
+
+    const DEFAULT_TICKETS = [
+        {
+            id: 'APSIT-TKT-2026-1042',
+            category: 'Moodle LMS',
+            priority: 'Normal',
+            subject: 'ADSA Lab Assignment 4 zip upload format inquiry',
+            message: 'Could you please confirm if Python .py files or .ipynb notebook format is preferred for submission in Experiment 4?',
+            studentName: 'JASMINE MOHANTY',
+            moodleId: '25104021',
+            rollNo: 'IT-2026-38',
+            date: '10-Oct-2026 14:30',
+            status: 'Resolved',
+            response: 'Either .py script or Jupyter Notebook (.ipynb) is accepted. Confirmed with Prof. Mandar Ganjapurkar.'
+        },
+        {
+            id: 'APSIT-TKT-2026-1088',
+            category: 'Attendance Grievance',
+            priority: 'High',
+            subject: 'Attendance sync for DBMS Theory Lecture on 06-Oct',
+            message: 'Attended the 2nd session of DBMS in Room 304, but marked absent on Moodle tracker. Kindly verify with sign sheet.',
+            studentName: 'JASMINE MOHANTY',
+            moodleId: '25104021',
+            rollNo: 'IT-2026-38',
+            date: '11-Oct-2026 11:15',
+            status: 'In Review',
+            response: 'Forwarded to Prof. Shital Agarwal for classroom attendance register cross-verification.'
+        }
+    ];
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function getStoredTickets() {
+        try {
+            const data = localStorage.getItem(STORAGE_KEY_TICKETS);
+            if (data) return JSON.parse(data);
+        } catch(e) {}
+        return DEFAULT_TICKETS;
+    }
+
+    function saveStoredTickets(tickets) {
+        try {
+            localStorage.setItem(STORAGE_KEY_TICKETS, JSON.stringify(tickets));
+        } catch(e) {}
+    }
+
+    function initHelpSupportModule() {
+        // Populate student info in ticket form
+        const student = getCurrentUser();
+        if (student) {
+            const nameInput = document.getElementById('ticketStudentName');
+            const idInput = document.getElementById('ticketStudentMoodleId');
+            if (nameInput) nameInput.value = student.name.toUpperCase();
+            if (idInput) idInput.value = `${student.moodleId} (${student.rollNo})`;
+        } else if (isFacultyRole() && activeFacultyObj) {
+            const nameInput = document.getElementById('ticketStudentName');
+            const idInput = document.getElementById('ticketStudentMoodleId');
+            if (nameInput) nameInput.value = activeFacultyObj.title;
+            if (idInput) idInput.value = `${activeFacultyObj.id} (${activeFacultyObj.subjectName})`;
+        }
+        renderSupportTickets();
+    }
+
+    function renderSupportTickets() {
+        const container = document.getElementById('supportTicketsListContainer');
+        const countBadge = document.getElementById('ticketCountBadge');
+        if (!container) return;
+
+        const tickets = getStoredTickets();
+        if (countBadge) countBadge.textContent = `Total: ${tickets.length}`;
+
+        if (tickets.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                    <p class="mb-0 small">No active support requests found.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = tickets.map(t => {
+            let badgeColor = 'bg-primary';
+            if (t.status === 'Resolved') badgeColor = 'bg-success';
+            if (t.status === 'In Review') badgeColor = 'bg-warning text-dark';
+            if (t.status === 'Open') badgeColor = 'bg-info text-dark';
+
+            let prioBadge = 'bg-light text-secondary border';
+            if (t.priority === 'Urgent') prioBadge = 'bg-danger text-white';
+            else if (t.priority === 'High') prioBadge = 'bg-warning-subtle text-warning-emphasis border border-warning';
+
+            return `
+                <div class="p-3 mb-3 border rounded-3 bg-white support-ticket-card shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="badge ${badgeColor} fw-semibold">${t.status}</span>
+                            <span class="badge ${prioBadge} ms-1">${t.priority}</span>
+                            <span class="badge bg-light text-dark border ms-1">${t.category}</span>
+                        </div>
+                        <small class="text-muted">${t.date}</small>
+                    </div>
+                    <h6 class="fw-bold text-dark mb-1">${escapeHtml(t.subject)}</h6>
+                    <p class="text-secondary small mb-2" style="line-height: 1.5;">${escapeHtml(t.message)}</p>
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                        <small class="text-muted fw-semibold"><i class="bi bi-hash"></i>${t.id}</small>
+                        ${t.response ? `<span class="badge bg-light text-primary border" title="${escapeHtml(t.response)}"><i class="bi bi-chat-left-dots-fill me-1"></i>Staff Responded</span>` : '<span class="text-muted small">Pending Response</span>'}
+                    </div>
+                    ${t.response ? `
+                        <div class="mt-2 p-2 rounded bg-light border-start border-3 border-primary small text-secondary">
+                            <strong class="text-primary d-block mb-1"><i class="bi bi-reply-fill me-1"></i>Staff Reply:</strong>
+                            ${escapeHtml(t.response)}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+    }
+
+    function handleSupportTicketSubmit(e) {
+        if (e) e.preventDefault();
+        const category = document.getElementById('ticketCategory')?.value || 'Attendance Grievance';
+        const priority = document.getElementById('ticketPriority')?.value || 'Normal';
+        const subject = document.getElementById('ticketSubject')?.value?.trim();
+        const message = document.getElementById('ticketMessage')?.value?.trim();
+
+        if (!subject || !message) {
+            alert('Please fill out both the Subject and Description fields.');
+            return;
+        }
+
+        const student = getCurrentUser() || { name: 'Jasmine Mohanty', moodleId: '25104021', rollNo: 'IT-2026-38' };
+        const randNum = Math.floor(1000 + Math.random() * 9000);
+        const newTicket = {
+            id: `APSIT-TKT-2026-${randNum}`,
+            category,
+            priority,
+            subject,
+            message,
+            studentName: student.name,
+            moodleId: student.moodleId,
+            rollNo: student.rollNo,
+            date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            status: 'Open',
+            response: 'Your request has been registered and assigned to the respective desk coordinator.'
+        };
+
+        const tickets = getStoredTickets();
+        tickets.unshift(newTicket);
+        saveStoredTickets(tickets);
+
+        // Reset inputs
+        const subjInput = document.getElementById('ticketSubject');
+        const msgInput = document.getElementById('ticketMessage');
+        if (subjInput) subjInput.value = '';
+        if (msgInput) msgInput.value = '';
+
+        // Show Success Alert
+        const alertEl = document.getElementById('ticketSuccessAlert');
+        const textEl = document.getElementById('ticketSuccessText');
+        if (alertEl && textEl) {
+            textEl.innerHTML = `<strong>Ticket Generated!</strong> Ticket ID <code>${newTicket.id}</code> registered under <em>${category}</em>. Staff will respond shortly.`;
+            alertEl.classList.remove('d-none');
+        }
+
+        renderSupportTickets();
+    }
+
+    function filterHelpFaqs(query) {
+        const q = (query || '').toLowerCase().trim();
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+            const text = (item.textContent || '').toLowerCase();
+            const keywords = (item.getAttribute('data-keywords') || '').toLowerCase();
+            if (!q || text.includes(q) || keywords.includes(q)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    window.initHelpSupportModule = initHelpSupportModule;
+    window.renderSupportTickets = renderSupportTickets;
+    window.handleSupportTicketSubmit = handleSupportTicketSubmit;
+    window.filterHelpFaqs = filterHelpFaqs;
+

@@ -70,6 +70,11 @@
                         <i class="bi bi-info-circle"></i> About APSIT
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" onclick="openHelpSupportTab()">
+                        <i class="bi bi-question-circle"></i> Help &amp; Support
+                    </a>
+                </li>
                 
                 <!-- Faculty Portal Direct Access -->
                 <li class="nav-item" id="topNavFacultyItem" style="display: none;">
@@ -159,8 +164,8 @@
                 <li class="nav-item">
                     <h6 class="text-muted px-3 mb-2">SUPPORT</h6>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="help-tab" data-bs-toggle="pill" data-bs-target="#help-view" role="tab" aria-controls="help-view" aria-selected="false">
                         <i class="bi bi-question-circle"></i> Help &amp; Support
                     </a>
                 </li>
@@ -1539,6 +1544,349 @@
                     </div>
                 </div>
 
+                <!-- Dedicated Help & Support Tab Pane -->
+                <div class="tab-pane fade" id="help-view" role="tabpanel" aria-labelledby="help-tab">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="javascript:void(0)" onclick="document.getElementById('dashboard-tab').click()">Home</a></li>
+                            <li class="breadcrumb-item">Support</li>
+                            <li class="breadcrumb-item active">Help &amp; Support</li>
+                        </ol>
+                    </nav>
+
+                    <!-- Hero Support Banner -->
+                    <div class="card help-hero-banner border-0 mb-4 shadow-sm overflow-hidden text-white" style="background: linear-gradient(135deg, #09203f 0%, #123b6d 50%, #205081 100%); border-radius: 12px;">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="row align-items-center g-4">
+                                <div class="col-lg-8">
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <span class="badge bg-warning text-dark fw-bold px-3 py-1"><i class="bi bi-headset me-1"></i> APSIT STUDENT HELPDESK</span>
+                                        <span class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-1"><i class="bi bi-clock-history me-1"></i> Mon &ndash; Sat: 9:00 AM &ndash; 5:30 PM</span>
+                                    </div>
+                                    <h1 class="display-6 fw-bold mb-2">Help &amp; Support Center</h1>
+                                    <p class="lead mb-4 text-light opacity-90" style="font-size: 1.05rem; line-height: 1.6;">
+                                        Get prompt assistance for Moodle LMS credentials, lecture &amp; lab attendance reconciliation, examination grievances, syllabus queries, and student counseling.
+                                    </p>
+                                    
+                                    <!-- Search Input -->
+                                    <div class="input-group shadow-sm" style="max-width: 620px;">
+                                        <span class="input-group-text bg-white border-0 text-primary"><i class="bi bi-search fs-5"></i></span>
+                                        <input type="text" class="form-control border-0 py-3 ps-2" id="helpFaqSearchInput" placeholder="Search FAQs, attendance rules, Moodle issues, exams..." oninput="filterHelpFaqs(this.value)">
+                                        <button class="btn btn-warning fw-bold px-4" type="button" onclick="filterHelpFaqs(document.getElementById('helpFaqSearchInput').value)">Search</button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 text-center">
+                                    <div class="p-4 rounded-4 bg-white bg-opacity-10 border border-light border-opacity-25 shadow-sm text-center">
+                                        <i class="bi bi-life-preserver text-warning mb-2" style="font-size: 3.5rem;"></i>
+                                        <h5 class="fw-bold mb-1">Quick Contact</h5>
+                                        <p class="small text-light opacity-75 mb-3">Direct Helpline: 7738305400</p>
+                                        <button class="btn btn-light text-primary fw-bold btn-sm px-3 py-2 w-100" onclick="document.getElementById('raiseTicketSection').scrollIntoView({ behavior: 'smooth' })">
+                                            <i class="bi bi-ticket-detailed-fill me-1 text-primary"></i> Raise a Support Ticket
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4 Specialized Helpdesk Contact Cards -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card h-100 border-0 shadow-sm helpdesk-card">
+                                <div class="card-body p-4 text-center">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 58px; height: 58px;">
+                                        <i class="bi bi-laptop fs-3"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1">IT &amp; Moodle LMS Helpdesk</h6>
+                                    <small class="badge bg-primary-subtle text-primary mb-2">Systems Team</small>
+                                    <p class="small text-secondary mb-3">Password resets, LMS access, assignment submission glitches &amp; mobile syncing.</p>
+                                    <div class="border-top pt-2 small text-muted">
+                                        <div><i class="bi bi-geo-alt me-1 text-primary"></i> Comp Center (2nd Flr)</div>
+                                        <div class="mt-1"><i class="bi bi-envelope me-1 text-primary"></i> <a href="mailto:moodle-support@apsit.edu.in" class="text-decoration-none">moodle-support@apsit.edu.in</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card h-100 border-0 shadow-sm helpdesk-card">
+                                <div class="card-body p-4 text-center">
+                                    <div class="rounded-circle bg-success bg-opacity-10 text-success mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 58px; height: 58px;">
+                                        <i class="bi bi-calendar-check fs-3"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1">Attendance Grievance Cell</h6>
+                                    <small class="badge bg-success-subtle text-success mb-2">Class Coordinator / HOD</small>
+                                    <p class="small text-secondary mb-3">75% attendance criteria, medical leave submission, attendance rectification &amp; proctor signoffs.</p>
+                                    <div class="border-top pt-2 small text-muted">
+                                        <div><i class="bi bi-geo-alt me-1 text-success"></i> IT Dept (3rd Flr)</div>
+                                        <div class="mt-1"><i class="bi bi-envelope me-1 text-success"></i> <a href="mailto:it-attendance@apsit.edu.in" class="text-decoration-none">it-attendance@apsit.edu.in</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card h-100 border-0 shadow-sm helpdesk-card">
+                                <div class="card-body p-4 text-center">
+                                    <div class="rounded-circle bg-info bg-opacity-10 text-info mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 58px; height: 58px;">
+                                        <i class="bi bi-mortarboard fs-3"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1">Examination &amp; Grade Cell</h6>
+                                    <small class="badge bg-info-subtle text-info mb-2">Controller of Exams</small>
+                                    <p class="small text-secondary mb-3">IAT internal marks review, term work endorsements, KT examination forms &amp; hall tickets.</p>
+                                    <div class="border-top pt-2 small text-muted">
+                                        <div><i class="bi bi-geo-alt me-1 text-info"></i> Exam Office (Ground Flr)</div>
+                                        <div class="mt-1"><i class="bi bi-envelope me-1 text-info"></i> <a href="mailto:exam@apsit.edu.in" class="text-decoration-none">exam@apsit.edu.in</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card h-100 border-0 shadow-sm helpdesk-card">
+                                <div class="card-body p-4 text-center">
+                                    <div class="rounded-circle bg-warning bg-opacity-10 text-warning mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 58px; height: 58px;">
+                                        <i class="bi bi-wallet2 fs-3 text-warning"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1">Accounts &amp; Fee Desk</h6>
+                                    <small class="badge bg-warning-subtle text-warning-emphasis mb-2">Administration</small>
+                                    <p class="small text-secondary mb-3">Tuition fee receipts, scholarship document countersigning &amp; fee structure clarifications.</p>
+                                    <div class="border-top pt-2 small text-muted">
+                                        <div><i class="bi bi-geo-alt me-1 text-warning"></i> Admin Wing (Room 105)</div>
+                                        <div class="mt-1"><i class="bi bi-envelope me-1 text-warning"></i> <a href="mailto:accounts@apsit.edu.in" class="text-decoration-none">accounts@apsit.edu.in</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Ticket Submission Form & Live Ticket Tracker -->
+                    <div class="row g-4 mb-4" id="raiseTicketSection">
+                        <div class="col-lg-7">
+                            <div class="card section-card border-0 shadow-sm h-100">
+                                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-envelope-plus-fill text-primary me-2"></i>Submit a Support Request or Grievance</h5>
+                                    <span class="badge bg-primary-subtle text-primary">Direct Portal Dispatch</span>
+                                </div>
+                                <div class="card-body p-4">
+                                    <form id="supportTicketForm" onsubmit="handleSupportTicketSubmit(event)">
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-semibold text-secondary" for="ticketStudentName">Student Name</label>
+                                                <input type="text" class="form-control bg-light" id="ticketStudentName" readonly value="JASMINE MOHANTY">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-semibold text-secondary" for="ticketStudentMoodleId">Moodle ID / Roll No</label>
+                                                <input type="text" class="form-control bg-light" id="ticketStudentMoodleId" readonly value="25104021 (IT-2026-38)">
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-semibold text-secondary" for="ticketCategory">Issue Category</label>
+                                                <select class="form-select" id="ticketCategory" required>
+                                                    <option value="Attendance Grievance">Attendance Discrepancy / Condonation</option>
+                                                    <option value="Moodle LMS">Moodle Technical / Upload Issue</option>
+                                                    <option value="Examination & Marks">IAT Marks / Grade Grievance</option>
+                                                    <option value="Coursework & Syllabus">Coursework / Practical Queries</option>
+                                                    <option value="Fees & Administration">Accounts / Fee Verification</option>
+                                                    <option value="Mentorship & Counseling">Student Mentorship &amp; Counseling</option>
+                                                    <option value="Other">Other General Query</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-semibold text-secondary" for="ticketPriority">Priority Level</label>
+                                                <select class="form-select" id="ticketPriority" required>
+                                                    <option value="Normal">Normal (Response in 24&ndash;48 hrs)</option>
+                                                    <option value="High">High (Response in 12&ndash;24 hrs)</option>
+                                                    <option value="Urgent">Urgent (Attendance / Exam critical)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-semibold text-secondary" for="ticketSubject">Subject Line</label>
+                                            <input type="text" class="form-control" id="ticketSubject" placeholder="e.g. Attendance rectification request for ADSA Lab dated 08-Oct" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-semibold text-secondary" for="ticketMessage">Detailed Description / Grievance</label>
+                                            <textarea class="form-control" id="ticketMessage" rows="4" placeholder="Provide complete details including subject code, lecture date, faculty in-charge, and explanation..." required></textarea>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted"><i class="bi bi-shield-lock me-1"></i>Routed to concerned faculty / administrator.</small>
+                                            <button type="submit" class="btn btn-primary fw-semibold px-4">
+                                                <i class="bi bi-send-fill me-1"></i> Submit Ticket
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                    <!-- Feedback Alert -->
+                                    <div id="ticketSuccessAlert" class="alert alert-success alert-dismissible fade show mt-3 d-none" role="alert">
+                                        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                                        <span id="ticketSuccessText">Your ticket has been submitted successfully!</span>
+                                        <button type="button" class="btn-close" onclick="document.getElementById('ticketSuccessAlert').classList.add('d-none')"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active / Recent Tickets Tracker -->
+                        <div class="col-lg-5">
+                            <div class="card section-card border-0 shadow-sm h-100">
+                                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-clock-history text-primary me-2"></i>My Support Tickets</h5>
+                                    <span class="badge bg-secondary-subtle text-secondary" id="ticketCountBadge">Active: 1</span>
+                                </div>
+                                <div class="card-body p-3" id="supportTicketsListContainer" style="max-height: 480px; overflow-y: auto;">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comprehensive FAQs Section -->
+                    <div class="card section-card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                            <div>
+                                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-question-circle-fill text-primary me-2"></i>Frequently Asked Questions (FAQs)</h5>
+                                <small class="text-muted">Common student queries about attendance, Moodle, assessments &amp; policies.</small>
+                            </div>
+                            <span class="badge bg-primary-subtle text-primary">Official Academic FAQs</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="accordion" id="helpFaqAccordion">
+                                
+                                <!-- FAQ 1 -->
+                                <div class="accordion-item mb-2 border rounded-3 faq-item" data-keywords="attendance criteria 75 percent defauler eligibility semester exam mumbai university">
+                                    <h2 class="accordion-header" id="faqHeading1">
+                                        <button class="accordion-button collapsed fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1">
+                                            <i class="bi bi-check2-circle text-primary me-2"></i> What are the minimum attendance requirements for appearing in Mumbai University exams?
+                                        </button>
+                                    </h2>
+                                    <div id="faqCollapse1" class="accordion-collapse collapse" data-bs-parent="#helpFaqAccordion">
+                                        <div class="accordion-body text-secondary" style="font-size: 0.95rem; line-height: 1.6;">
+                                            As per Mumbai University Ordinance 0.6086, students are required to maintain a minimum of <strong>75% overall attendance</strong> across theory lectures and practical/tutorial sessions conducted during the semester. Students whose attendance falls between 50% and 74% are placed on the Defaulter List and must complete remedial coursework, while attendance below 50% renders a student ineligible for end-semester examinations without university condonation.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- FAQ 2 -->
+                                <div class="accordion-item mb-2 border rounded-3 faq-item" data-keywords="attendance grievance wrong mark absent error discrepancy correction">
+                                    <h2 class="accordion-header" id="faqHeading2">
+                                        <button class="accordion-button collapsed fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2">
+                                            <i class="bi bi-clock-history text-primary me-2"></i> How do I rectify an attendance discrepancy or missing lecture mark?
+                                        </button>
+                                    </h2>
+                                    <div id="faqCollapse2" class="accordion-collapse collapse" data-bs-parent="#helpFaqAccordion">
+                                        <div class="accordion-body text-secondary" style="font-size: 0.95rem; line-height: 1.6;">
+                                            If you believe you were marked absent erroneously, submit an Attendance Grievance via the form above or approach the respective faculty member (e.g., Prof. Puja Chavan, Dr. Sonia Aneesh, Prof. Shital Agarwal) within <strong>3 working days</strong> of the lecture. Once verified against classroom logs, the faculty can update the live attendance database.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- FAQ 3 -->
+                                <div class="accordion-item mb-2 border rounded-3 faq-item" data-keywords="medical leave certificate sick illness duty leave nss sports condolence">
+                                    <h2 class="accordion-header" id="faqHeading3">
+                                        <button class="accordion-button collapsed fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3">
+                                            <i class="bi bi-file-medical text-primary me-2"></i> What is the procedure for submitting medical certificates or official duty leaves?
+                                        </button>
+                                    </h2>
+                                    <div id="faqCollapse3" class="accordion-collapse collapse" data-bs-parent="#helpFaqAccordion">
+                                        <div class="accordion-body text-secondary" style="font-size: 0.95rem; line-height: 1.6;">
+                                            Students absent due to illness must submit a valid medical certificate and fitness certificate signed by a registered medical practitioner to their Class Teacher/Proctor within <strong>7 calendar days</strong> of resuming college. For participation in official events (NSS drives, hackathons, sports championships), obtain an Official Duty (OD) leave form endorsed by the event coordinator prior to the activity.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- FAQ 4 -->
+                                <div class="accordion-item mb-2 border rounded-3 faq-item" data-keywords="moodle password format reset login id credentials forgot">
+                                    <h2 class="accordion-header" id="faqHeading4">
+                                        <button class="accordion-button collapsed fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4">
+                                            <i class="bi bi-key-fill text-primary me-2"></i> What is the default password format for Moodle ISMS, and how can I change it?
+                                        </button>
+                                    </h2>
+                                    <div id="faqCollapse4" class="accordion-collapse collapse" data-bs-parent="#helpFaqAccordion">
+                                        <div class="accordion-body text-secondary" style="font-size: 0.95rem; line-height: 1.6;">
+                                            The institutional default password for students is your <strong>MoodleID@Apsit</strong> (e.g., <code>25104021@Apsit</code>). You can update your password at any time by navigating to <strong>Account Settings &gt; Security &amp; Passwords</strong>. If locked out, contact the IT Computer Center or submit a support ticket.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- FAQ 5 -->
+                                <div class="accordion-item mb-2 border rounded-3 faq-item" data-keywords="syllabus experiment list course notes question banks downloads">
+                                    <h2 class="accordion-header" id="faqHeading5">
+                                        <button class="accordion-button collapsed fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5">
+                                            <i class="bi bi-book-half text-primary me-2"></i> Where can I download official course syllabi and lab experiment lists?
+                                        </button>
+                                    </h2>
+                                    <div id="faqCollapse5" class="accordion-collapse collapse" data-bs-parent="#helpFaqAccordion">
+                                        <div class="accordion-body text-secondary" style="font-size: 0.95rem; line-height: 1.6;">
+                                            Navigate to the <strong>My Courses</strong> tab in the sidebar. Click the <em>View Course Modules &amp; Syllabus</em> button on any course card (AMT-I, ADSA, DBMS, AT, OE, ED, EVS, etc.) to view and download the official University of Mumbai syllabus PDF, experiment lists, software prerequisites, and reference texts.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- FAQ 6 -->
+                                <div class="accordion-item mb-2 border rounded-3 faq-item" data-keywords="iat marks internal assessment test revaluation marks dispute">
+                                    <h2 class="accordion-header" id="faqHeading6">
+                                        <button class="accordion-button collapsed fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6">
+                                            <i class="bi bi-bar-chart-fill text-primary me-2"></i> How are Internal Assessment Tests (IAT-I &amp; IAT-II) evaluated and reviewed?
+                                        </button>
+                                    </h2>
+                                    <div id="faqCollapse6" class="accordion-collapse collapse" data-bs-parent="#helpFaqAccordion">
+                                        <div class="accordion-body text-secondary" style="font-size: 0.95rem; line-height: 1.6;">
+                                            IAT examinations carry 20 marks each. Answer scripts are reviewed and moderated by subject faculty. Evaluated answer sheets are shown to students during scheduled classroom sessions. Any grievances regarding question valuation or totaling must be raised immediately before marks are uploaded to the University of Mumbai portal.
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campus Emergency Helplines & Statutory Units -->
+                    <div class="card section-card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                            <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-shield-fill-check text-danger me-2"></i>Campus Safety, Helplines &amp; Student Welfare</h5>
+                            <span class="badge bg-danger-subtle text-danger">Statutory Cells</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded-3 h-100 bg-light bg-opacity-50">
+                                        <div class="text-danger mb-2"><i class="bi bi-shield-slash-fill fs-3"></i></div>
+                                        <h6 class="fw-bold text-dark mb-1">Anti-Ragging Helpline</h6>
+                                        <p class="small text-secondary mb-2">Zero-tolerance policy. Strict compliance with UGC and AICTE anti-ragging regulations.</p>
+                                        <small class="fw-semibold text-danger d-block">Toll Free: 1800-180-5522</small>
+                                        <small class="text-muted">Campus Cell: antiragging@apsit.edu.in</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded-3 h-100 bg-light bg-opacity-50">
+                                        <div class="text-primary mb-2"><i class="bi bi-person-heart fs-3"></i></div>
+                                        <h6 class="fw-bold text-dark mb-1">Women Development Cell (WDC)</h6>
+                                        <p class="small text-secondary mb-2">Internal complaints committee for gender equity, student safety, and grievance redressal.</p>
+                                        <small class="fw-semibold text-primary d-block">Helpline: +91 7738305400</small>
+                                        <small class="text-muted">Email: wdc@apsit.edu.in</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded-3 h-100 bg-light bg-opacity-50">
+                                        <div class="text-success mb-2"><i class="bi bi-hospital fs-3"></i></div>
+                                        <h6 class="fw-bold text-dark mb-1">Medical Room &amp; First Aid</h6>
+                                        <p class="small text-secondary mb-2">On-campus primary healthcare, emergency first-aid room, and ambulance coordination.</p>
+                                        <small class="fw-semibold text-success d-block">Location: Room 102 (Ground Flr)</small>
+                                        <small class="text-muted">Main Gate Security: 7738940600</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </main>
     </div>
@@ -1557,6 +1905,7 @@
                 <a href="javascript:void(0)" onclick="document.getElementById('dashboard-tab').click()" class="text-white me-3">Home</a>
                 <a href="javascript:void(0)" onclick="document.getElementById('courses-tab').click()" class="text-white me-3">Courses</a>
                 <a href="javascript:void(0)" onclick="openAboutApsitTab()" class="text-white me-3">About APSIT</a>
+                <a href="javascript:void(0)" onclick="openHelpSupportTab()" class="text-white me-3">Help &amp; Support</a>
                 <a href="https://www.apsit.edu.in/about-us" target="_blank" rel="noopener noreferrer" class="text-white">Official APSIT</a>
             </div>
         </div>
