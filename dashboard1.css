@@ -948,13 +948,6 @@ body {
     color: #94a3b8 !important;
 }
 
-[data-theme="dark"] #aboutApsitDashSection,
-[data-theme="dark"] #aboutApsitDashSection .card {
-    background-color: var(--app-card-bg) !important;
-    border-color: var(--app-border) !important;
-}
-
-[data-theme="dark"] #aboutApsitDashSection .bg-light,
 [data-theme="dark"] #about-view .bg-light {
     background-color: var(--app-surface) !important;
     border-color: var(--app-border) !important;
