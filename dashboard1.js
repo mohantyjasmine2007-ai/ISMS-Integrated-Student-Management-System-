@@ -56,6 +56,25 @@ let activeFacultyObj = null;
             }
         }
 
+        // Open About APSIT tab if URL specifies ?view=about
+        if (urlParams.get('view') === 'about') {
+            openAboutApsitTab();
+        }
+
+        // Synchronize active states between main sidebar tabs and support tabs (About APSIT)
+        const aboutTabBtn = document.getElementById('about-tab');
+        if (aboutTabBtn) {
+            aboutTabBtn.addEventListener('shown.bs.tab', () => {
+                document.querySelectorAll('#sidebarTabs .nav-link').forEach(link => link.classList.remove('active'));
+                aboutTabBtn.classList.add('active');
+            });
+            document.querySelectorAll('#sidebarTabs .nav-link').forEach(link => {
+                link.addEventListener('shown.bs.tab', () => {
+                    aboutTabBtn.classList.remove('active');
+                });
+            });
+        }
+
         // Listen for storage events across tabs
         window.addEventListener('storage', (e) => {
             if (e.key === 'apsit_isms_dynamic_students') {
@@ -69,6 +88,19 @@ let activeFacultyObj = null;
             }
         });
     });
+
+    // Switch to About APSIT tab
+    function openAboutApsitTab() {
+        const aboutTab = document.getElementById('about-tab');
+        if (aboutTab) {
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
+            aboutTab.classList.add('active');
+            const tabInstance = bootstrap.Tab.getOrCreateInstance(aboutTab);
+            tabInstance.show();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+    window.openAboutApsitTab = openAboutApsitTab;
 
     // Switch to Faculty Portal tab
     function openFacultyPortalTab() {

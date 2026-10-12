@@ -61,8 +61,13 @@
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav ms-auto align-items-lg-center">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="javascript:void(0)" onclick="document.getElementById('dashboard-tab').click()">
                         <i class="bi bi-house"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" onclick="openAboutApsitTab()">
+                        <i class="bi bi-info-circle"></i> About APSIT
                     </a>
                 </li>
                 
@@ -148,17 +153,19 @@
                         <span class="badge bg-success">Live</span>
                     </a>
                 </li>
-            </ul>
-            <hr>
-            <h6 class="text-muted px-3">SUPPORT</h6>
-            <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-question-circle"></i> Help & Support
-                    </a>
+                    <hr class="my-2">
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <h6 class="text-muted px-3 mb-2">SUPPORT</h6>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                        <i class="bi bi-question-circle"></i> Help &amp; Support
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="about-tab" data-bs-toggle="pill" data-bs-target="#about-view" role="tab" aria-controls="about-view" aria-selected="false">
                         <i class="bi bi-info-circle"></i> About APSIT
                     </a>
                 </li>
@@ -241,71 +248,158 @@
                         </button>
                     </div>
 
-                    <!-- Institute Overview Section -->
-                    <div class="row g-4 mb-4">
-                        <div class="col-lg-6">
-                            <div class="card section-card overview-info-card h-100 border-0 shadow-sm">
-                                <div class="card-body p-4">
-                                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-building text-primary me-2"></i>Institute Overview</h5>
-                                    
-                                    <div class="d-flex mb-4">
-                                        <div class="flex-shrink-0">
-                                            <div class="bg-primary bg-opacity-10 text-primary rounded p-3 text-center" style="width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="bi bi-eye fs-4"></i>
-                                            </div>
-                                        </div>
-                                        <div class="ms-3">
-                                            <h6 class="fw-bold text-uppercase text-primary mb-1">Vision</h6>
-                                            <p class="text-secondary mb-0" style="font-size: 0.95rem; line-height: 1.6;">APSIT aspires to be a premier institute producing globally competent engineering professionals to contribute towards socio-economic growth of India.</p>
-                                        </div>
+                    <!-- About APSIT & Institute Overview Section -->
+                    <div class="card section-card mb-4 border-0 shadow-sm" id="aboutApsitDashSection">
+                        <div class="card-body p-4">
+                            <!-- Section Heading & Institutional Identity -->
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 border-bottom pb-3">
+                                <div>
+                                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                        <span class="badge bg-primary px-3 py-1 fw-bold"><i class="bi bi-patch-check-fill me-1"></i> ESTD. NOV 1993</span>
+                                        <span class="badge bg-success-subtle text-success border border-success fw-semibold"><i class="bi bi-shield-check me-1"></i> Religious Jain Minority Institute</span>
+                                        <span class="badge bg-info-subtle text-info border border-info fw-semibold"><i class="bi bi-mortarboard-fill me-1"></i> Affiliated to Univ. of Mumbai</span>
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning fw-semibold"><i class="bi bi-award-fill me-1"></i> AICTE &amp; DTE Approved</span>
                                     </div>
+                                    <h4 class="fw-bold text-dark mb-1">
+                                        <i class="bi bi-building-fill-check text-primary me-2"></i>About APSIT (A. P. Shah Institute of Technology)
+                                    </h4>
+                                    <p class="text-muted mb-0 small">
+                                        Parshvanath Charitable Trust &bull; Survey No. 12, 13, Opp. Hypercity Mall, Kasarvadavali, Ghodbunder Road, Thane (West) 400 615
+                                    </p>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm fw-semibold" onclick="openAboutApsitTab()">
+                                        <i class="bi bi-journal-text me-1"></i> Full Institute Dossier
+                                    </button>
+                                    <a href="https://www.apsit.edu.in/about-us" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm fw-semibold">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i> Official Portal
+                                    </a>
+                                </div>
+                            </div>
 
-                                    <div class="d-flex">
-                                        <div class="flex-shrink-0">
-                                            <div class="bg-success bg-opacity-10 text-success rounded p-3 text-center" style="width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="bi bi-bullseye fs-4"></i>
-                                            </div>
+                            <!-- Founder's Visionary Philosophy -->
+                            <div class="p-3 mb-4 rounded-3 border bg-light bg-opacity-75" style="border-left: 4px solid #123b6d !important;">
+                                <div class="row align-items-center g-3">
+                                    <div class="col-lg-8">
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <span class="badge bg-warning text-dark fw-bold text-uppercase"><i class="bi bi-stars me-1"></i> Founder's Noble Vision</span>
+                                            <span class="text-muted small fw-semibold">Parshvanath Charitable Trust (Est. November 1993)</span>
                                         </div>
-                                        <div class="ms-3">
-                                            <h6 class="fw-bold text-uppercase text-success mb-1">Mission</h6>
-                                            <p class="text-secondary mb-0" style="font-size: 0.95rem; line-height: 1.6;">To provide conducive and collaborative environment to meet contemporary & future Engineering challenges by project based and value-added education with the support of trained faculty.</p>
+                                        <h5 class="fw-bold text-primary mb-1">Late Shree Ashokbhai P. Shah &mdash; Founder, Parshvanath Charitable Trust</h5>
+                                        <p class="mb-2 text-secondary" style="font-size: 0.95rem; line-height: 1.6;">
+                                            <em>"To run an engineering college in the trust, my father had a dream that a person who comes to Mumbai can study in a good institute with very low fees."</em> &mdash; Hon'ble Shree Chiragbhai A. Shah (Chairman, PCT &amp; Founder, APSIT)
+                                        </p>
+                                        <p class="mb-0 text-secondary small" style="line-height: 1.6;">
+                                            A. P. Shah Institute of Technology (APSIT) functions with the commitment of imparting state-of-the-art technical education so as to inculcate conceptual know-how, analyzing skills, decision-making abilities, and leadership qualities. APSIT stands committed to the intellectual and moral growth of every student, with an experienced team unlocking the hidden potential in the subconscious minds of students to create competent Engineers with vision and social commitment.
+                                        </p>
+                                    </div>
+                                    <div class="col-lg-4 border-start-lg ps-lg-4">
+                                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-gem text-primary me-1"></i> Institutional Pillars</h6>
+                                        <div class="d-flex flex-column gap-2 small text-secondary">
+                                            <div><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>Jain Religious Minority:</strong> Ethical &amp; inclusive ethos</div>
+                                            <div><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>Low &amp; Affordable Fees:</strong> Fulfilling founder's dream</div>
+                                            <div><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>Moodle LMS E-Learning:</strong> 24/7 digital academic hub</div>
+                                            <div><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>MNC Placements:</strong> Robust industry career pipelines</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-lg-6">
-                            <div class="card section-card overview-info-card h-100 border-0 shadow-sm">
-                                <div class="card-body p-4">
-                                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-laptop text-primary me-2"></i>Department of IT</h5>
-                                    
-                                    <div class="d-flex mb-4">
-                                        <div class="flex-shrink-0">
-                                            <div class="bg-info bg-opacity-10 text-info rounded p-3 text-center" style="width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="bi bi-eye fs-4"></i>
+                            <!-- Vision & Mission 2-Column Row -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-lg-6">
+                                    <div class="card h-100 border bg-light bg-opacity-25 shadow-none p-3">
+                                        <div class="d-flex align-items-center gap-2 mb-3">
+                                            <div class="bg-primary bg-opacity-10 text-primary rounded p-2 text-center" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-eye fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-uppercase text-primary mb-0">Institute Vision</h6>
+                                                <small class="text-muted">A. P. Shah Institute of Technology</small>
                                             </div>
                                         </div>
-                                        <div class="ms-3">
-                                            <h6 class="fw-bold text-uppercase text-info mb-1">Vision</h6>
-                                            <p class="text-secondary mb-0 fst-italic" style="font-size: 0.95rem; line-height: 1.6;">"To be a prime centre of excellence by transforming students into globally competent IT professionals."</p>
+                                        <p class="text-secondary mb-3" style="font-size: 0.93rem; line-height: 1.6;">
+                                            APSIT aspires to be a premier institute producing globally competent engineering professionals to contribute towards socio-economic growth of India.
+                                        </p>
+                                        <div class="d-flex align-items-center gap-2 mb-2 pt-2 border-top">
+                                            <div class="bg-success bg-opacity-10 text-success rounded p-2 text-center" style="width: 44px; height: 44px; display: center; align-items: center; justify-content: center;">
+                                                <i class="bi bi-bullseye fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-uppercase text-success mb-0">Institute Mission</h6>
+                                                <small class="text-muted">Core Educational Purpose</small>
+                                            </div>
                                         </div>
+                                        <p class="text-secondary mb-0" style="font-size: 0.93rem; line-height: 1.6;">
+                                            To provide conducive and collaborative environment to meet contemporary &amp; future Engineering challenges by project based and value-added education with the support of trained faculty.
+                                        </p>
                                     </div>
+                                </div>
 
-                                    <div class="d-flex">
-                                        <div class="flex-shrink-0">
-                                            <div class="bg-warning bg-opacity-10 text-warning rounded p-3 text-center" style="width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="bi bi-bullseye fs-4"></i>
+                                <div class="col-lg-6">
+                                    <div class="card h-100 border bg-light bg-opacity-25 shadow-none p-3">
+                                        <div class="d-flex align-items-center gap-2 mb-3">
+                                            <div class="bg-info bg-opacity-10 text-info rounded p-2 text-center" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-laptop fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-uppercase text-info mb-0">Department of IT Vision</h6>
+                                                <small class="text-muted">Information Technology</small>
                                             </div>
                                         </div>
-                                        <div class="ms-3">
-                                            <h6 class="fw-bold text-uppercase text-warning mb-1">Mission</h6>
-                                            <ul class="text-secondary mb-0 ps-3" style="font-size: 0.9rem; line-height: 1.6;">
-                                                <li class="mb-2">To develop, support and maintain state-of-art infrastructure to serve as a potent resource hub for IT industries.</li>
-                                                <li class="mb-2">To inculcate the problem solving, analytical, logical skills to promote the culture of creativity and innovation among the students.</li>
-                                                <li>To adapt with the transformation of the technology emphasising on interdisciplinary studies, exposure to emerging technologies and imbibing high standards of professional ethics and social responsibilities in all endeavours.</li>
-                                            </ul>
+                                        <p class="text-secondary mb-3 fst-italic" style="font-size: 0.93rem; line-height: 1.6;">
+                                            "To be a prime centre of excellence by transforming students into globally competent IT professionals."
+                                        </p>
+                                        <div class="d-flex align-items-center gap-2 mb-2 pt-2 border-top">
+                                            <div class="bg-warning bg-opacity-10 text-warning rounded p-2 text-center" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-compass fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-uppercase text-warning mb-0">Department of IT Mission</h6>
+                                                <small class="text-muted">Key Strategic Objectives</small>
+                                            </div>
                                         </div>
+                                        <ul class="text-secondary mb-0 ps-3" style="font-size: 0.88rem; line-height: 1.5;">
+                                            <li class="mb-1">Maintain state-of-the-art infrastructure as a potent resource hub for IT industries.</li>
+                                            <li class="mb-1">Inculcate problem solving, analytical, and logical skills promoting creativity &amp; innovation.</li>
+                                            <li>Adapt to transforming technologies with emerging tech exposure and high professional ethics.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Leadership Snapshot Cards -->
+                            <div class="row g-3">
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="p-3 border rounded text-center h-100 bg-white leadership-mini-card">
+                                        <div class="text-primary mb-2"><i class="bi bi-person-badge fs-2"></i></div>
+                                        <h6 class="fw-bold mb-1 text-dark">Shri Chirag A. Shah</h6>
+                                        <small class="badge bg-primary-subtle text-primary mb-2">Chairman, PCT</small>
+                                        <p class="small text-muted mb-0">Founder of APSIT; driving world-class engineering education with accessible low fees.</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="p-3 border rounded text-center h-100 bg-white leadership-mini-card">
+                                        <div class="text-success mb-2"><i class="bi bi-award fs-2"></i></div>
+                                        <h6 class="fw-bold mb-1 text-dark">Shri Niranjan P. Shah</h6>
+                                        <small class="badge bg-success-subtle text-success mb-2">Secretary, PCT</small>
+                                        <p class="small text-muted mb-0">Founder Trustee; dedicated to fostering environments conducive to student personality.</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="p-3 border rounded text-center h-100 bg-white leadership-mini-card">
+                                        <div class="text-info mb-2"><i class="bi bi-mortarboard fs-2"></i></div>
+                                        <h6 class="fw-bold mb-1 text-dark">Dr. Uttam D. Kolekar</h6>
+                                        <small class="badge bg-info-subtle text-info mb-2">Principal (Ph.D.)</small>
+                                        <p class="small text-muted mb-0">Spearheading research, advanced computer labs, STTPs, and MNC placement excellence.</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="p-3 border rounded text-center h-100 bg-white leadership-mini-card">
+                                        <div class="text-warning mb-2"><i class="bi bi-laptop-fill fs-2"></i></div>
+                                        <h6 class="fw-bold mb-1 text-dark">Prof. Atul M. Deshpande</h6>
+                                        <small class="badge bg-warning-subtle text-dark mb-2">Vice-Principal</small>
+                                        <p class="small text-muted mb-0">Leading the digital Moodle LMS e-learning ecosystem ensuring top university results.</p>
                                     </div>
                                 </div>
                             </div>
@@ -1066,6 +1160,385 @@
                     </div>
                 </div>
 
+                <!-- Dedicated About APSIT Tab Pane -->
+                <div class="tab-pane fade" id="about-view" role="tabpanel" aria-labelledby="about-tab">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="javascript:void(0)" onclick="document.getElementById('dashboard-tab').click()">Home</a></li>
+                            <li class="breadcrumb-item">Support</li>
+                            <li class="breadcrumb-item active">About APSIT</li>
+                        </ol>
+                    </nav>
+
+                    <!-- Hero Showcase Banner -->
+                    <div class="card about-hero-banner border-0 mb-4 shadow-sm overflow-hidden text-white" style="background: linear-gradient(135deg, #0f2d59 0%, #123b6d 45%, #1e5ba3 100%); border-radius: 12px;">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="row align-items-center g-4">
+                                <div class="col-lg-8">
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <span class="badge bg-warning text-dark fw-bold px-3 py-1"><i class="bi bi-star-fill me-1"></i> ESTABLISHED NOV 1993</span>
+                                        <span class="badge bg-light text-dark fw-bold px-3 py-1"><i class="bi bi-shield-check text-primary me-1"></i> Religious Jain Minority</span>
+                                        <span class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-1"><i class="bi bi-mortarboard-fill me-1"></i> University of Mumbai</span>
+                                        <span class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-1"><i class="bi bi-award-fill me-1"></i> AICTE &amp; DTE Approved</span>
+                                    </div>
+                                    <h1 class="display-6 fw-bold mb-2">Parshvanath Charitable Trust's</h1>
+                                    <h2 class="h1 fw-bolder text-warning mb-3">A. P. Shah Institute of Technology</h2>
+                                    <p class="lead mb-3 text-light opacity-90" style="font-size: 1.1rem; line-height: 1.6;">
+                                        Committed to imparting state-of-the-art technical education so as to inculcate conceptual know-how, analyzing skills, decision-making abilities, and leadership qualities in students.
+                                    </p>
+                                    <div class="d-flex flex-wrap align-items-center gap-3 pt-2">
+                                        <div class="d-flex align-items-center gap-2 text-light small">
+                                            <i class="bi bi-geo-alt-fill text-warning fs-5"></i>
+                                            <span>Survey No. 12, 13, Opp. Hypercity Mall, Kasarvadavali, Ghodbunder Rd, Thane (W) 400 615</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2 text-light small">
+                                            <i class="bi bi-telephone-fill text-warning fs-5"></i>
+                                            <span>7738305400 / 7738940600</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 text-center">
+                                    <div class="p-4 rounded-4 bg-white bg-opacity-10 border border-light border-opacity-25 shadow-sm text-center">
+                                        <i class="bi bi-mortarboard-fill text-warning mb-2" style="font-size: 4rem;"></i>
+                                        <h5 class="fw-bold mb-1">APSIT Moodle ISMS</h5>
+                                        <p class="small text-light opacity-75 mb-3">Integrated Student &amp; Academic Management Portal</p>
+                                        <a href="https://www.apsit.edu.in/about-us" target="_blank" rel="noopener noreferrer" class="btn btn-warning text-dark fw-bold btn-sm px-3 py-2 shadow-sm">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> View Official College Website
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- The Founder's Genesis & Visionary Legacy -->
+                    <div class="card section-card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                            <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-stars text-warning me-2"></i>Genesis &amp; The Founder's Noble Vision</h5>
+                            <span class="badge bg-primary-subtle text-primary">Parshvanath Charitable Trust (PCT)</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4 align-items-center">
+                                <div class="col-lg-7">
+                                    <h4 class="fw-bold text-primary mb-2">Late Shree Ashokbhai P. Shah</h4>
+                                    <h6 class="text-muted fw-semibold mb-3">Founder, Parshvanath Charitable Trust (November 1993)</h6>
+                                    
+                                    <div class="p-3 rounded-3 bg-light border-start border-4 border-primary mb-3">
+                                        <p class="mb-0 fst-italic text-dark fw-medium" style="line-height: 1.7; font-size: 1.05rem;">
+                                            "A. P. Shah Institute of Technology is governed by Parshvanath Charitable Trust which was founded by my father Hon'ble Shree Ashokbhai P. Shah in 1993. To run an engineering college in the trust, my father had a dream that a person who comes to Mumbai can study in a good institute with very low fees."
+                                        </p>
+                                        <small class="text-muted d-block mt-2 fw-semibold text-end">&mdash; Hon'ble Shree Chiragbhai A. Shah (Chairman, PCT &amp; Founder, APSIT)</small>
+                                    </div>
+
+                                    <p class="text-secondary mb-2" style="line-height: 1.7;">
+                                        A. P. Shah Institute of Technology (APSIT) has started functioning with the commitment of imparting state-of-the-art technical education so as to inculcate conceptual know-how, analyzing skills, decision-making abilities, and leadership qualities in students. APSIT stands steadfastly committed to the intellectual and moral growth of every student.
+                                    </p>
+                                    <p class="text-secondary mb-0" style="line-height: 1.7;">
+                                        APSIT possesses an experienced and proficient team which aspires to unlock the hidden potential in the subconscious minds of students and to create competent Engineers with profound vision and social commitment.
+                                    </p>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="card border-0 bg-light p-4 rounded-3 h-100 shadow-none">
+                                        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-award-fill text-primary me-2"></i>Parshvanath Charitable Trust (PCT)</h5>
+                                        <p class="text-secondary small mb-3" style="line-height: 1.6;">
+                                            PCT was established in November 1993 under the pioneering leadership of Late Shri Ashokbhai Shah. The Trust is committed to providing world-class facilities, modern infrastructure, cutting-edge technology, and an enriching atmosphere to students to achieve their career goals in the era of globalization.
+                                        </p>
+                                        <div class="border-top pt-3">
+                                            <h6 class="fw-bold text-dark small text-uppercase mb-2">Institutional Recognition</h6>
+                                            <ul class="list-unstyled mb-0 small text-secondary d-flex flex-column gap-2">
+                                                <li><i class="bi bi-check2-circle text-success me-2 fs-6"></i><strong>Status:</strong> Religious Jain Minority Educational Institute</li>
+                                                <li><i class="bi bi-check2-circle text-success me-2 fs-6"></i><strong>Affiliation:</strong> University of Mumbai (MU)</li>
+                                                <li><i class="bi bi-check2-circle text-success me-2 fs-6"></i><strong>Approvals:</strong> All India Council for Technical Education (AICTE), New Delhi</li>
+                                                <li><i class="bi bi-check2-circle text-success me-2 fs-6"></i><strong>Directorate:</strong> Directorate of Technical Education (DTE), Maharashtra</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Board of Trustees Grid -->
+                    <div class="card section-card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                            <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-people-fill text-primary me-2"></i>Board of Trustees &mdash; Parshvanath Charitable Trust</h5>
+                            <span class="badge bg-secondary-subtle text-secondary fw-semibold">Governance &amp; Leadership</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <div class="col-sm-6 col-lg-4">
+                                    <div class="card h-100 border p-3 rounded-3 trustee-profile-card">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
+                                                <i class="bi bi-person-fill fs-3"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">Shri Chirag A. Shah</h6>
+                                                <span class="badge bg-primary text-white mt-1">Chairman</span>
+                                                <small class="text-muted d-block mt-1">Founder, APSIT &bull; PCT</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-4">
+                                    <div class="card h-100 border p-3 rounded-3 trustee-profile-card">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
+                                                <i class="bi bi-person-fill fs-3"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">Shri Niranjan P. Shah</h6>
+                                                <span class="badge bg-success text-white mt-1">Secretary</span>
+                                                <small class="text-muted d-block mt-1">Founder Trustee &bull; PCT</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-4">
+                                    <div class="card h-100 border p-3 rounded-3 trustee-profile-card">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
+                                                <i class="bi bi-person-fill fs-3"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">Smt. Pooja C. Shah</h6>
+                                                <span class="badge bg-info text-white mt-1">Trustee</span>
+                                                <small class="text-muted d-block mt-1">Parshvanath Charitable Trust</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-4">
+                                    <div class="card h-100 border p-3 rounded-3 trustee-profile-card">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
+                                                <i class="bi bi-person-fill fs-3"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">Shri Kunthal N. Shah</h6>
+                                                <span class="badge bg-warning text-dark mt-1">Trustee</span>
+                                                <small class="text-muted d-block mt-1">Parshvanath Charitable Trust</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-4">
+                                    <div class="card h-100 border p-3 rounded-3 trustee-profile-card">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
+                                                <i class="bi bi-person-fill fs-3"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">Shri Minesh N. Shah</h6>
+                                                <span class="badge bg-secondary text-white mt-1">Trustee</span>
+                                                <small class="text-muted d-block mt-1">Parshvanath Charitable Trust</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-4">
+                                    <div class="card h-100 border p-3 rounded-3 trustee-profile-card">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
+                                                <i class="bi bi-person-fill fs-3"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">Shri Hetanshu C. Shah</h6>
+                                                <span class="badge bg-dark text-white mt-1">Trustee</span>
+                                                <small class="text-muted d-block mt-1">Parshvanath Charitable Trust</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leadership Perspectives & Messages -->
+                    <div class="card section-card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                            <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-chat-quote-fill text-primary me-2"></i>Leadership Insights &amp; Messages</h5>
+                            <span class="badge bg-primary-subtle text-primary">Executive Directorate</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <!-- Chairman Message -->
+                                <div class="col-md-6">
+                                    <div class="card h-100 border rounded-3 p-4 bg-light bg-opacity-50 leader-quote-card">
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div class="bg-primary text-white rounded-circle p-2 text-center" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-quote fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">Hon'ble Shree Chiragbhai A. Shah</h6>
+                                                <small class="text-primary fw-semibold">Chairman, Parshvanath Charitable Trust &bull; Founder, APSIT</small>
+                                            </div>
+                                        </div>
+                                        <p class="text-secondary mb-0" style="line-height: 1.7; font-size: 0.95rem;">
+                                            "A. P. Shah Institute Of Technology is governed by Parshvanath Charitable Trust which was founded by my father Hon'ble Shree Ashokbhai P Shah in 1993. To run an engineering college in the trust my father had a dream that a person who comes to Mumbai, he can study in a good institute with a very low fees."
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Secretary Message -->
+                                <div class="col-md-6">
+                                    <div class="card h-100 border rounded-3 p-4 bg-light bg-opacity-50 leader-quote-card">
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div class="bg-success text-white rounded-circle p-2 text-center" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-quote fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">Hon'ble Shree Niranjanbhai P. Shah</h6>
+                                                <small class="text-success fw-semibold">Secretary &amp; Founder Trustee, Parshvanath Charitable Trust</small>
+                                            </div>
+                                        </div>
+                                        <p class="text-secondary mb-0" style="line-height: 1.7; font-size: 0.95rem;">
+                                            "PCT's A P Shah Institute of Technology, Thane is committed to create an environment which is most conducive to the overall personality of the students."
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Principal Address -->
+                                <div class="col-md-6">
+                                    <div class="card h-100 border rounded-3 p-4 bg-light bg-opacity-50 leader-quote-card">
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div class="bg-info text-white rounded-circle p-2 text-center" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-mortarboard fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">Dr. Uttam D. Kolekar</h6>
+                                                <small class="text-info fw-semibold">Principal &bull; PhD (Electronics and Telecommunication Engineering)</small>
+                                            </div>
+                                        </div>
+                                        <p class="text-secondary mb-2" style="line-height: 1.7; font-size: 0.95rem;">
+                                            "It is my privilege to welcome you to our Institute, dedicated to quality technical education with all-round development of students to be competent professional Engineers of tomorrow to serve society. We have exemplary infrastructural facilities, well-equipped laboratories, separate computer center, highly qualified faculty, and an exhilarating campus atmosphere."
+                                        </p>
+                                        <p class="text-secondary mb-0 small" style="line-height: 1.6;">
+                                            "We have research oriented, challenge seeking, well qualified and devoted faculty. The ultimate aim is to place our students in multi-national companies and conduct Seminars, Workshops, STTP, National and International conferences."
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Vice-Principal Address -->
+                                <div class="col-md-6">
+                                    <div class="card h-100 border rounded-3 p-4 bg-light bg-opacity-50 leader-quote-card">
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div class="bg-warning text-dark rounded-circle p-2 text-center" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-laptop fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">Prof. Atul M. Deshpande</h6>
+                                                <small class="text-warning-emphasis fw-semibold">Vice-Principal &bull; Head of Academic Rigor</small>
+                                            </div>
+                                        </div>
+                                        <p class="text-secondary mb-2" style="line-height: 1.7; font-size: 0.95rem;">
+                                            "We have a learning management system called Moodle (The e-learning Software). Faculty members can upload their PPTs, notes, question banks, solutions, and even attendance on Moodle. Students can access all the uploaded material seamlessly with PC or mobile."
+                                        </p>
+                                        <p class="text-secondary mb-0 small" style="line-height: 1.6;">
+                                            "Adoption of best practices like e-learning &amp; online tests has ensured the best academic results in University examinations."
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campus Facilities & Institutional Distinctions -->
+                    <div class="card section-card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                            <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-buildings-fill text-primary me-2"></i>World-Class Infrastructure &amp; Academic Pillars</h5>
+                            <span class="badge bg-primary-subtle text-primary">Student Excellence</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="card h-100 border p-3 rounded-3 feature-pillar-card">
+                                        <div class="text-primary mb-2"><i class="bi bi-cpu-fill fs-2"></i></div>
+                                        <h6 class="fw-bold text-dark mb-2">Advanced Labs &amp; Computer Center</h6>
+                                        <p class="text-secondary small mb-0">State-of-the-art engineering laboratories, high-speed computing centers, and modern specialized departmental facilities for hands-on technical proficiency.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card h-100 border p-3 rounded-3 feature-pillar-card">
+                                        <div class="text-success mb-2"><i class="bi bi-book-half fs-2"></i></div>
+                                        <h6 class="fw-bold text-dark mb-2">E-Learning &amp; Central Library</h6>
+                                        <p class="text-secondary small mb-0">Rich collection of technical volumes, national &amp; international journals, digital library access, and 24/7 online study materials via Moodle.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card h-100 border p-3 rounded-3 feature-pillar-card">
+                                        <div class="text-info mb-2"><i class="bi bi-buildings fs-2"></i></div>
+                                        <h6 class="fw-bold text-dark mb-2">Corporate &amp; MNC Placements</h6>
+                                        <p class="text-secondary small mb-0">Dedicated training &amp; placement cell organizing aptitude training, mock interviews, STTPs, and recruitment drives with leading tech multinational firms.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card h-100 border p-3 rounded-3 feature-pillar-card">
+                                        <div class="text-warning mb-2"><i class="bi bi-diagram-3-fill fs-2"></i></div>
+                                        <h6 class="fw-bold text-dark mb-2">Research, STTPs &amp; Conferences</h6>
+                                        <p class="text-secondary small mb-0">Regular national and international conferences, short-term training programs (STTP), and workshops updating students on modern developments in science &amp; technology.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card h-100 border p-3 rounded-3 feature-pillar-card">
+                                        <div class="text-danger mb-2"><i class="bi bi-heart-pulse-fill fs-2"></i></div>
+                                        <h6 class="fw-bold text-dark mb-2">NSS Unit &amp; Social Outreach</h6>
+                                        <p class="text-secondary small mb-0">Active National Service Scheme (NSS) unit organizing community health drives, World AIDS Day awareness, blood donation camps, and environmental initiatives.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card h-100 border p-3 rounded-3 feature-pillar-card">
+                                        <div class="text-primary mb-2"><i class="bi bi-music-note-beamed fs-2"></i></div>
+                                        <h6 class="fw-bold text-dark mb-2">Cultural &amp; Student Life</h6>
+                                        <p class="text-secondary small mb-0">Vibrant campus community celebrating events like the annual APSIT Garba Night, technical festivals, hackathons, sports championships, and cultural arts.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campus Location & Contact Directory -->
+                    <div class="card section-card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                            <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Campus Location &amp; Contact Details</h5>
+                            <span class="badge bg-success-subtle text-success">Thane West, Maharashtra</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold text-dark mb-2"><i class="bi bi-building me-2 text-primary"></i>Campus Address</h6>
+                                    <p class="text-secondary mb-3" style="line-height: 1.6;">
+                                        <strong>Parshvanath Charitable Trust's A. P. Shah Institute of Technology</strong><br>
+                                        Survey No. 12, 13, Opp. Hypercity Mall, Kasarvadavali,<br>
+                                        Ghodbunder Road, Thane (West) &mdash; 400 615, Maharashtra, India.
+                                    </p>
+                                    <div class="d-flex flex-column gap-2 text-secondary small">
+                                        <div><i class="bi bi-telephone-fill text-primary me-2"></i><strong>Mobile:</strong> 7738305400 / 7738940600</div>
+                                        <div><i class="bi bi-envelope-fill text-primary me-2"></i><strong>General Queries:</strong> info@apsit.edu.in</div>
+                                        <div><i class="bi bi-mortarboard-fill text-primary me-2"></i><strong>Exam &amp; Transcripts:</strong> exam@apsit.edu.in</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-4 bg-light rounded-3 h-100 d-flex flex-column justify-content-center">
+                                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-globe me-2 text-primary"></i>Official Web Portals</h6>
+                                        <p class="text-secondary small mb-3">
+                                            Visit the official institutional portal for complete statutory disclosures, syllabus schemes, admission notices, NAAC/NBA documentation, and announcements.
+                                        </p>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <a href="https://www.apsit.edu.in/about-us" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm fw-semibold">
+                                                <i class="bi bi-box-arrow-up-right me-1"></i> APSIT Official About Us Page
+                                            </a>
+                                            <a href="https://www.apsit.edu.in" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm fw-semibold">
+                                                <i class="bi bi-house me-1"></i> APSIT Main Website
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -1081,9 +1554,10 @@
             </div>
             <div class="col-md-6 text-md-end mt-3 mt-md-0">
                 <p class="mb-1">Quick Links</p>
-                <a href="#" class="text-white me-3">Home</a>
-                <a href="#" class="text-white me-3">Courses</a>
-                <a href="#" class="text-white">Contact</a>
+                <a href="javascript:void(0)" onclick="document.getElementById('dashboard-tab').click()" class="text-white me-3">Home</a>
+                <a href="javascript:void(0)" onclick="document.getElementById('courses-tab').click()" class="text-white me-3">Courses</a>
+                <a href="javascript:void(0)" onclick="openAboutApsitTab()" class="text-white me-3">About APSIT</a>
+                <a href="https://www.apsit.edu.in/about-us" target="_blank" rel="noopener noreferrer" class="text-white">Official APSIT</a>
             </div>
         </div>
         <hr>

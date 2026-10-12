@@ -876,3 +876,96 @@ body {
     cursor: pointer;
 }
 
+/* ==========================================================================
+   About APSIT Styles & Dark Theme Enhancements
+   ========================================================================== */
+.leadership-mini-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border-color: #e2e8f0;
+}
+
+.leadership-mini-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.trustee-profile-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    background-color: var(--app-surface);
+    border-color: var(--app-border) !important;
+}
+
+.trustee-profile-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+}
+
+.leader-quote-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border-color: var(--app-border) !important;
+}
+
+.leader-quote-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.feature-pillar-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    background-color: var(--app-surface);
+    border-color: var(--app-border) !important;
+}
+
+.feature-pillar-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+@media (min-width: 992px) {
+    .border-start-lg {
+        border-left: 1px solid #dee2e6 !important;
+    }
+}
+
+/* Dark Theme Overrides for About APSIT */
+[data-theme="dark"] .leadership-mini-card {
+    background-color: var(--app-card-bg) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .leadership-mini-card .text-dark,
+[data-theme="dark"] .trustee-profile-card .text-dark,
+[data-theme="dark"] .leader-quote-card .text-dark,
+[data-theme="dark"] .feature-pillar-card .text-dark {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .leadership-mini-card .text-muted,
+[data-theme="dark"] .trustee-profile-card .text-muted,
+[data-theme="dark"] .leader-quote-card .text-secondary,
+[data-theme="dark"] .feature-pillar-card .text-secondary {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] #aboutApsitDashSection,
+[data-theme="dark"] #aboutApsitDashSection .card {
+    background-color: var(--app-card-bg) !important;
+    border-color: var(--app-border) !important;
+}
+
+[data-theme="dark"] #aboutApsitDashSection .bg-light,
+[data-theme="dark"] #about-view .bg-light {
+    background-color: var(--app-surface) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+[data-theme="dark"] #about-view .border {
+    border-color: var(--app-border) !important;
+}
+
+[data-theme="dark"] .border-start-lg {
+    border-left: 1px solid var(--app-border) !important;
+}
+
