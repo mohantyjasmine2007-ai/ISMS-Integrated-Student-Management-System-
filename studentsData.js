@@ -4207,6 +4207,44 @@ function initializeStudentGrades(student) {
 // Live shared data store with localStorage sync
 const STORAGE_KEY_STUDENTS = 'apsit_isms_dynamic_students';
 const STORAGE_KEY_FACULTY = 'apsit_isms_active_faculty';
+const STORAGE_KEY_SUBJECT_INFO = 'apsit_isms_subject_info';
+
+function loadStoredSubjectInfo() {
+    try {
+        if (typeof localStorage !== 'undefined') {
+            const stored = localStorage.getItem(STORAGE_KEY_SUBJECT_INFO);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                for (const key in parsed) {
+                    if (SUBJECT_INFO[key] && typeof parsed[key].conducted === 'number') {
+                        SUBJECT_INFO[key].conducted = parsed[key].conducted;
+                    }
+                }
+            }
+        }
+    } catch(e) {
+        console.error('Failed reading live subject info from localStorage', e);
+    }
+}
+loadStoredSubjectInfo();
+
+function saveSubjectInfo() {
+    try {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(STORAGE_KEY_SUBJECT_INFO, JSON.stringify(SUBJECT_INFO));
+        }
+    } catch(e) {
+        console.error('Failed saving live subject info to localStorage', e);
+    }
+}
+
+function getSubjectInfo(subjectKey) {
+    return SUBJECT_INFO[subjectKey] || null;
+}
+
+let inMemoryStudents = null;
+let inMemoryFaculty = null;
+let inMemoryRole = null;
 
 function getLiveStudents() {
     try {
@@ -4215,6 +4253,7 @@ function getLiveStudents() {
             if (cached) {
                 const parsed = JSON.parse(cached);
                 if (Array.isArray(parsed) && parsed.length === STUDENTS_DATA.length) {
+                    inMemoryStudents = parsed;
                     return parsed;
                 }
             }
@@ -4222,13 +4261,16 @@ function getLiveStudents() {
     } catch(e) {
         console.error('Failed reading live students from localStorage', e);
     }
+    if (inMemoryStudents) return inMemoryStudents;
     // Deep clone original and initialize grades
     const cloned = STUDENTS_DATA.map(s => initializeStudentGrades(JSON.parse(JSON.stringify(s))));
+    inMemoryStudents = cloned;
     saveLiveStudents(cloned);
     return cloned;
 }
 
 function saveLiveStudents(studentsList) {
+    inMemoryStudents = studentsList;
     try {
         if (typeof localStorage !== 'undefined') {
             localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(studentsList));
@@ -4260,7 +4302,8 @@ function getFacultyCourses(facultyNameOrId) {
 function updateStudentAttendanceByFaculty(moodleId, subjectKey, newAttended, newConducted) {
     // Role check: Ensure logged-in faculty is authorized for this specific subject
     const activeFaculty = getCurrentFaculty();
-    if (activeFaculty && typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty') {
+    const isFaculty = isFacultyRole();
+    if (activeFaculty && isFaculty) {
         const allowedSubjects = FACULTY_LIST
             .filter(f => f.name.toLowerCase() === activeFaculty.name.toLowerCase())
             .map(f => f.subjectKey);
@@ -4285,6 +4328,12 @@ function updateStudentAttendanceByFaculty(moodleId, subjectKey, newAttended, new
     const conducted = newConducted !== undefined ? Number(newConducted) : (SUBJECT_INFO[subjectKey] ? SUBJECT_INFO[subjectKey].conducted : 20);
     const attended = Math.min(Math.max(0, Number(newAttended)), conducted);
     
+    // Sync subject-wide conducted count if specified and changed
+    if (SUBJECT_INFO[subjectKey] && newConducted !== undefined && SUBJECT_INFO[subjectKey].conducted !== conducted) {
+        SUBJECT_INFO[subjectKey].conducted = conducted;
+        saveSubjectInfo();
+    }
+
     student.attendance[subjectKey].attended = attended;
     student.attendance[subjectKey].conducted = conducted;
     student.attendance[subjectKey].pct = Math.round((attended / conducted) * 100);
@@ -4317,6 +4366,99 @@ function updateStudentAttendanceByFaculty(moodleId, subjectKey, newAttended, new
     }
 
     return { success: true, student: student };
+}
+
+// Faculty activity: Modify total lectures taken / conducted for a course
+function updateSubjectConductedLectures(subjectKey, newConducted, syncAllStudents = true, markAllPresentForDelta = false) {
+    // Role check: Ensure logged-in faculty is authorized for this specific subject
+    const activeFaculty = getCurrentFaculty();
+    const isFaculty = isFacultyRole();
+    if (activeFaculty && isFaculty) {
+        const allowedSubjects = FACULTY_LIST
+            .filter(f => f.name.toLowerCase() === activeFaculty.name.toLowerCase())
+            .map(f => f.subjectKey);
+        if (allowedSubjects.length > 0 && !allowedSubjects.includes(subjectKey)) {
+            return { 
+                success: false, 
+                message: `Access Denied: ${activeFaculty.title} is strictly authorized to manage their assigned course(s) only.` 
+            };
+        }
+    }
+
+    if (!SUBJECT_INFO[subjectKey]) {
+        return { success: false, message: 'Invalid course/subject identifier: ' + subjectKey };
+    }
+
+    const conductedVal = parseInt(newConducted, 10);
+    if (isNaN(conductedVal) || conductedVal < 1) {
+        return { success: false, message: 'Number of lectures conducted must be a positive integer (minimum 1).' };
+    }
+
+    const oldConducted = SUBJECT_INFO[subjectKey].conducted || 20;
+    const delta = conductedVal - oldConducted;
+
+    SUBJECT_INFO[subjectKey].conducted = conductedVal;
+    saveSubjectInfo();
+
+    if (syncAllStudents) {
+        const students = getLiveStudents();
+        const theoryKeys = ['amt1', 'adsa', 'dbms', 'at', 'oe', 'fsjp', 'evs', 'ed', 'mentoring'];
+
+        students.forEach(student => {
+            if (!student.attendance) student.attendance = {};
+            if (!student.attendance[subjectKey]) {
+                student.attendance[subjectKey] = { attended: 0, pct: 0 };
+            }
+
+            let attended = Number(student.attendance[subjectKey].attended) || 0;
+            if (markAllPresentForDelta && delta > 0) {
+                attended += delta;
+            }
+            // Attended cannot exceed total conducted
+            attended = Math.min(Math.max(0, attended), conductedVal);
+
+            student.attendance[subjectKey].attended = attended;
+            student.attendance[subjectKey].conducted = conductedVal;
+            student.attendance[subjectKey].pct = Math.round((attended / conductedVal) * 100);
+
+            // Recalculate theory total
+            let totalAttended = 0;
+            let totalConducted = 0;
+            theoryKeys.forEach(k => {
+                if (student.attendance[k] && SUBJECT_INFO[k]) {
+                    totalAttended += (student.attendance[k].attended || 0);
+                    totalConducted += (SUBJECT_INFO[k].conducted || 0);
+                }
+            });
+
+            student.attendance.theoryTotal = {
+                attended: totalAttended,
+                pct: Math.round((totalAttended / (totalConducted || 146)) * 100)
+            };
+
+            // Calculate overall attendance (weighted 70% theory + 30% practical)
+            student.attendance.overallPct = Math.round(
+                (student.attendance.theoryTotal.pct * 0.7) + ((student.attendance.practicalAvg || 80) * 0.3)
+            );
+        });
+
+        saveLiveStudents(students);
+
+        // If currently logged-in student is loaded, sync session
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+            const updatedCur = students.find(s => s.moodleId === currentUser.moodleId);
+            if (updatedCur) setCurrentUser(updatedCur);
+        }
+    }
+
+    return {
+        success: true,
+        oldConducted: oldConducted,
+        newConducted: conductedVal,
+        subject: SUBJECT_INFO[subjectKey],
+        message: `Successfully updated conducted lectures for ${SUBJECT_INFO[subjectKey].name} from ${oldConducted} to ${conductedVal}!`
+    };
 }
 
 // Faculty activity: Update grades and assessment for a subject
@@ -4445,6 +4587,8 @@ function authenticateFaculty(facultyNameOrId, password) {
 }
 
 function setCurrentFaculty(faculty) {
+    inMemoryFaculty = faculty;
+    inMemoryRole = 'faculty';
     try {
         if (typeof sessionStorage !== 'undefined') {
             sessionStorage.setItem(STORAGE_KEY_FACULTY, JSON.stringify(faculty));
@@ -4464,11 +4608,14 @@ function getCurrentFaculty() {
         if (!stored && typeof localStorage !== 'undefined') stored = localStorage.getItem(STORAGE_KEY_FACULTY);
         if (stored) return JSON.parse(stored);
     } catch(e) {}
-    // Default to Prof. Shital Agarwal or Dr. Sonia Aneesh for quick view
-    return FACULTY_LIST[1]; // Dr. Sonia Aneesh
+    if (inMemoryFaculty) return inMemoryFaculty;
+    // Default to Dr. Sonia Aneesh for quick view
+    return FACULTY_LIST[1];
 }
 
 function logoutFaculty() {
+    inMemoryFaculty = null;
+    inMemoryRole = null;
     try {
         if (typeof sessionStorage !== 'undefined') {
             sessionStorage.removeItem(STORAGE_KEY_FACULTY);
@@ -4487,6 +4634,7 @@ function isFacultyRole() {
         if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('apsit_auth_role') === 'faculty') return true;
         if (typeof localStorage !== 'undefined' && localStorage.getItem('apsit_auth_role') === 'faculty') return true;
     } catch(e) {}
+    if (inMemoryRole === 'faculty') return true;
     return false;
 }
 
@@ -4688,6 +4836,13 @@ function updateFacultyProfile(facultyId, updatedData) {
     return { success: true, faculty: faculty, message: 'Faculty profile details updated successfully.' };
 }
 
+if (typeof window !== 'undefined') {
+    window.loadStoredSubjectInfo = loadStoredSubjectInfo;
+    window.saveSubjectInfo = saveSubjectInfo;
+    window.getSubjectInfo = getSubjectInfo;
+    window.updateSubjectConductedLectures = updateSubjectConductedLectures;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         STUDENTS_DATA,
@@ -4697,6 +4852,10 @@ if (typeof module !== 'undefined' && module.exports) {
         getLiveStudents,
         getStudentByMoodleId,
         updateStudentAttendanceByFaculty,
+        updateSubjectConductedLectures,
+        saveSubjectInfo,
+        loadStoredSubjectInfo,
+        getSubjectInfo,
         updateStudentGradeByFaculty,
         authenticateStudent,
         getCurrentUser,

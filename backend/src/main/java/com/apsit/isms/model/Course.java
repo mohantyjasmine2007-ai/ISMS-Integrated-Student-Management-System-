@@ -27,6 +27,12 @@ public class Course {
     @Column(name = "credits")
     private Integer credits = 2;
 
+    @Column(name = "theory_hours")
+    private Integer theoryHours = 0;
+
+    @Column(name = "practical_hours")
+    private Integer practicalHours = 2;
+
     @Column(name = "term_work_marks")
     private Integer termWorkMarks = 50;
 
@@ -71,4 +77,10 @@ public class Course {
 
     public List<Experiment> getExperiments() { return experiments; }
     public void setExperiments(List<Experiment> experiments) { this.experiments = experiments; }
+
+    public Integer getTheoryHours() { return theoryHours; }
+    public void setTheoryHours(Integer theoryHours) { this.theoryHours = theoryHours; }
+
+    public Integer getPracticalHours() { return practicalHours; }
+    public void setPracticalHours(Integer practicalHours) { this.practicalHours = practicalHours; }
 }

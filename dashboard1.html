@@ -918,10 +918,15 @@
                     <!-- Faculty Action & Statistics Row -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <div class="card border-0 shadow-sm p-3 text-center">
+                            <div class="card border-0 shadow-sm p-3 text-center position-relative">
                                 <small class="text-muted text-uppercase fw-semibold">Conducted Lectures</small>
                                 <h3 class="fw-bold text-primary mt-1 mb-0" id="facStatConducted">21</h3>
                                 <small class="text-secondary" id="facStatType">Theory Hours</small>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.75rem;" onclick="openModifyLecturesModal()" title="Modify Conducted Lectures">
+                                        <i class="bi bi-pencil-square me-1"></i> Edit Count
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -965,11 +970,14 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4 text-md-end">
-                                    <button class="btn btn-success fw-semibold btn-sm me-2" onclick="facultyMarkAllPresent()">
-                                        <i class="bi bi-plus-circle me-1"></i> +1 Lecture (All Present)
+                                    <button class="btn btn-outline-primary fw-semibold btn-sm me-2" onclick="openModifyLecturesModal()" title="Modify total lectures taken / conducted">
+                                        <i class="bi bi-pencil-square me-1"></i> Modify Lectures
                                     </button>
-                                    <button class="btn btn-outline-primary fw-semibold btn-sm" onclick="exportFacultyRosterCSV()">
-                                        <i class="bi bi-download me-1"></i> Export CSV
+                                    <button class="btn btn-success fw-semibold btn-sm me-2" onclick="facultyMarkAllPresent()">
+                                        <i class="bi bi-plus-circle me-1"></i> +1 (All Present)
+                                    </button>
+                                    <button class="btn btn-outline-secondary fw-semibold btn-sm" onclick="exportFacultyRosterCSV()">
+                                        <i class="bi bi-download me-1"></i> CSV
                                     </button>
                                 </div>
                             </div>
@@ -5011,6 +5019,92 @@
         </div>
     </div>
 </div>
+
+<!-- Faculty Modify Conducted Lectures Modal -->
+<div class="modal fade" id="modifySubjectLecturesModal" tabindex="-1" aria-labelledby="modifySubjectLecturesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="modifySubjectLecturesModalLabel">
+                    <i class="bi bi-calendar-event me-2"></i> Modify Lectures Taken / Conducted
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Course & Faculty Information Header -->
+                <div class="mb-3 p-3 bg-light rounded border">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="badge bg-primary-subtle text-primary border fw-bold" id="modLecCourseCode">COURSE</span>
+                        <span class="badge bg-secondary" id="modLecCourseType">Theory</span>
+                    </div>
+                    <h6 class="fw-bold mb-1 text-dark" id="modLecCourseName">Course Title</h6>
+                    <small class="text-muted d-block" id="modLecFacultyName">Faculty In-Charge: Prof.</small>
+                    <div class="mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
+                        <span class="small text-muted fw-semibold">Current Recorded Lectures:</span>
+                        <span class="badge bg-primary fs-6 px-3 py-1" id="modLecCurrentCountBadge">21 Hours</span>
+                    </div>
+                </div>
+
+                <form id="modifySubjectLecturesForm" onsubmit="saveModifyLectures(event)">
+                    <!-- Direct Input with Step Buttons -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="modLecInput">
+                            New Total Number of Lectures Taken
+                        </label>
+                        <div class="input-group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="adjustModifyLectures(-5)" title="Decrease by 5">-5</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="adjustModifyLectures(-1)" title="Decrease by 1">-1</button>
+                            <input type="number" class="form-control text-center fw-bold fs-4 text-primary" id="modLecInput" min="1" max="100" required oninput="previewModifyLecturesChange()">
+                            <button type="button" class="btn btn-outline-secondary" onclick="adjustModifyLectures(1)" title="Increase by 1">+1</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="adjustModifyLectures(5)" title="Increase by 5">+5</button>
+                        </div>
+                        <div class="form-text text-muted">Enter the total count of lectures or hours conducted for this subject so far.</div>
+                    </div>
+
+                    <!-- Quick Preset Buttons -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase mb-1">Quick Add Presets</label>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary flex-fill" onclick="quickAddLectures(1)">+1 Lecture</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary flex-fill" onclick="quickAddLectures(2)">+2 Lectures</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary flex-fill" onclick="quickAddLectures(3)">+3 Lectures</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary flex-fill" onclick="quickAddLectures(4)">+4 Lectures</button>
+                        </div>
+                    </div>
+
+                    <!-- Live Impact & Preview Alert -->
+                    <div class="alert alert-info py-2 mb-3 text-center" id="modLecPreviewAlert">
+                        <div class="fw-semibold small" id="modLecPreviewText">No change in total lectures</div>
+                    </div>
+
+                    <!-- Attendance Sync Options -->
+                    <div class="card bg-light border-0 p-3 mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="modLecRecalcCheckbox" checked>
+                            <label class="form-check-label small fw-semibold" for="modLecRecalcCheckbox">
+                                Automatically recalculate all 70 students' attendance percentages &amp; eligibility
+                            </label>
+                        </div>
+                        <div class="form-check" id="modLecMarkPresentContainer" style="display: none;">
+                            <input class="form-check-input" type="checkbox" id="modLecMarkPresentCheckbox">
+                            <label class="form-check-label small text-success fw-semibold" for="modLecMarkPresentCheckbox">
+                                <i class="bi bi-check-all me-1"></i> Mark all 70 students present for the newly added lecture(s)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary fw-semibold px-4" id="modLecSubmitBtn">
+                            <i class="bi bi-check2-circle me-1"></i> Apply &amp; Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Core Data & Framework Scripts -->
 <script src="studentsData.js"></script>

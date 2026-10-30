@@ -62,4 +62,30 @@ public class CourseController {
     public List<Experiment> getExperiments(@PathVariable String courseCode) {
         return experimentRepository.findByCourseCourseCodeOrderByExpNumberAsc(courseCode);
     }
+
+    @PutMapping("/{courseCode}/lectures")
+    public ResponseEntity<?> updateLecturesConducted(
+            @PathVariable String courseCode,
+            @RequestBody Map<String, Object> payload) {
+        Optional<Course> courseOpt = courseRepository.findByCourseCode(courseCode);
+        if (courseOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Course course = courseOpt.get();
+        if (payload.containsKey("lecturesConducted") || payload.containsKey("theoryHours")) {
+            Object raw = payload.containsKey("lecturesConducted") ? payload.get("lecturesConducted") : payload.get("theoryHours");
+            int lectures = Integer.parseInt(raw.toString());
+            course.setTheoryHours(lectures);
+            courseRepository.save(course);
+        }
+
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("courseCode", courseCode);
+        resp.put("lecturesConducted", course.getTheoryHours());
+        resp.put("message", "Lectures conducted updated successfully to " + course.getTheoryHours());
+
+        return ResponseEntity.ok(resp);
+    }
 }

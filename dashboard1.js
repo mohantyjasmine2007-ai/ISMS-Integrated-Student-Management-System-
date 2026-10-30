@@ -536,7 +536,8 @@ let activeFacultyObj = null;
 
     // Render Safe Margin & University Compliance Analytics
     function renderComplianceAnalytics(student) {
-        const conducted = 146;
+        const theoryKeys = ['amt1', 'adsa', 'dbms', 'at', 'oe', 'fsjp', 'evs', 'ed', 'mentoring'];
+        const conducted = theoryKeys.reduce((sum, k) => sum + (typeof SUBJECT_INFO !== 'undefined' && SUBJECT_INFO[k]?.conducted ? SUBJECT_INFO[k].conducted : 0), 0) || 146;
         const attended = student.attendance.theoryTotal.attended;
         const overallPct = student.attendance.overallPct;
 
@@ -961,29 +962,170 @@ let activeFacultyObj = null;
         }
     }
 
+    // Open Modal for Modifying Conducted Lectures for the Course
+    function openModifyLecturesModal() {
+        if (!activeFacultyObj) {
+            alert('Please select or log in to a faculty account first.');
+            return;
+        }
+
+        const subjKey = activeFacultyObj.subjectKey;
+        const subjInfo = (typeof SUBJECT_INFO !== 'undefined' && SUBJECT_INFO[subjKey]) 
+            ? SUBJECT_INFO[subjKey] 
+            : { conducted: 20, code: 'COURSE', type: activeFacultyObj.type };
+
+        const courseNameEl = document.getElementById('modLecCourseName');
+        const courseCodeEl = document.getElementById('modLecCourseCode');
+        const courseTypeEl = document.getElementById('modLecCourseType');
+        const facultyNameEl = document.getElementById('modLecFacultyName');
+        const currentCountBadge = document.getElementById('modLecCurrentCountBadge');
+        const inputEl = document.getElementById('modLecInput');
+        const markPresentCheck = document.getElementById('modLecMarkPresentCheckbox');
+        const recalcCheck = document.getElementById('modLecRecalcCheckbox');
+
+        if (courseNameEl) courseNameEl.textContent = activeFacultyObj.subjectName;
+        if (courseCodeEl) courseCodeEl.textContent = subjInfo.code || 'COURSE';
+        if (courseTypeEl) courseTypeEl.textContent = `${subjInfo.type || activeFacultyObj.type} Course`;
+        if (facultyNameEl) facultyNameEl.textContent = `Faculty In-Charge: ${activeFacultyObj.title} (${activeFacultyObj.email})`;
+        if (currentCountBadge) currentCountBadge.textContent = `${subjInfo.conducted || 20} Hours/Lectures`;
+
+        if (inputEl) {
+            inputEl.value = subjInfo.conducted || 20;
+            inputEl.setAttribute('data-original', subjInfo.conducted || 20);
+        }
+        if (markPresentCheck) markPresentCheck.checked = false;
+        if (recalcCheck) recalcCheck.checked = true;
+
+        previewModifyLecturesChange();
+
+        const modalEl = document.getElementById('modifySubjectLecturesModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modalInstance.show();
+        }
+    }
+
+    function adjustModifyLectures(delta) {
+        const inp = document.getElementById('modLecInput');
+        if (!inp) return;
+        const current = parseInt(inp.value, 10) || 1;
+        inp.value = Math.max(1, current + delta);
+        previewModifyLecturesChange();
+    }
+
+    function quickAddLectures(count) {
+        const inp = document.getElementById('modLecInput');
+        if (!inp) return;
+        const orig = parseInt(inp.getAttribute('data-original'), 10) || parseInt(inp.value, 10) || 1;
+        inp.value = Math.max(1, orig + count);
+        previewModifyLecturesChange();
+    }
+
+    function previewModifyLecturesChange() {
+        const inp = document.getElementById('modLecInput');
+        const previewAlert = document.getElementById('modLecPreviewAlert');
+        const previewText = document.getElementById('modLecPreviewText');
+        const markPresentContainer = document.getElementById('modLecMarkPresentContainer');
+        if (!inp || !previewText) return;
+
+        const original = parseInt(inp.getAttribute('data-original'), 10) || 20;
+        const current = parseInt(inp.value, 10) || 1;
+        const diff = current - original;
+
+        if (diff === 0) {
+            previewText.innerHTML = `<i class="bi bi-info-circle me-1"></i> Current lecture count: <strong>${original}</strong> (No changes applied).`;
+            if (previewAlert) previewAlert.className = 'alert alert-light py-2 mb-3 text-center border';
+            if (markPresentContainer) markPresentContainer.style.display = 'none';
+        } else if (diff > 0) {
+            previewText.innerHTML = `<i class="bi bi-arrow-up-circle-fill text-success me-1"></i> Adding <strong>+${diff}</strong> lecture(s). New Total: <strong>${current}</strong> lectures conducted.`;
+            if (previewAlert) previewAlert.className = 'alert alert-success py-2 mb-3 text-center border border-success-subtle';
+            if (markPresentContainer) {
+                markPresentContainer.style.display = 'block';
+                const label = markPresentContainer.querySelector('label');
+                if (label) label.innerHTML = `<i class="bi bi-check-all me-1"></i> Mark all 70 students present for the <strong>+${diff}</strong> newly added lecture(s)`;
+            }
+        } else {
+            previewText.innerHTML = `<i class="bi bi-arrow-down-circle-fill text-warning me-1"></i> Decreasing by <strong>${Math.abs(diff)}</strong> lecture(s). New Total: <strong>${current}</strong> lectures conducted.`;
+            if (previewAlert) previewAlert.className = 'alert alert-warning py-2 mb-3 text-center border border-warning-subtle';
+            if (markPresentContainer) markPresentContainer.style.display = 'none';
+        }
+    }
+
+    function saveModifyLectures(e) {
+        if (e) e.preventDefault();
+        if (!activeFacultyObj) return;
+
+        const inp = document.getElementById('modLecInput');
+        const recalcCheck = document.getElementById('modLecRecalcCheckbox');
+        const markPresentCheck = document.getElementById('modLecMarkPresentCheckbox');
+
+        const newConducted = parseInt(inp?.value, 10);
+        if (isNaN(newConducted) || newConducted < 1) {
+            alert('Please enter a valid positive number for total conducted lectures (minimum 1).');
+            return;
+        }
+
+        const subjKey = activeFacultyObj.subjectKey;
+        const syncAll = recalcCheck ? recalcCheck.checked : true;
+        const markPresentForDelta = markPresentCheck ? markPresentCheck.checked : false;
+
+        const res = updateSubjectConductedLectures(subjKey, newConducted, syncAll, markPresentForDelta);
+        if (!res.success) {
+            alert(res.message || 'Failed to update lectures.');
+            return;
+        }
+
+        // Close modal
+        const modalEl = document.getElementById('modifySubjectLecturesModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            const instance = bootstrap.Modal.getInstance(modalEl);
+            if (instance) instance.hide();
+        }
+
+        // Refresh views
+        updateFacultyHeaderInfo();
+        renderFacultyRoster();
+        applyFacultyData(activeFacultyObj);
+
+        // Notify React components & other tabs to re-render
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('facultyUpdated'));
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Sync student view if viewing active user
+        const curUser = getCurrentUser();
+        if (curUser) {
+            const freshStudent = getStudentByMoodleId(curUser.moodleId);
+            if (freshStudent) applyStudentData(freshStudent);
+        }
+
+        alert(`Successfully updated conducted lectures for ${activeFacultyObj.subjectName} to ${newConducted}!\nAll student rosters and attendance percentages have been recalculated.`);
+    }
+
     // Faculty Action: Mark All Present (+1 Lecture)
     function facultyMarkAllPresent() {
         if (!activeFacultyObj) return;
         const confirmed = confirm(`Conducted 1 new lecture for ${activeFacultyObj.subjectName} and mark ALL 70 students present?`);
         if (!confirmed) return;
 
-        const students = getLiveStudents();
         const subjKey = activeFacultyObj.subjectKey;
         const oldConducted = (SUBJECT_INFO[subjKey]?.conducted || 20);
         const newConducted = oldConducted + 1;
-        if (SUBJECT_INFO[subjKey]) SUBJECT_INFO[subjKey].conducted = newConducted;
 
-        students.forEach(s => {
-            const currentAtt = s.attendance[subjKey] ? s.attendance[subjKey].attended : Math.round(oldConducted * 0.8);
-            updateStudentAttendanceByFaculty(s.moodleId, subjKey, currentAtt + 1, newConducted);
-        });
-
-        updateFacultyHeaderInfo();
-        renderFacultyRoster();
-        const cur = getCurrentUser();
-        if (cur) applyStudentData(getStudentByMoodleId(cur.moodleId));
-
-        alert(`Successfully conducted lecture #${newConducted} for ${activeFacultyObj.subjectName}! All student records updated.`);
+        const res = updateSubjectConductedLectures(subjKey, newConducted, true, true);
+        if (res.success) {
+            updateFacultyHeaderInfo();
+            renderFacultyRoster();
+            applyFacultyData(activeFacultyObj);
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new Event('facultyUpdated'));
+                window.dispatchEvent(new Event('storage'));
+            }
+            const cur = getCurrentUser();
+            if (cur) applyStudentData(getStudentByMoodleId(cur.moodleId));
+            alert(`Successfully conducted lecture #${newConducted} for ${activeFacultyObj.subjectName}! All student records updated.`);
+        }
     }
 
     // Export CSV
@@ -1846,4 +1988,10 @@ let activeFacultyObj = null;
     window.renderSupportTickets = renderSupportTickets;
     window.handleSupportTicketSubmit = handleSupportTicketSubmit;
     window.filterHelpFaqs = filterHelpFaqs;
+    window.openModifyLecturesModal = openModifyLecturesModal;
+    window.adjustModifyLectures = adjustModifyLectures;
+    window.quickAddLectures = quickAddLectures;
+    window.previewModifyLecturesChange = previewModifyLecturesChange;
+    window.saveModifyLectures = saveModifyLectures;
+    window.facultyMarkAllPresent = facultyMarkAllPresent;
 
