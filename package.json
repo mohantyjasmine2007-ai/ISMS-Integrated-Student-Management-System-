@@ -1,4 +1,9 @@
 {
+  "name": "isms-integrated-student-management-system",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node scratch/server.js"
+  },
   "dependencies": {
     "puppeteer-core": "^25.13.0"
   }
