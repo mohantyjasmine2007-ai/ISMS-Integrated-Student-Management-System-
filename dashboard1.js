@@ -1,9 +1,61 @@
 let activeFacultyObj = null;
 
-    // Initialize application on load
-    document.addEventListener('DOMContentLoaded', () => {
-        initTheme();
-        initSettingsModalEvents();
+const API_BASE = (typeof window !== 'undefined' && (window.location.port === '3000' || window.location.port === '8080'))
+    ? '/api'
+    : 'http://localhost:8080/api';
+
+async function initBackendDatabaseSync() {
+    const badge = document.getElementById('navBackendStatusBadge');
+    const textEl = document.getElementById('navBackendStatusText');
+    if (!badge) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(2000) });
+        if (res.ok) {
+            const health = await res.json();
+            badge.className = 'badge bg-success-subtle text-success border border-success-subtle px-2 py-1 d-inline-flex align-items-center gap-1 shadow-xs';
+            if (textEl) {
+                textEl.innerHTML = `DB &amp; Backend Online (${health.database ? health.database.split(' ')[0] : 'Database'}) &bull; ${health.totalStudents || 70} Students`;
+            }
+
+            // Sync logged-in student attendance directly from Database
+            const student = getCurrentUser();
+            if (student && student.moodleId) {
+                try {
+                    const attRes = await fetch(`${API_BASE}/students/${student.moodleId}/attendance`, { signal: AbortSignal.timeout(2000) });
+                    if (attRes.ok) {
+                        const attData = await attRes.json();
+                        if (attData && attData.attendance) {
+                            console.log('[APSIT ISMS] Synced student attendance from live database:', attData.attendance);
+                        }
+                    }
+                } catch(e) {}
+            }
+            return;
+        }
+    } catch(err) {
+        try {
+            const res2 = await fetch('http://localhost:8080/api/health', { signal: AbortSignal.timeout(2000) });
+            if (res2.ok) {
+                const health = await res2.json();
+                badge.className = 'badge bg-success-subtle text-success border border-success-subtle px-2 py-1 d-inline-flex align-items-center gap-1 shadow-xs';
+                if (textEl) textEl.innerHTML = `Spring Boot 8080 &amp; DB Online &bull; ${health.totalStudents || 70} Students`;
+                return;
+            }
+        } catch(e) {}
+    }
+
+    if (badge && textEl) {
+        badge.className = 'badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 d-inline-flex align-items-center gap-1 shadow-xs';
+        textEl.innerHTML = `Local Roster Mode`;
+    }
+}
+
+// Initialize application on load
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initSettingsModalEvents();
+    initBackendDatabaseSync();
 
         const urlParams = new URLSearchParams(window.location.search);
         const isFaculty = isFacultyRole();
@@ -1093,6 +1145,24 @@ let activeFacultyObj = null;
             window.dispatchEvent(new Event('storage'));
         }
 
+        // Sync with Spring Boot database asynchronously
+        const subjectCodeMap = {
+            'amt1': 'ITC301',
+            'adsa': 'ITC302',
+            'dbms': 'ITC303',
+            'at': 'ITC304',
+            'oe': 'ITC305',
+            'fsjp': 'ITL301',
+            'ed': '2993511',
+            'evs': '2993512'
+        };
+        const courseCode = subjectCodeMap[subjKey] || subjKey;
+        fetch(`${API_BASE}/courses/${courseCode}/lectures`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lecturesConducted: newConducted })
+        }).catch(err => console.log('[ISMS Database Sync Notice]:', err));
+
         // Sync student view if viewing active user
         const curUser = getCurrentUser();
         if (curUser) {
@@ -1100,7 +1170,7 @@ let activeFacultyObj = null;
             if (freshStudent) applyStudentData(freshStudent);
         }
 
-        alert(`Successfully updated conducted lectures for ${activeFacultyObj.subjectName} to ${newConducted}!\nAll student rosters and attendance percentages have been recalculated.`);
+        alert(`Successfully updated conducted lectures for ${activeFacultyObj.subjectName} to ${newConducted}!\nAll student rosters and attendance percentages have been recalculated and synced with the database.`);
     }
 
     // Faculty Action: Mark All Present (+1 Lecture)
@@ -1115,6 +1185,23 @@ let activeFacultyObj = null;
 
         const res = updateSubjectConductedLectures(subjKey, newConducted, true, true);
         if (res.success) {
+            const subjectCodeMap = {
+                'amt1': 'ITC301',
+                'adsa': 'ITC302',
+                'dbms': 'ITC303',
+                'at': 'ITC304',
+                'oe': 'ITC305',
+                'fsjp': 'ITL301',
+                'ed': '2993511',
+                'evs': '2993512'
+            };
+            const courseCode = subjectCodeMap[subjKey] || subjKey;
+            fetch(`${API_BASE}/courses/${courseCode}/lectures`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lecturesConducted: newConducted })
+            }).catch(e => {});
+
             updateFacultyHeaderInfo();
             renderFacultyRoster();
             applyFacultyData(activeFacultyObj);

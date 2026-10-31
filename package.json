@@ -2,7 +2,11 @@
   "name": "isms-integrated-student-management-system",
   "version": "1.0.0",
   "scripts": {
-    "start": "node scratch/server.js"
+    "start": "node scratch/server.js",
+    "backend": "mvnw.cmd spring-boot:run",
+    "frontend": "node scratch/server.js",
+    "fullstack": "node scratch/run_fullstack.js",
+    "build": "mvnw.cmd compile"
   },
   "dependencies": {
     "puppeteer-core": "^25.13.0"

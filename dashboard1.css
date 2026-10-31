@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
+.leadership-mini-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.leadership-mini-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
 :root {
     --app-bg: #f5f7fb;
     --app-surface: #ffffff;

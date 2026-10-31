@@ -1,5 +1,6 @@
 package com.apsit.isms.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +38,11 @@ public class Course {
     private Integer termWorkMarks = 50;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<SyllabusModule> modules = new ArrayList<>();
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Experiment> experiments = new ArrayList<>();
 
     public Course() {}
